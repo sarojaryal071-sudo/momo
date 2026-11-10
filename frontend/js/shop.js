@@ -1,6 +1,7 @@
 // Shop page: quantity controls and add to cart. The page works as plain HTML without this script.
 import './main.js';
 import { getCart, updateHeaderCount } from './cart.js';
+import { updateCheckoutBar } from './checkout-bar.js';
 import { siteConfig } from './site-config.js';
 
 const max = siteConfig.limits.maxQtyPerItem;
@@ -20,8 +21,22 @@ document.addEventListener('click', (e) => {
     const ok = getCart().add(item.dataset.slug, qty);
     note.textContent = ok ? `Added ${qty} x ${name} to your cart.` : 'Your cart is full. Remove something first.';
     updateHeaderCount();
+    updateCheckoutBar();
+    flashAdded(e.target.closest('[data-add-to-cart]'));
   }
 });
+
+// The button says "Added" for a moment. The live region under it announces the details.
+function flashAdded(btn) {
+  const label = btn.firstChild;
+  btn.dataset.label ??= label.nodeValue;
+  label.nodeValue = 'Added';
+  clearTimeout(btn.flashTimer);
+  btn.flashTimer = setTimeout(() => { label.nodeValue = btn.dataset.label; }, siteConfig.addedFlashMs);
+  const note = btn.parentElement.querySelector('[data-added-note]'); // keeps the card short once the announcement has been made
+  clearTimeout(note.clearTimer);
+  note.clearTimer = setTimeout(() => { note.textContent = ''; }, siteConfig.addedFlashMs * 3);
+}
 document.addEventListener('change', (e) => {
   if (e.target.matches('[data-qty-input]')) e.target.value = clampQty(e.target.value);
 });

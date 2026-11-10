@@ -68,8 +68,15 @@
   --band-pad: clamp(3rem, 1.8rem + 5vw, 6rem);
   --band-pad-quiet: clamp(4rem, 2.5rem + 8vw, 9rem);
   --card-min: 14rem;
-  --card-max: 22rem;
-  --card-max-wide: 16rem;
+  --card-max: 16rem;
+  --card-thumb: clamp(6.5rem, 28vw, 9rem);
+  --photo-small: 16rem;
+  --section-gap: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
+  --menu-row: 3.25rem;
+  --z-menu: 20;
+  --z-bar: 30;
+  --checkout-bar-space: 5rem;
+  --bp-tablet: 48em; /* documentation only: CSS variables cannot be used inside media queries */
   --tile-wide: 1.6fr;
   --media-max: 36rem;
   --photo-max: 40rem;
@@ -112,7 +119,8 @@
   --ratio-photo: 3 / 2;
 }
 
-/* Media queries: none are defined. Layout changes use intrinsic grids and container queries.
-   If one is ever truly needed, use at most two widths, in em units, and list them here
-   (CSS variables cannot be used inside media queries):
-   - (none) */
+/* Breakpoints. Layout is intrinsic and uses container queries where it can. One media query is defined,
+   at the tablet width (--bp-tablet, 48em). CSS variables cannot be used inside media queries, so the value is
+   repeated here and nowhere else in the CSS but the rule itself. Used for: the header (phone menu below it,
+   inline nav from it) and the product cards (compact rows below it, vertical grid cards from it).
+   - (min-width: 48em) */

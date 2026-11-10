@@ -6,8 +6,9 @@ export const KIND_LABELS = { pack: 'Momo', addon: 'Sauces' }; // filter chip lab
 
 export const siteConfig = {
   backend: 'mock', // 'mock' or 'supabase' (Step 3)
-  whatsappNumber: '447413069241', // TODO: confirm with owner that this is also her WhatsApp number
+  whatsappNumber: '447413069241', // also her phone number; the same digits are in the HTML links and scripts/build.mjs
   currency: 'GBP',
+  socialLinks: { instagram: '' }, // the build fills the footer and menu Instagram line from this; empty shows a visible placeholder
   supabaseUrl: '',
   supabaseAnonKey: '',
   limits: {
@@ -23,5 +24,6 @@ export const siteConfig = {
   kindLabels: KIND_LABELS,
   gatewayTimeoutMs: 8000,
   autoOpenDelayMs: 1500,
+  addedFlashMs: 1600, // how long the Add to cart button says "Added"
   mock: { orderNumber: 'SS-TEST-01', delayMs: 400 },
 };

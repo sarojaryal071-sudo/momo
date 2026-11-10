@@ -1,4 +1,5 @@
 // Cart page: lines, totals, optional details, confirm. Customer text is only ever written with textContent.
+import './menu.js';
 import { buildLines, cartTotal, formatPrice, getCart, updateHeaderCount } from './cart.js';
 import { loadPickup, loadProducts } from './data.js';
 import { submitOrder } from './order-gateway.js';

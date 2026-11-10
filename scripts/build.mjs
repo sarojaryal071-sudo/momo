@@ -6,6 +6,7 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fillRegion, merge, renderRegion } from './lib/render.mjs';
 import { hasPlaceholderData, launchBlockers } from './lib/validate.mjs';
+import { siteConfig } from '../frontend/js/site-config.js';
 
 const root = resolve(fileURLToPath(import.meta.url), '..', '..');
 const dist = join(root, 'dist');
@@ -15,6 +16,8 @@ const indexable = process.env.SITE_INDEXABLE === 'true';
 const useSeed = process.argv.includes('--seed') || !process.env.SUPABASE_URL;
 
 // Named constants (D-022).
+const INSTAGRAM_GLYPH = '<svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7 h.01"/></svg>';
+const INSTAGRAM_RE = /<!-- build:instagram -->[\s\S]*?<!-- \/build:instagram -->/g;
 const NOINDEX = '<meta name="robots" content="noindex">';
 const OG_IMAGE = 'assets/img/placeholder-og.webp';
 const ORG = { name: 'Steam & Spice', telephone: '+44 7413 069241' };
@@ -75,6 +78,9 @@ for (const file of htmlFiles) {
   let html = await readFile(file, 'utf8');
 
   if (!isAdmin) {
+    // Instagram line: a real link once the constant is set, otherwise the visible placeholder already in the HTML.
+    const ig = siteConfig.socialLinks.instagram;
+    if (ig) html = html.replace(INSTAGRAM_RE, `<!-- build:instagram --><a class="contact-item" href="${escAttr(ig)}" rel="noopener">${INSTAGRAM_GLYPH}Instagram</a><!-- /build:instagram -->`);
     if (useSeed && products.length) html = fillRegion(html, renderRegion(page === 'index' ? 'index' : 'shop', products, siteUrl));
     // SEO region: canonical, og:url, og:image, and Organization data on the home page.
     const seo = [

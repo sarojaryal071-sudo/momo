@@ -30,9 +30,12 @@ h2 { letter-spacing: var(--tracking-display); }
 .rule::after { content: ""; display: block; inline-size: var(--space-2xl); block-size: var(--ring-width); margin-block-start: var(--space-2xs); background: var(--copper); border-radius: var(--radius); }
 .centered .rule::after { margin-inline: auto; }
 
-/* Bands */
-.band { padding-block: var(--band-pad); }
-.band-quiet { padding-block: var(--band-pad-quiet); }
+/* Vertical rhythm: one gap between major sections, so no two coloured blocks touch. Coloured bands pad their own content. */
+.flow > section + section { margin-block-start: var(--section-gap); }
+.flow > .page-head + section { margin-block-start: 0; }
+.band { padding-block: 0; }
+.band-quiet { padding-block: var(--space-xl); }
+.band-emerald, .band-peach-tint { padding-block: var(--band-pad); }
 .band-emerald { background: var(--emerald); color: var(--white); }
 .band-emerald h2 { color: var(--white); }
 .band-peach-tint { background: var(--peach-tint); }
@@ -82,7 +85,8 @@ h2 { letter-spacing: var(--tracking-display); }
 .tile-emerald h2 { color: var(--white); }
 .tile-peach { background: var(--peach); color: var(--charcoal); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-m); align-items: center; }
 .tile-peach h2 { color: var(--emerald); }
-.tile-peach img { display: block; inline-size: min(100%, 16rem); block-size: auto; justify-self: center; }
+.tile-peach img { display: block; inline-size: min(100%, var(--photo-small)); block-size: auto; justify-self: center; }
+.sauce-photo { aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-lg); }
 .tile .btn-secondary { margin-block-start: var(--space-2xs); }
 @container (min-width: 44rem) {
   .tiles { grid-template-columns: minmax(0, 1fr) minmax(0, var(--tile-wide)); }
@@ -125,6 +129,5 @@ h2 { letter-spacing: var(--tracking-display); }
   .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
 }
 
-.band-tiles { padding-block: var(--band-pad) 0; }
 .band-shop { padding-block: 0 var(--band-pad); }
 .curious { margin-block-start: var(--space-l); }

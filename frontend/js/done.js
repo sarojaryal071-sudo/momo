@@ -1,4 +1,5 @@
 // Done page: order number and summary from sessionStorage, plus one automatic WhatsApp open.
+import './menu.js';
 import { formatPrice, updateHeaderCount } from './cart.js';
 import { siteConfig } from './site-config.js';
 

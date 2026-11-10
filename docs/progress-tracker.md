@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1d done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
+- Current step: **Step 1e done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -71,14 +71,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1e — Contact links, sauce corrections and mobile fixes (D-029, D-030)
 
-- [ ] Mobile header: one line with menu button; cart icon always visible
-- [ ] Compact product cards on phones
-- [ ] "Added" state and sticky checkout bar
-- [ ] Home section spacing
-- [ ] Phone, WhatsApp and Instagram links (placeholder for Instagram)
-- [ ] Sauce tile copy and alt text corrected
-- [ ] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist
-- [ ] Verified, merged to `main`, deploy confirmed
+- [x] Mobile header: one line with menu button; cart icon always visible — HASH, 53 px single line at 360 px on all five pages; cart icon and badge outside the menu; menu button opens, closes on Escape, link tap and outside tap, focus moves in and back; wide header unchanged
+- [x] Compact product cards on phones — HASH, image-left rows (about 190 px) below 48em, vertical grid cards from 48em; classes and data hooks unchanged
+- [x] "Added" state and sticky checkout bar — HASH, button says Added for 1.6 s, live region announces it; fixed bar "N items · £X" (count only if a price is unknown) with Go to checkout; absent on cart and done
+- [x] Home section spacing — HASH, one --section-gap between sections via .flow; coloured bands pad their own content; sauce tile no longer touches Made together
+- [x] Phone, WhatsApp and Instagram links (placeholder for Instagram) — HASH, wa.me/447413069241 in menu, footer, home ordering row, cart and done; Instagram line filled by build.mjs from siteConfig.socialLinks.instagram (empty = data-todo placeholder; tested with a temporary value)
+- [x] Sauce tile copy and alt text corrected — HASH, "The sauces", copy from brand-direction item 4; no tomato claims left (grep clean); shop photo alt says red sauce
+- [x] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist — HASH, framed rounded photo-sauce.webp, max 16rem; old red cutout-chutney files deleted; cutout-chutney (yellow) and cutout-hot-sauce were NOT present after the merge, so sauce cards keep drawn placeholders
+- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -154,6 +154,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `scripts/build.mjs` | Build v1: copy to `dist/`, noindex, sitemap, robots | 0 |
 | `.github/workflows/deploy.yml` | Pages deploy on push to `main` and manual | 0 |
 | `frontend/{index,shop,how-to-cook}.html` | The three public pages, hand-written, shared header/footer copied in | 1 |
+| `frontend/js/menu.js`, `checkout-bar.js`, `js-flag.js` | Phone menu, sticky checkout bar, early `js` class (no flash) | 1e |
 | `frontend/css/motifs.css` | Motif masks, hero panel, trust row, tiles, Made together, fold flow, ordering row, steam, reveal | 1b-1d |
 | `frontend/assets/img/` | AI mood images per `docs/design/image-manifest.md` (cut-outs, two pack shots, two scenes) plus `placeholder-og.webp`; replace with real photos later | 1d |
 | `frontend/assets/svg/` | fold, ridge, steam, kraft-tag, arrow motifs; art-momo and art-bowl placeholder drawings | 1d |
@@ -183,6 +184,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 1e: `npm test` 23 pass, `npm run build` passes. At 360 px all five pages: header 53 px (one line), no horizontal overflow, cart icon visible; menu opens/closes by button, Escape, link tap and outside tap, focus moves in and returns, tab order skip > brand > cart > menu. Shop: compact rows (about 190 px), Added state for 1.6 s, bar "1 item" then "2 items · £11.11" linking to cart.html; bar visible on home and how-to-cook, absent on cart and done. Instagram: placeholder with data-todo (2 places per page); with a temporary URL (reverted) both became real links with rel=noopener. `grep -ri tomato frontend` finds nothing. Phone number is in: cart.html, done.html, how-to-cook.html, index.html, shop.html, frontend/js/site-config.js, scripts/build.mjs, tests/whatsapp.test.mjs. Sauce images present after merge: photo-sauce.webp only. Kept the button label "Confirm order" on the cart page (the step says keep it as it is today).
 - 2026-11-10, step 1d: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow; CLS 0.0000; JS off shows all home content and all 12 test cards, chips and search hidden; reduced motion stops steam and shows all sections; focus rings emerald on white, peach on emerald. Shop with the 2 real products: chips yes (2 kinds), no search; temporary 12-item set (deleted): chips and search appear, chip and search filtering work, a no-match shows the message; 0 products shows "New items are coming soon."; 1 product shows no chips. `?kind=addon` preselects Sauces. Home transfer after scrolling the whole page: 230.7 KB raw / 197 KB gzip over 22 requests (images 173 KB, font 27 KB); above the fold only about 105 KB. Fixed a Step 2 bug: shop.js did not update the header count on load (now imports main.js).
 - 2026-11-10, step 1c: `npm test` 23 pass, `npm run build` passes. Home, shop, how-to-cook, cart, done at 320, 360 and 1280 px (home also at 768 and 1600): no horizontal overflow; headline on two lines at every width; hero image overlaps the charcoal band; CLS 0.0000; JS off shows all home content; reduced motion stops steam and shows all sections; cart badge updates (1 item). Home transfer about 94.7 KB raw / 70.4 KB gzip over 17 requests (cut-out placeholders 31 KB of that). Contrast: charcoal/white 16.06, chutney/white 5.98, white/chutney 5.98, charcoal/turmeric 7.12, cream/charcoal 13.57, white/clay 5.82, clay/white 5.82, charcoal/cream 13.57; chutney button against turmeric edge 2.65 (text inside passes). Focus ring checked on white (charcoal), turmeric (charcoal), charcoal board (cream).
 - 2026-11-10, step 1b: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow. Home CLS 0.0000; font loads; home transfer 65.9 KB raw / about 42.9 KB gzip over 17 requests (font 27.0 KB, SVGs 1.6 KB, CSS 20.9 KB raw). JS off: all home content present. Reduced motion: animations off, content visible. Focus ring visible on every band after switching it to charcoal (cream on dark). Contrast: cream/charcoal 13.57, charcoal/turmeric 7.12, cream-light/clay 5.31, chutney/cream 5.05, clay/cream 4.92, cream-light/chutney 5.45. Lighthouse not run (owner uses PageSpeed Insights).
