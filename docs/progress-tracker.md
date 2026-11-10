@@ -48,6 +48,16 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Motion (two effects, reduced-motion safe) — 2ec61ed, steam drift + scroll-driven fade-in; both off under reduced motion
 - [x] Verified and merged to `main` — 2ec61ed, see log; deploy status recorded in the log
 
+## Step 1c — Rebuild the look to the approved reference (D-026)
+
+- [ ] White page, cream demoted, grain removed
+- [ ] Header and footer to the reference
+- [ ] Hero band with overlapping cut-out slot and ridge line
+- [ ] Made together band, steps, chutney band, statement, chalkboard with kraft tag, ordering
+- [ ] Other pages aligned
+- [ ] Cut-out image slots with honest placeholders
+- [ ] Verified, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
