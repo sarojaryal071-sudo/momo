@@ -27,14 +27,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1 — Static pages
 
-- [x] Fluid tokens (D-022): `theme.css` type, space, layout and control scales; `base.css` token-only — COMMIT, 360 px and 1280 px render fine, no horizontal overflow
-- [x] Shared header and footer, `components.css` — COMMIT
-- [x] `index.html` (hero, taste-of-home passage, packs, how ordering works, contact) — COMMIT
-- [x] `shop.html` with `<!-- build:products -->` region and chalkboard menu panel — COMMIT
-- [x] `how-to-cook.html` with `TODO:` for steam time — COMMIT
-- [x] `products.seed.json` and `content/products/<slug>.json` for the two momo packs — COMMIT
-- [x] Placeholder images in place; list of image slots delivered in the report — COMMIT
-- [x] SEO basics on every page, JSON-LD, build validations (title, description, canonical, one `h1`) — COMMIT
+- [x] Fluid tokens (D-022): `theme.css` type, space, layout and control scales; `base.css` token-only — 40f5af1, 360 px and 1280 px render fine, no horizontal overflow
+- [x] Shared header and footer, `components.css` — 40f5af1
+- [x] `index.html` (hero, taste-of-home passage, packs, how ordering works, contact) — 40f5af1
+- [x] `shop.html` with `<!-- build:products -->` region and chalkboard menu panel — 40f5af1
+- [x] `how-to-cook.html` with `TODO:` for steam time — 40f5af1
+- [x] `products.seed.json` and `content/products/<slug>.json` for the two momo packs — 40f5af1
+- [x] Placeholder images in place; list of image slots delivered in the report — 40f5af1
+- [x] SEO basics on every page, JSON-LD, build validations (title, description, canonical, one `h1`) — 40f5af1
 - [ ] Verified (partial: local only): 360 px and desktop, source shows content without JS, Lighthouse, contrast ratios
 
 ## Step 2 — Cart and order flow (mock)
