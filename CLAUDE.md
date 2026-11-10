@@ -30,7 +30,7 @@ The planning chat (claude.ai) never writes code. It writes these docs and instru
 - **Content must exist in the HTML.** Everything Google should index is real HTML in the file. JavaScript may enhance a page, never create its main content.
 - **Money is integer pence** everywhere in code and the database. Show as £10 or £10.50.
 - **No secrets in the repo.** The repo is public. The Supabase URL and anon key are allowed. The service-role key, GitHub tokens, email API keys and the owner's email never are.
-- **Never invent facts.** No cooking times, allergen details, reviews, ratings, addresses, hygiene ratings, awards, or story details. Where content is missing, put a visible `TODO:` placeholder, mark it `data-todo`, and list it in your report.
+- **Never invent facts.** No cooking times, allergen details, reviews, ratings, addresses, hygiene ratings, awards, or story details. Where content is missing, put a visible `TODO:` placeholder, mark it `data-todo`, and list it in your report. **Exception (decision D-023):** for **prices, steam time and pickup hours only**, use obvious sample values instead, mark them `data-placeholder` (or `"placeholder": true` in seed data) with a visible "sample" label, and list them in your report. Allergens, storage and food-safety advice, pickup location and legal or health wording always stay `TODO:`.
 - **Do not look AI-generated.** See the UI rulebook: no purple, no gradients, no emoji icons, no rows of identical rounded cards.
 - **UK English only.** One language. Currency £.
 - **Relative paths** or paths built from `SITE_URL`. The site lives under `/momo/` now and moves to a custom domain later.
