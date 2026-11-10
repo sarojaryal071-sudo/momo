@@ -40,7 +40,7 @@ In `mock` mode (before the backend exists) the gateway returns a clearly fake nu
 
 ## 4. WhatsApp rules
 
-- Link: `https://wa.me/<number>?text=<encodeURIComponent(message)>`. The number is digits only in international format, for example `447413069241`. Confirm with the owner that this is the WhatsApp number.
+- Link: `https://wa.me/<number>?text=<encodeURIComponent(message)>`. The number is digits only in international format, for example `447413069241`. Confirmed by the owner as the same number as the public phone (D-030).
 - A website cannot send the message. Never write "sent" or "your order has been sent via WhatsApp." Write "Tap send in WhatsApp to confirm."
 - Navigate in the same tab (`location.href`) after the gateway returns. Opening a new window after an async call is often blocked by browsers. The done page always has a visible button as the fallback.
 - Message layout (plain text, UK English):

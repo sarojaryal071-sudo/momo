@@ -45,7 +45,7 @@ Items marked [CONFIRM] must not appear as plain text until the owner confirms; u
 1. **Hero.** H1: "Taste like Nepal." Subline: "Homemade frozen momo, ready to steam at home. Pickup in the UK." Button: "See the momo".
 2. **Made together.** H2: "Made together." Text: "In Himalayan homes, momo is often made by family and friends, folding side by side." Then: "We make ours at home, then freeze them, so you can have that table wherever you are."
 3. **Buy. Steam. Eat.** (D-029) The momo arrive already folded and filled and frozen, so the customer only buys, steams and eats. Three short steps: "Order online and pick up." "Steam them at home." "Eat them hot." [TODO: steam time, and whether steaming straight from frozen is right, from her] Never describe folding or filling as something the customer does.
-4. **The chutney.** "Momo is traditionally served with a spicy tomato dip." "Add our spicy tomato chutney to your order." [TODO: her own words describing the flavour]
+4. **The sauces.** "Momo is traditionally served with a spicy dip." "Add our chutney or hot sauce to your order." Her chutney is turmeric yellow and her hot sauce is red with chilli seeds (D-030): describe only what you can see, not the taste or ingredients. [TODO: her own words describing the flavours]
 5. **Wherever home is now.** "For anyone far from home, a bag of momo in the freezer is a little closer." (Quiet, full-width, large type.)
 6. **For the curious.** "New to momo? Think of a dumpling, steamed until soft, with a sauce that wakes everything up."
 7. **The packs.** The two 40-piece packs on the chalkboard panel, with prices.
