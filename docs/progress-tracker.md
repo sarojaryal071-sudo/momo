@@ -80,6 +80,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist — b0c3ec2, framed rounded photo-sauce.webp, max 16rem; old red cutout-chutney files deleted; cutout-chutney (yellow) and cutout-hot-sauce were NOT present after the merge, so sauce cards keep drawn placeholders
 - [x] Verified, merged to `main`, deploy confirmed — b0c3ec2, see log
 
+## Step 1f — Product details window, options, stock and custom lead time (D-031)
+
+- [ ] Small cards with Add and compact stepper
+- [ ] Details dialog (info, options, stock line, live total, allergy line)
+- [ ] Seed data for options and stock; constants `LOW_STOCK_THRESHOLD` and `CUSTOM_MIN_LEAD_HOURS`
+- [ ] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options
+- [ ] Verified, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
