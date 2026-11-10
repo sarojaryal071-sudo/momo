@@ -30,7 +30,8 @@ h1, h2, h3 {
   font-family: var(--font-head);
   line-height: var(--line-height-head);
   margin: 0 0 var(--space-xs);
-  font-weight: 700;
+  font-weight: 400;
+  font-synthesis: none;
 }
 h1 { font-size: var(--step-5); }
 h2 { font-size: var(--step-3); }
@@ -43,7 +44,9 @@ img { max-inline-size: 100%; height: auto; }
 .wrap { width: min(100% - 2 * var(--gutter), var(--wrap)); margin-inline: auto; }
 .section { padding-block: var(--space-xl); }
 
-:focus-visible { outline: var(--ring-width) solid var(--turmeric); outline-offset: var(--ring-offset); }
+:focus-visible { outline: var(--ring-width) solid var(--ring-color); outline-offset: var(--ring-offset); }
+
+.band-dark :focus-visible, .site-footer :focus-visible, .menu-board :focus-visible { outline-color: var(--ring-color-on-dark); }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; overflow: hidden;

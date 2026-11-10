@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 2 — built and verified locally on the mock gateway; deployed-URL checks pending (Step 0 live deploy and Step 1 Lighthouse still waiting on owner)**
+- Current step: **Step 1b done and merged to `main`; Steps 0 to 2 live-URL checks still open**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -39,14 +39,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1b — Visual upgrade ("Made together", D-024, D-025)
 
-- [ ] Fluid tokens extended
-- [ ] Display font self-hosted with licence
-- [ ] SVG motifs (fold, ridge line, steam, kraft tag)
-- [ ] Home page rebuilt to the copy spine
-- [ ] Shop, how to cook, cart, done, header and footer updated
-- [ ] Image slots wired
-- [ ] Motion (two effects, reduced-motion safe)
-- [ ] Verified and merged to `main`
+- [x] Fluid tokens extended — HASH, theme.css: display step, band/ridge/fold/steam/numeral/tag/motion tokens, ring colours
+- [x] Display font self-hosted with licence — HASH, Young Serif (SIL OFL), 26,992 bytes woff2 + OFL text, swap, Times-matched fallback (size-adjust 120.6%)
+- [x] SVG motifs (fold, ridge line, steam, kraft tag) — HASH, fold, ridge, steam, kraft-tag: 1,554 bytes total, used as masks on currentColor
+- [x] Home page rebuilt to the copy spine — HASH, exact brand-direction strings; [CONFIRM] items are `data-todo`
+- [x] Shop, how to cook, cart, done, header and footer updated — HASH, fold-bordered chalkboard, kraft price tags, ridge above footer, wordmark; behaviour and markup hooks unchanged
+- [x] Image slots wired — HASH, srcset + fixed aspect-ratio + width/height; placeholders kept
+- [x] Motion (two effects, reduced-motion safe) — HASH, steam drift + scroll-driven fade-in; both off under reduced motion
+- [x] Verified and merged to `main` — HASH, see log; deploy status recorded in the log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -122,10 +122,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `scripts/build.mjs` | Build v1: copy to `dist/`, noindex, sitemap, robots | 0 |
 | `.github/workflows/deploy.yml` | Pages deploy on push to `main` and manual | 0 |
 | `frontend/{index,shop,how-to-cook}.html` | The three public pages, hand-written, shared header/footer copied in | 1 |
+| `frontend/css/motifs.css` | Step 1b: motif masks, bands, display type, steam, fold steps, reveal | 1b |
+| `frontend/assets/fonts/` | Young Serif latin woff2 (27 KB) and its OFL licence | 1b |
+| `frontend/assets/svg/` | fold, ridge, steam, kraft-tag SVG motifs | 1b |
 | `frontend/css/components.css` | Buttons, header, footer, forms, notice, chalkboard, layouts; tokens only | 1 |
 | `frontend/data/products.seed.json`, `frontend/content/products/*.json` | Seed products and momo copy | 1 |
 | `frontend/assets/img/placeholder-*.webp`, `assets/icons/favicon.svg` | Flat-colour placeholder images and favicon | 1 |
-| `scripts/lib/render.mjs` | Renders the `build:products` regions and Product JSON-LD | 1 |
+| `scripts/lib/render.mjs` | Renders the `build:products` regions (home: chalkboard rows with kraft price tags) and Product JSON-LD | 1, 1b |
 | `tests/regions.test.mjs` | Checks the source fallback regions match the seed | 1 |
 | `frontend/cart.html`, `frontend/done.html` | Cart with order form; confirmation with WhatsApp button; both `noindex` | 2 |
 | `frontend/js/site-config.js` | Backend choice, WhatsApp number, limits, timeouts (single config place) | 2 |
@@ -146,6 +149,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 1b: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow. Home CLS 0.0000; font loads; home transfer 65.9 KB raw / about 42.9 KB gzip over 17 requests (font 27.0 KB, SVGs 1.6 KB, CSS 20.9 KB raw). JS off: all home content present. Reduced motion: animations off, content visible. Focus ring visible on every band after switching it to charcoal (cream on dark). Contrast: cream/charcoal 13.57, charcoal/turmeric 7.12, cream-light/clay 5.31, chutney/cream 5.05, clay/cream 4.92, cream-light/chutney 5.45. Lighthouse not run (owner uses PageSpeed Insights).
 - 2026-11-10, step 2: merged origin/main (D-023). `npm test` 23 pass. Dev server at 360 px: added both packs and a sauce pot (header count 4), edited qty, removed a line, reload kept cart (£40). Empty-field confirm -> `done.html?o=SS-TEST-01`, cart cleared. Filled confirm: pickup, name and notes appear in the message; notes with `<b>` shown as text. Forced failure (backend `broken`): plain error text, WhatsApp link without number opened, cart kept, button re-enabled. Keyboard: tab order sane, Enter adds and submits, focus ring visible. Only console errors: expected 404 for `data/products.json` on the dev server (seed fallback used). Not done: live URL, real WhatsApp on a phone.
 - 2026-11-10, step 1: merged origin/main (D-022). `npm test` 3 pass; `npm run build` validations pass (3 pages, titles and descriptions in range, one h1, canonical); `SITE_INDEXABLE=true` build fails on the `TODO:` text as intended; 3 pages at 320, 360 and 1280 px had no horizontal overflow; screenshots checked for home and shop. Contrast ratios: charcoal/cream 13.57, chutney link/cream 5.05, cream-light/chutney 5.45, cream/charcoal 13.57, charcoal/turmeric 7.12, clay/cream 4.92, cream-light/clay 5.31. Lighthouse not run (not available).
 - 2026-11-10, step 0: dev server 200s and styles applied at 360 px; build with `SITE_INDEXABLE` unset gives noindex + `Disallow: /`; with `true` gives no noindex, `Allow`, sitemap line; `npm test` runs clean. Live deploy not yet run.

@@ -7,6 +7,8 @@ import { siteConfig } from '../../frontend/js/site-config.js';
 export { formatPrice };
 const SAMPLE = '<span class="sample-label">sample</span>';
 const priceHtml = (p) => (p.placeholder ? `<span data-placeholder>${formatPrice(p.price_pence)} ${SAMPLE}</span>` : formatPrice(p.price_pence));
+// Unit label, then the price on a kraft tag. The dash keeps the product line readable as text.
+const metaHtml = (p) => `<span>${esc(p.unit_label)}</span><span class="visually-hidden"> — </span><span class="tag tag-price">${priceHtml(p)}</span>`;
 
 function qtyControl(p) {
   const n = esc(p.name);
@@ -44,7 +46,7 @@ function productJsonLd(products, siteUrl) {
 function packItem(p) {
   return `<li class="menu-item" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}">
   <h3>${esc(p.name)}</h3>
-  <p class="menu-meta">${esc(p.unit_label)} — ${priceHtml(p)}</p>
+  <p class="menu-meta">${metaHtml(p)}</p>
   <p class="menu-desc">${esc(p.description || p.summary || '')}</p>
   ${qtyControl(p)}
   ${addButton(p, '')}
@@ -56,7 +58,7 @@ function addonItem(p) {
   const buyable = p.available && priced;
   const attrs = `data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''}`;
   const meta = priced
-    ? `${esc(p.unit_label)} — ${priceHtml(p)}`
+    ? metaHtml(p)
     : `${esc(p.unit_label)} — Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span>`;
   const action = buyable
     ? `${qtyControl(p)}\n  ${addButton(p, ' btn-secondary')}`
@@ -72,9 +74,11 @@ export function renderRegion(page, products, siteUrl = '') {
   const packs = products.filter((p) => p.kind === 'pack');
   const addons = products.filter((p) => p.kind === 'addon');
   if (page === 'index') {
-    return `<ul class="pack-list">
-${packs.map((p) => `<li class="pack-row" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}"><span class="pack-name">${esc(p.name)}</span> <span class="pack-meta">${esc(p.unit_label)} — ${priceHtml(p)}</span></li>`).join('\n')}
-</ul>`;
+    return `<div class="menu-board">
+<ul class="pack-board">
+${packs.map((p) => `<li class="pack-row" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}"><span class="pack-name">${esc(p.name)}</span> <span class="pack-meta">${metaHtml(p)}</span></li>`).join('\n')}
+</ul>
+</div>`;
   }
   return `<section class="menu-board" aria-labelledby="menu-title">
 <h2 id="menu-title">The momo</h2>

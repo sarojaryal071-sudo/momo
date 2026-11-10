@@ -23,8 +23,8 @@
 
 /* Header */
 .site-header { border-block-end: var(--hairline) solid var(--line); background: var(--cream-light); }
-.header-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2xs) var(--space-m); padding-block: var(--space-2xs); }
-.brand { font-family: var(--font-head); font-size: var(--step-2); font-weight: 700; color: var(--charcoal); text-decoration: none; }
+.header-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2xs) var(--space-l); padding-block: var(--space-xs); }
+.brand { font-family: var(--font-head); font-size: var(--step-3); line-height: var(--line-height-head); font-weight: 400; letter-spacing: var(--tracking-display); color: var(--charcoal); text-decoration: none; }
 .nav-list, .header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-s); margin: 0; padding: 0; list-style: none; }
 .site-header a:not(.brand) {
   display: inline-flex; align-items: center; min-block-size: var(--tap);
@@ -53,23 +53,17 @@
 
 /* Chalkboard menu panel */
 .menu-board {
-  background: var(--charcoal); color: var(--cream); padding: var(--space-l);
-  border: calc(var(--hairline) * 2) dashed var(--chalk-line); border-radius: var(--radius);
+  position: relative; background: var(--charcoal); color: var(--cream);
+  padding: calc(var(--space-l) + var(--fold-height)) var(--space-l); border-radius: var(--radius);
 }
 .menu-board h2 { margin-block-end: var(--space-m); }
 .menu-list, .addon-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--space-l); margin: 0; padding: 0; list-style: none; }
 .menu-item h3, .addon-item h3 { margin-block-end: var(--space-3xs); }
-.menu-meta { font-weight: 700; margin-block-end: var(--space-2xs); }
+.menu-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2xs) var(--space-s); font-weight: 700; margin-block-end: var(--space-xs); }
 .menu-board .btn { border-color: var(--cream-light); }
 .addons { margin-block-start: var(--space-xl); }
 .addon-item { padding-block-start: var(--space-s); border-block-start: var(--hairline) solid var(--line); }
 
-/* Kraft tag detail */
-.tag {
-  display: inline-block; margin: 0; padding: var(--space-2xs) var(--space-s);
-  background: var(--clay); color: var(--cream-light); font-weight: 700;
-  rotate: var(--tilt); border-radius: var(--radius);
-}
 
 /* Chalk-style rule under key headings */
 .rule::after {
@@ -86,13 +80,13 @@
 .band-light { background: var(--cream-light); }
 .pack-list { margin: 0 0 var(--space-m); padding: 0; list-style: none; max-inline-size: var(--measure); }
 .pack-row { display: grid; gap: var(--space-3xs); padding-block: var(--space-xs); border-block-end: var(--hairline) solid var(--line); font-size: var(--step-1); }
-.pack-name { font-family: var(--font-head); font-weight: 700; }
+.pack-name { font-family: var(--font-head); font-weight: 400; }
 .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--space-l); margin: 0; padding: 0; list-style: none; counter-reset: step; }
 .steps li { counter-increment: step; }
 .steps li::before {
   content: counter(step); display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap);
   margin-block-end: var(--space-xs); background: var(--turmeric); color: var(--charcoal);
-  font: 700 var(--step-2) var(--font-head); border-radius: var(--radius);
+  font: 400 var(--step-2) var(--font-head); border-radius: var(--radius);
 }
 .steps h3 { margin-block-end: var(--space-3xs); }
 .cook-steps { max-inline-size: var(--measure); padding-inline-start: var(--space-m); }
