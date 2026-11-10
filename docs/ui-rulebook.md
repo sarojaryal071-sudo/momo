@@ -13,8 +13,9 @@ Himalayan and earthy. Warm brick, wood, steam, chalkboard, kraft paper, prayer-f
 | `--turmeric` | `#E3A018` | Main accent: highlights, badges, big decorative shapes. Charcoal text on turmeric passes; turmeric text on cream does not. |
 | `--coriander` | `#5E7D3A` | Secondary: borders, banners, large decoration. Low contrast for small text on cream. |
 | `--chutney` | `#B8321F` | Buttons, links, key highlights. White text on chutney passes. |
-| `--cream` | `#F6EBD3` | Page background. |
-| `--cream-light` | `#FBF4E4` | Raised areas, forms. |
+| `--white` | `#FFFFFF` | Page background (decision D-026). |
+| `--cream` | `#F6EBD3` | Light tint for one or two calm bands only. No longer the page background. |
+| `--cream-light` | `#FBF4E4` | Optional soft tint for raised areas or form fields if white needs warmth. |
 | `--charcoal` | `#23211E` | Body text, dark sections. |
 | `--clay` | `#8A5A3B` | Small details, captions, dividers. |
 
@@ -42,7 +43,7 @@ Nothing visual is hard-coded. Everything scales smoothly with the screen and is 
 ## 3. Typography and texture
 
 - Headings: one self-hosted open-licence serif (decision D-025) with the existing serif stack as fallback in `--font-head`. Body: system sans (`--font-body`). No other web-font downloads. Story, voice and motifs: `docs/brand-direction.md`.
-- Faint paper grain on the page background (already in `base.css`). Keep the opacity low.
+- No paper grain on the white page (decision D-026). Texture only on the chalkboard panel and the kraft tags.
 - Chalk-style underline or hand-drawn rule under key headings, done with CSS or a small inline SVG, not an image dependency.
 - Large, confident headings; short lines; generous spacing. Body copy max about 60 characters wide.
 

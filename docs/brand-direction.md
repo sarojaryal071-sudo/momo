@@ -55,7 +55,7 @@ Items marked [CONFIRM] must not appear as plain text until the owner confirms; u
 
 **Principle: restraint with one strong idea.** Each section says one thing. Large fluid type. Generous space. Colour comes in broad flat bands, not scattered accents.
 
-- **Colour bands.** Full-width bands of charcoal, turmeric, chutney red and coriander on cream, with the existing palette only. Text and background pairs must pass the contrast rules.
+- **Colour bands.** Full-width bands of charcoal, turmeric, chutney red and coriander on a white page (D-026), with the existing palette only; cream appears only as a light tint on one or two calm bands. Text and background pairs must pass the contrast rules.
 - **The fold.** A hand-drawn, slightly imperfect pleat pattern, drawn as SVG, used as section divider and as a border for the chalkboard panel. It is the signature motif.
 - **The ridge line.** One continuous hand-drawn line of mountains, as a single-stroke SVG across the hero and above the footer.
 - **Steam.** Two or three small drifting wisps over the hero image or the steamer illustration.
@@ -79,3 +79,7 @@ Home follows section 4. Shop and how-to-cook keep their content and take the mot
 5. What should someone feel when they open the bag?
 
 Answers go into the About section and the chutney and hero copy, in her own words where possible. Until then, nothing personal is written.
+
+## 8. Design reference (D-026)
+
+Approved reference: direction A, turmeric hero, white page. Images: `docs/design/home-reference-a-narrow.jpg` (phone) and `docs/design/home-reference-a-wide.jpg` (wider layout). They are mockups made with an image generator: use them for layout, colour, type scale, rhythm and component shapes, not for pixels. The photos in them (steamer, momo, chutney bowl) are AI placeholders; the real images come later. Text in the mockups matches section 4.
