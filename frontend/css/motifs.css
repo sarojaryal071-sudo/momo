@@ -93,10 +93,12 @@ h2 { letter-spacing: var(--tracking-display); }
 .photo-frame { display: block; inline-size: min(100%, var(--photo-max)); aspect-ratio: var(--ratio-photo); object-fit: cover; border-radius: var(--radius-lg); justify-self: center; }
 .band .fold { margin-block-end: var(--space-l); }
 
-/* Fold. Fill. Steam.: copper numerals, step pictures and drawn arrows */
+/* Buy. Steam. Eat.: copper numerals, step pictures and drawn arrows */
 .fold-flow { container-type: inline-size; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-l); margin: 0; padding: 0; list-style: none; counter-reset: fold; align-items: end; }
 .fold-flow li { counter-increment: fold; position: relative; display: grid; gap: var(--space-2xs); justify-items: start; }
 .fold-flow img { display: block; block-size: auto; }
+.fold-flow .art-multiply { mix-blend-mode: multiply; }
+.fold-flow li { isolation: isolate; }
 .fold-flow li:nth-child(1) img { inline-size: calc(var(--step-art) * 0.75); }
 .fold-flow li:nth-child(2) img { inline-size: calc(var(--step-art) * 0.9); }
 .fold-flow li:nth-child(3) img { inline-size: calc(var(--step-art) * 1.15); }

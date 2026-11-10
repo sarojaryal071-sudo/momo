@@ -13,11 +13,9 @@ Status: v2, 2026-11-10 (hero replaced). All images are in `frontend/assets/img/`
 | File (+ smaller variant) | Size | Type | Where | Suggested alt text |
 |---|---|---|---|---|
 | `cutout-hero.webp` (+ `-600`) | 1200 x 1200 | cut-out | Hero panel | "A bamboo steamer filled with freshly steamed momo" |
-| `cutout-momo.webp` (+ `-400`) | 800 x 800 | cut-out | Steps section; spare | "A single pleated momo" |
+| `cutout-momo.webp` (+ `-400`) | 800 x 800 | cut-out | "Buy. Steam. Eat." section | "A single pleated momo" |
 | `cutout-chutney.webp` (+ `-400`) | 800 x 800 | cut-out | Chutney tile | "A clay bowl of red tomato chutney with a wooden spoon" |
-| `cutout-step-wrapper.webp` (+ `-300`) | 600 x 600 | cut-out | Steps: wrapper | "A thin round of dough" |
-| `cutout-step-fold.webp` (+ `-300`) | 600 x 600 | cut-out | Steps: fold | "A momo being folded around a filling" |
-| `cutout-step-finished.webp` (+ `-300`) | 600 x 600 | cut-out | Steps: finished | "A finished, pleated momo" |
+| `cutout-step-finished.webp` (+ `-300`) | 600 x 600 | cut-out | Spare (a finished momo) | "A finished, pleated momo" |
 | `pack-chicken.webp` (+ `-400`) | 800 x 800 | multiply | Product card, slug `chicken-momo` | "A bag of frozen momo tied with twine and a blank paper tag" |
 | `pack-veg.webp` (+ `-400`) | 800 x 800 | multiply | Product card, slug `veg-momo` | same wording |
 | `photo-kitchen-corner.webp` (+ `-800`) | 1024 x 687 | scene | Made-together band, how to cook | "A home kitchen corner with a brick wall, wooden counter and a bamboo steamer" |
