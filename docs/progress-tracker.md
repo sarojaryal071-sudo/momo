@@ -115,6 +115,12 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Filter chips and card controls match — 3bdb668, chips, card Add to cart and stepper share the glass pill and press feel
 - [x] Checked in own screenshots, merged to `main`, deploy confirmed — 3bdb668, see log
 
+## Step 1j — Cart on desktop and the ambient background (D-042)
+
+- [ ] Stepper content width; cart line grid and two-column wide cart
+- [ ] Ambient background layer with tokens and kill switch
+- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
