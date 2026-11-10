@@ -45,6 +45,14 @@ Named constants in `frontend/js/site-config.js` (D-022): `LOW_STOCK_THRESHOLD` (
 - The order sent to the gateway and the WhatsApp message list each line with its options and mark customised lines. The mock gateway and its tests are updated accordingly. Keep order total logic in integer pence.
 - A line whose quantity would exceed the stock is capped with a clear message; a sold-out item cannot be added.
 
+## 5. Pickup time picker (decision D-034)
+
+In the cart, after the customer picks a pickup date, show a **time drop-down** (a native `<select>`, which phones show as a scrolling wheel) listing every time from the window's start to its end in steps of `PICKUP_STEP_MINUTES` (named constant, default 15, matching `slot_minutes` in the seed rules), for example 09:00, 09:15, 09:30. Only valid times are listed: inside that weekday's window or an extra-date window, never on a closed date, never earlier than the lead time (standard or customised notice). Change the seed rule steps from 60 to 15. The selected date and time keep the same shape in the order. No capacity limit.
+
+## 6. Pickup address copy (decision D-035)
+
+Public pages show only the pickup **area** as a visible `<span data-todo>TODO: pickup area from the owner</span>`; never a street address. On the cart and done pages add one plain sentence: "We will send the full pickup address on WhatsApp once we confirm your order." Check that the home Pickup tile, the shop page and the footer all follow this.
+
 ## Do not
 
 Add a free-text allergy box (waiting for the owner and the council), prices or promises about allergens, a database, or the admin panel. Hard-code option names, prices or lead times in the page or script code: only data and named constants. Start Step 3.
@@ -53,6 +61,7 @@ Add a free-text allergy box (waiting for the owner and the council), prices or p
 
 - Shop and home at 360 px: cards are small, one phone screen shows four or more; "Add" works; the stepper appears after adding; a card with options opens the window first.
 - Dialog: opens from the card, traps and returns focus, Escape and backdrop close it, options change the total live, the customised note and earliest-pickup date appear when a non-default option is chosen, stock limit and "Only N left" work, sold-out card has no button.
+- Pickup picker: times in 15-minute steps inside the window only, none before the lead time; address sentence present, no street address anywhere.
 - Cart: lines with options are separate lines, "Customised" label, date picker respects the longer notice only when needed, the WhatsApp text lists options.
 - Works with JavaScript off for what is static (card text and price, links); keyboard-only run through add, options, checkout.
 - `npm test` and `npm run build` pass (update tests that depend on the old card markup, and say so). No horizontal overflow at 360 px. Merge to `main`, push, confirm the deploy ran.
@@ -63,6 +72,7 @@ Add a free-text allergy box (waiting for the owner and the council), prices or p
 - [ ] Details dialog (info, options, stock line, live total, allergy line)
 - [ ] Seed data for options and stock; constants `LOW_STOCK_THRESHOLD` and `CUSTOM_MIN_LEAD_HOURS`
 - [ ] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options
+- [ ] 15-minute time drop-down in the cart; pickup address copy (area only)
 - [ ] Verified, merged to `main`, deploy confirmed
 
 ## Report
