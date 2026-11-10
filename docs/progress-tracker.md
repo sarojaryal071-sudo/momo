@@ -106,6 +106,15 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Compact 3D pill options in the product window — 527c5fc, options are wrapped compact pills with a solid edge, tick that springs in, tap again to remove; press-down state
 - [x] Verified, merged to `main`, deploy confirmed — 527c5fc, see log
 
+## Step 1i — Glass pills fix: menu, product sheet, options (D-040, D-041)
+
+- [ ] Glass pill tokens and press state
+- [ ] Full-screen menu: tinted glass layer, visible X and wordmark, centred pills, contact group
+- [ ] Product sheet: focus fix, light glass, content height, pinned footer
+- [ ] Option pills and stepper restyled
+- [ ] Filter chips and card controls match
+- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
