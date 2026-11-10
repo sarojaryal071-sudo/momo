@@ -117,9 +117,9 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1j — Cart on desktop and the ambient background (D-042)
 
-- [x] Stepper content width; cart line grid and two-column wide cart — HASH, `.cart-info` is the only growing block, `.stepper` is flex none; lines are a 4-column grid from 30rem of list width (name / stepper / price / Remove); two-column cart (lines and total left, solid details card right, max 70rem) from 52rem of page width; checked at 1440, 1024, 768 and 390 px
-- [x] Ambient background layer with tokens and kill switch — HASH, body::before fixed layer, three radial spots from palette tokens, `--ambient-opacity` 0.18 (set to 0 to turn off); hidden for print, prefers-reduced-transparency and prefers-contrast: more
-- [x] Checked in own screenshots, merged to `main`, deploy confirmed — HASH, see log
+- [x] Stepper content width; cart line grid and two-column wide cart — 5e30314, `.cart-info` is the only growing block, `.stepper` is flex none; lines are a 4-column grid from 30rem of list width (name / stepper / price / Remove); two-column cart (lines and total left, solid details card right, max 70rem) from 52rem of page width; checked at 1440, 1024, 768 and 390 px
+- [x] Ambient background layer with tokens and kill switch — 5e30314, body::before fixed layer, three radial spots from palette tokens, `--ambient-opacity` 0.18 (set to 0 to turn off); hidden for print, prefers-reduced-transparency and prefers-contrast: more
+- [x] Checked in own screenshots, merged to `main`, deploy confirmed — 5e30314, see log
 
 ## Step 2 — Cart and order flow (mock)
 
