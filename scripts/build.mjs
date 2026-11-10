@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fillRegion, merge, renderRegion } from './lib/render.mjs';
+import { hasPlaceholderData, launchBlockers } from './lib/validate.mjs';
 
 const root = resolve(fileURLToPath(import.meta.url), '..', '..');
 const dist = join(root, 'dist');
@@ -51,6 +52,12 @@ if (useSeed) {
     if (existsSync(f)) content[p.slug] = await readJson(f);
   }
   products = merge(seed, content);
+}
+
+if (products.length) {
+  const slim = products.map(({ slug, name, unit_label, price_pence, available, placeholder }) =>
+    ({ slug, name, unit_label, price_pence, available, photo: null, ...(placeholder ? { placeholder: true } : {}) }));
+  await writeFile(join(dist, 'data/products.json'), JSON.stringify(slim, null, 2) + '\n');
 }
 
 const htmlFiles = (await walk(dist)).filter((f) => f.endsWith('.html'));
@@ -109,7 +116,14 @@ for (const file of htmlFiles) {
     }
     if (canonical !== urlFor(rel)) errors.push(`${rel}: canonical is "${canonical}", expected ${urlFor(rel)}`);
     if (h1s !== 1) errors.push(`${rel}: ${h1s} h1 elements, expected 1`);
-    if (indexable && /TODO:/.test(html)) errors.push(`${rel}: TODO: text remains and SITE_INDEXABLE is true`);
+  }
+  if (indexable && !isAdmin) {
+    for (const b of launchBlockers(html)) errors.push(`${rel}: ${b} remains and SITE_INDEXABLE is true`);
+  }
+}
+if (indexable) {
+  for (const f of (await walk(join(dist, 'data'))).filter((x) => x.endsWith('.json'))) {
+    if (hasPlaceholderData(await readFile(f, 'utf8'))) errors.push(`${relative(dist, f)}: "placeholder": true remains and SITE_INDEXABLE is true`);
   }
 }
 

@@ -32,7 +32,7 @@
         </ul>
       </nav>
       <div class="header-actions">
-        <a class="cart-link" href="shop.html" data-cart-link aria-label="Cart, 0 items">Cart (<span data-cart-count>0</span>)</a>
+        <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items">Cart (<span data-cart-count>0</span>)</a>
         <a href="tel:+447413069241">+44 7413 069241</a>
       </div>
     </div>
@@ -58,28 +58,52 @@
   <h3>Frozen chicken momo</h3>
   <p class="menu-meta">40 pieces — £10</p>
   <p class="menu-desc">A pack of 40 homemade chicken momo. Keep them frozen, then cook them straight from the freezer.</p>
+  <div class="qty" role="group" aria-label="Quantity of Frozen chicken momo">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen chicken momo">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Frozen chicken momo" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen chicken momo">+</button>
+</div>
   <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Frozen chicken momo</span></button>
+<p class="added-note" role="status" data-added-note></p>
 </li>
 <li class="menu-item" data-slug="veg-momo" data-price-pence="1000">
   <h3>Frozen veg momo</h3>
   <p class="menu-meta">40 pieces — £10</p>
   <p class="menu-desc">A pack of 40 homemade veg momo. Keep them frozen, then cook them straight from the freezer.</p>
+  <div class="qty" role="group" aria-label="Quantity of Frozen veg momo">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen veg momo">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Frozen veg momo" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen veg momo">+</button>
+</div>
   <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Frozen veg momo</span></button>
+<p class="added-note" role="status" data-added-note></p>
 </li>
 </ul>
 </section>
 <section class="addons" aria-labelledby="addons-title">
 <h2 id="addons-title">Sauce pots</h2>
 <ul class="addon-list">
-<li class="addon-item" data-slug="chutney-pot">
+<li class="addon-item" data-slug="chutney-pot" data-price-pence="111">
   <h3>Chutney pot</h3>
-  <p class="menu-meta">1 pot — Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span></p>
-  <button type="button" class="btn btn-secondary" disabled>Not available yet<span class="visually-hidden">: Chutney pot</span></button>
+  <p class="menu-meta">1 pot — <span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
+  <div class="qty" role="group" aria-label="Quantity of Chutney pot">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Chutney pot">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Chutney pot" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Chutney pot">+</button>
+</div>
+  <button type="button" class="btn btn-secondary" data-add-to-cart>Add to cart<span class="visually-hidden">: Chutney pot</span></button>
+<p class="added-note" role="status" data-added-note></p>
 </li>
-<li class="addon-item" data-slug="hot-sauce-pot">
+<li class="addon-item" data-slug="hot-sauce-pot" data-price-pence="222">
   <h3>Hot sauce pot</h3>
-  <p class="menu-meta">1 pot — Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span></p>
-  <button type="button" class="btn btn-secondary" disabled>Not available yet<span class="visually-hidden">: Hot sauce pot</span></button>
+  <p class="menu-meta">1 pot — <span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
+  <div class="qty" role="group" aria-label="Quantity of Hot sauce pot">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Hot sauce pot">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Hot sauce pot" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Hot sauce pot">+</button>
+</div>
+  <button type="button" class="btn btn-secondary" data-add-to-cart>Add to cart<span class="visually-hidden">: Hot sauce pot</span></button>
+<p class="added-note" role="status" data-added-note></p>
 </li>
 </ul>
 </section>
@@ -97,5 +121,6 @@
       <p>Steam &amp; Spice: homemade frozen momo, made in the UK. Taste like Nepal.</p>
     </div>
   </footer>
+  <script type="module" src="js/shop.js"></script>
 </body>
 </html>

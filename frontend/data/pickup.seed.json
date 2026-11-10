@@ -1,0 +1,9 @@
+{
+  "placeholder": true,
+  "settings": { "min_lead_hours": 24, "max_days_ahead": 14 },
+  "rules": [
+    { "weekday": 6, "start_time": "10:00", "end_time": "18:00", "slot_minutes": 60, "active": true },
+    { "weekday": 0, "start_time": "10:00", "end_time": "18:00", "slot_minutes": 60, "active": true }
+  ],
+  "exceptions": []
+}

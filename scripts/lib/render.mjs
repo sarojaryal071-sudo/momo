@@ -1,10 +1,23 @@
 // Pure functions that render the marked product regions and JSON-LD. Used by build.mjs and the tests.
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-export function formatPrice(pence) {
-  const pounds = pence / 100;
-  return '£' + (Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2));
+import { formatPrice } from '../../frontend/js/cart.js';
+import { siteConfig } from '../../frontend/js/site-config.js';
+
+export { formatPrice };
+const SAMPLE = '<span class="sample-label">sample</span>';
+const priceHtml = (p) => (p.placeholder ? `<span data-placeholder>${formatPrice(p.price_pence)} ${SAMPLE}</span>` : formatPrice(p.price_pence));
+
+function qtyControl(p) {
+  const n = esc(p.name);
+  return `<div class="qty" role="group" aria-label="Quantity of ${n}">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of ${n}">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="${siteConfig.limits.maxQtyPerItem}" value="1" aria-label="Quantity of ${n}" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of ${n}">+</button>
+</div>`;
 }
+const addButton = (p, cls) => `<button type="button" class="btn${cls}" data-add-to-cart>Add to cart<span class="visually-hidden">: ${esc(p.name)}</span></button>
+<p class="added-note" role="status" data-added-note></p>`;
 
 const byOrder = (a, b) => a.sort_order - b.sort_order;
 export const merge = (products, content) =>
@@ -12,7 +25,7 @@ export const merge = (products, content) =>
 
 function productJsonLd(products, siteUrl) {
   const base = siteUrl ? `${siteUrl}/` : '';
-  const items = products.filter((p) => p.price_pence != null).map((p) => ({
+  const items = products.filter((p) => p.price_pence != null && !p.placeholder).map((p) => ({
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
@@ -31,25 +44,27 @@ function productJsonLd(products, siteUrl) {
 function packItem(p) {
   return `<li class="menu-item" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}">
   <h3>${esc(p.name)}</h3>
-  <p class="menu-meta">${esc(p.unit_label)} — ${formatPrice(p.price_pence)}</p>
+  <p class="menu-meta">${esc(p.unit_label)} — ${priceHtml(p)}</p>
   <p class="menu-desc">${esc(p.description || p.summary || '')}</p>
-  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: ${esc(p.name)}</span></button>
+  ${qtyControl(p)}
+  ${addButton(p, '')}
 </li>`;
 }
 
 function addonItem(p) {
   const priced = p.price_pence != null;
+  const buyable = p.available && priced;
   const attrs = `data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''}`;
-  const price = priced
-    ? `<p class="menu-meta">${esc(p.unit_label)} — ${formatPrice(p.price_pence)}</p>`
-    : `<p class="menu-meta">${esc(p.unit_label)} — Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span></p>`;
-  const button = p.available && priced
-    ? `<button type="button" class="btn btn-secondary" data-add-to-cart>Add to cart<span class="visually-hidden">: ${esc(p.name)}</span></button>`
+  const meta = priced
+    ? `${esc(p.unit_label)} — ${priceHtml(p)}`
+    : `${esc(p.unit_label)} — Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span>`;
+  const action = buyable
+    ? `${qtyControl(p)}\n  ${addButton(p, ' btn-secondary')}`
     : `<button type="button" class="btn btn-secondary" disabled>Not available yet<span class="visually-hidden">: ${esc(p.name)}</span></button>`;
   return `<li class="addon-item" ${attrs}>
   <h3>${esc(p.name)}</h3>
-  ${price}
-  ${button}
+  <p class="menu-meta">${meta}</p>
+  ${action}
 </li>`;
 }
 
@@ -58,7 +73,7 @@ export function renderRegion(page, products, siteUrl = '') {
   const addons = products.filter((p) => p.kind === 'addon');
   if (page === 'index') {
     return `<ul class="pack-list">
-${packs.map((p) => `<li class="pack-row" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}"><span class="pack-name">${esc(p.name)}</span> <span class="pack-meta">${esc(p.unit_label)} — ${formatPrice(p.price_pence)}</span></li>`).join('\n')}
+${packs.map((p) => `<li class="pack-row" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}"><span class="pack-name">${esc(p.name)}</span> <span class="pack-meta">${esc(p.unit_label)} — ${priceHtml(p)}</span></li>`).join('\n')}
 </ul>`;
   }
   return `<section class="menu-board" aria-labelledby="menu-title">

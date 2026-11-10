@@ -24,6 +24,7 @@ body::before {
 }
 
 main { flex: 1; }
+[hidden] { display: none !important; }
 
 h1, h2, h3 {
   font-family: var(--font-head);
