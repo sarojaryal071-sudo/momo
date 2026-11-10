@@ -58,3 +58,4 @@ Status: v1, 2026-11-10. Add new decisions at the bottom with the next number. Ch
 - [ ] Council registration, allergens, privacy wording, data retention period for orders
 - [ ] Her decisions on customisation: which options she will offer and their prices, whether custom items use frozen stock, the custom notice period (default 48 h), ingredients and allergen wording per product
 - [ ] Owner's email for order alerts (Supabase function secret only) and email provider account (D-037)
+- [ ] Delivery is a later add-on (not in the first version): areas or postcodes, delivery fee, address required only when delivery is chosen, privacy note. Customer addresses would be stored only in the private orders table, not in the WhatsApp link text.
