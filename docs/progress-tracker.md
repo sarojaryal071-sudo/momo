@@ -88,6 +88,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options — 38debc9, options stored as non-default ids per line, separate lines per option set, Customised label, compact stepper, stock cap message, date list uses the 48 h notice only for customised carts (checked with a fake Friday clock), WhatsApp and done page list options
 - [x] Verified, merged to `main`, deploy confirmed — 38debc9, see log
 
+## Step 1g — UI polish and the new order flow (D-036, D-038, D-039)
+
+- [ ] Glass and motion tokens
+- [ ] Modal sheet: fixed header and footer, compact photo, scrolling middle, animation
+- [ ] Tactile option buttons and press states
+- [ ] Menu glass panel and focus fix
+- [ ] Hour and minute pickup lists, `PICKUP_STEP_MINUTES`
+- [ ] Name and phone required, phone echoed back, "Place order"
+- [ ] "Order received" screen, failure path, no automatic WhatsApp
+- [ ] Verified, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
