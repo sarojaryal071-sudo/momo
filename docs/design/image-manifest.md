@@ -20,6 +20,7 @@ Status: v2, 2026-11-10 (hero replaced). All images are in `frontend/assets/img/`
 | `pack-chicken.webp` (+ `-400`) | 800 x 800 | multiply | Product card, slug `chicken-momo` | "A bag of frozen momo tied with twine and a blank paper tag" |
 | `pack-veg.webp` (+ `-400`) | 800 x 800 | multiply | Product card, slug `veg-momo` | same wording |
 | `photo-kitchen-corner.webp` (+ `-800`) | 1024 x 687 | scene | Made-together band, how to cook | "A home kitchen corner with a brick wall, wooden counter and a bamboo steamer" |
+| `photo-sauce.webp` | 335 x 335 | scene (real photo, owner-supplied) | Home sauce tile (framed) | "A bowl of homemade red-orange sauce" |
 | `photo-plate.webp` (+ `-800`) | 1024 x 687 | scene | Spare (banner or shop header) | "A plate of steamed momo with a small bowl of red sauce" |
 
 Variants named `-400`, `-300` and `-600` are the smaller sizes for `srcset`; the full-size file has no suffix. The old `placeholder-kitchen-corner*.webp` files can be deleted once nothing refers to them. `placeholder-og.webp` stays until the social preview image exists (Step 5).
@@ -29,7 +30,7 @@ Variants named `-400`, `-300` and `-600` are the smaller sizes for `srcset`; the
 1. **Hero (replaced 2026-11-10):** open steamer, no lid, fully inside the frame with margin, no baked shadow. It has a very faint baked steam wisp inside the basket; the CSS wisps add more above it, so keep them subtle.
 2. **The two pack shots look almost the same** (same bag, tag and angle) and show roughly 9 to 12 momo, not 40. They are placeholders. The product name, size and price carry the difference. Replace both with real photos before launch.
 3. **Scenes are only 1024 px wide.** Show them in a framed or half-width container up to about their native width. Do not stretch them across a wide band; they will look soft. Regenerate at larger size if a wide banner is wanted.
-4. **Sauce images (D-030):** the current `cutout-chutney.webp` is an older red tomato-style bowl and is wrong for her turmeric-yellow chutney. It is replaced by the owner's new images under the same name, and `cutout-hot-sauce.webp` is added. Until they arrive, the sauce slots show the drawn placeholder.
+4. **`photo-sauce.webp` is a real photo** (owner-supplied, 2026-11-10), only 335 px wide: show it framed at about 16rem or less. It is not known yet whether it is the chutney or the hot sauce, so it is not tied to a product. **Sauce images (D-030):** the current `cutout-chutney.webp` is an older red tomato-style bowl and is wrong for her turmeric-yellow chutney. It is replaced by the owner's new images under the same name, and `cutout-hot-sauce.webp` is added. Until they arrive, the sauce slots show the drawn placeholder.
 5. **Steam:** only a faint baked wisp in the hero; the CSS steam wisps provide the rest.
 6. **The product `photo` field in the database** can point at an uploaded image later; these files are only the fallbacks for the seeded products.
 7. **Placeholder honesty:** keep the "photo coming soon" status in the report; add the real photos when she has them and remove these.

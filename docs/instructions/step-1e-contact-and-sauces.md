@@ -22,11 +22,11 @@ Her chutney is **turmeric yellow** and her hot sauce is **red with chilli seeds*
 
 ## 3. Sauce images
 
-Two new cut-outs are coming from the owner, same style as the others: `cutout-chutney.webp` (turmeric-yellow chutney, replaces the old file) and `cutout-hot-sauce.webp` (red, oily, with chilli seeds), each with a `-400` variant, 800 x 800, real transparency, light backgrounds only. If they are in `frontend/assets/img/` after you merge `origin/main`, use them. If not, use the drawn sage placeholder and note it in the report.
+**A real photo now exists:** `frontend/assets/img/photo-sauce.webp` (335 x 335, opaque, supplied by the owner, a bowl of her orange-red sauce in a black bowl on a wooden board). It is a **scene** photo, not a cut-out: show it as a framed image with the rounded-corner token, never multiplied, never stretched, and not larger than about 16rem wide (it is small and would look soft). Alt text: "A bowl of homemade red-orange sauce". It is not yet known whether this is the chutney or the hot sauce, so do not label it as either; do not put it on a specific product card.
 
-- Seed products: `chutney-pot` uses photo `cutout-chutney`, `hot-sauce-pot` uses photo `cutout-hot-sauce`. These are real cut-outs: show them on the `--green-tint` square normally. Do **not** apply `mix-blend-mode: multiply` to them (that is only for the two opaque pack shots).
-- The sauce tile on the home page shows `cutout-chutney` (peach background), alt text from the manifest.
-- Alt texts: "A small pot of turmeric-yellow chutney" and "A small pot of red hot sauce with chilli seeds".
+- **Home sauce tile (peach):** show `photo-sauce` in a framed, rounded container beside the text. Replace the old red bowl cut-out there; the old `cutout-chutney.webp` (red tomato bowl with baked shadow) must no longer appear anywhere. Delete the old `cutout-chutney*.webp` files once nothing uses them, unless new ones with the same name have arrived from the owner after you merge `origin/main`.
+- **Product cards for `chutney-pot` and `hot-sauce-pot`:** keep the drawn sage placeholder with "Photo coming soon" until real or AI product images exist. If `cutout-chutney.webp` (turmeric yellow) and `cutout-hot-sauce.webp` (red, with seeds) are in `frontend/assets/img/` after you merge, use them as normal cut-outs on the `--green-tint` square (no `mix-blend-mode: multiply`; that is only for the two opaque pack shots), with the alt texts "A small pot of turmeric-yellow chutney" and "A small pot of red hot sauce with chilli seeds".
+- Report which of these files were present.
 
 ## 4. Mobile fixes (owner tested on a phone; do these first)
 
@@ -70,7 +70,7 @@ Change ordering logic, data structure, tests, or the build validations beyond fi
 - [ ] Home section spacing
 - [ ] Phone, WhatsApp and Instagram links (placeholder for Instagram)
 - [ ] Sauce tile copy and alt text corrected
-- [ ] Sauce images wired (or placeholders noted)
+- [ ] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist
 - [ ] Verified, merged to `main`, deploy confirmed
 
 ## Report
