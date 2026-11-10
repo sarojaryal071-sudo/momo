@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-10 (by the planning chat)
-- Current step: **Step 0 — not started**
-- Next action: Do Step 0 (`docs/instructions/step-0-scaffold-and-deploy.md`). Move the root `css/` folder into `frontend/css/` first.
+- Last updated: 2026-11-10 (Step 0 build, coding agent)
+- Current step: **Step 0 — code done; waiting on owner to switch Pages and set variables**
+- Next action: After the owner completes the Pages actions and the branch is merged to `main`, confirm the live deploy (last Step 0 item), then start Step 1.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -14,15 +14,15 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 0 — Scaffold and deploy pipeline
 
-- [ ] `css/` moved into `frontend/css/` with `git mv`, tokens unchanged
-- [ ] Folder tree created (`frontend/`, `admin/`, `backend/supabase/{migrations,functions}`, `scripts/`, `.github/workflows/`)
-- [ ] `package.json` (scripts `dev`, `build`, `test`; devDependency `sharp` only) and `.gitignore`
-- [ ] `scripts/dev.mjs` static server works
-- [ ] `scripts/build.mjs` v1: copy to `dist/`, `sitemap.xml`, `robots.txt`, `noindex` logic via `SITE_INDEXABLE`
-- [ ] Placeholder `frontend/index.html` (valid, `lang="en-GB"`, one `h1`)
-- [ ] `.github/workflows/deploy.yml` (Pages via Actions, concurrency group `pages`)
-- [ ] `README.md` updated with run and build commands
-- [ ] Verified: dev server, build output, noindex behaviour (see log)
+- [x] `css/` moved into `frontend/css/` with `git mv`, tokens unchanged — e4cf4e1, `git mv` rename, files unchanged
+- [x] Folder tree created (`frontend/`, `admin/`, `backend/supabase/{migrations,functions}`, `scripts/`, `.github/workflows/`) — e4cf4e1, folders present; `.gitkeep` in empty ones; `backend/README.md` one line
+- [x] `package.json` (scripts `dev`, `build`, `test`; devDependency `sharp` only) and `.gitignore` — e4cf4e1, `npm install` ok, lockfile committed
+- [x] `scripts/dev.mjs` static server works — e4cf4e1, `/`, `/css/theme.css`, `/css/base.css` return 200; path traversal returns 404
+- [x] `scripts/build.mjs` v1: copy to `dist/`, `sitemap.xml`, `robots.txt`, `noindex` logic via `SITE_INDEXABLE` — e4cf4e1, `dist/` has index.html, css/, sitemap.xml, robots.txt, admin/
+- [x] Placeholder `frontend/index.html` (valid, `lang="en-GB"`, one `h1`) — e4cf4e1, body background rgb(246,235,211), heading font from token
+- [x] `.github/workflows/deploy.yml` (Pages via Actions, concurrency group `pages`) — e4cf4e1, written; not yet run (needs Pages source switch and merge to `main`)
+- [x] `README.md` updated with run and build commands — e4cf4e1
+- [x] Verified: dev server, build output, noindex behaviour (see log) — e4cf4e1, see log
 - [ ] Owner switched Pages source to GitHub Actions and set variables; live deploy confirmed
 
 ## Step 1 — Static pages
@@ -103,23 +103,30 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `CLAUDE.md` | Agent instructions, auto-loaded | planning |
 | `docs/` | Decisions log, rulebooks, usage rules, this tracker, `instructions/step-0` to `step-5` | planning |
 | `PROJECT_NOTES.md` | Human overview | planning |
-| `css/base.css`, `css/theme.css` | Base styles and tokens (moves to `frontend/css/` in Step 0) | agent, pre-step |
+| `frontend/css/base.css`, `frontend/css/theme.css` | Base styles and tokens | 0 |
+| `frontend/index.html` | Placeholder home page with a `TODO:` line | 0 |
+| `admin/` , `backend/supabase/{migrations,functions}` | Empty (`.gitkeep`); `backend/README.md` is one line | 0 |
+| `package.json`, `package-lock.json`, `.gitignore` | Scripts dev/build/test, `sharp` only | 0 |
+| `scripts/dev.mjs` | Static dev server (`frontend/` at `/`, `admin/` at `/admin/`, port 8080 or `PORT`) | 0 |
+| `scripts/build.mjs` | Build v1: copy to `dist/`, noindex, sitemap, robots | 0 |
+| `.github/workflows/deploy.yml` | Pages deploy on push to `main` and manual | 0 |
 
 ## Test and run commands (agent fills in once they exist)
 
-- Dev server: _not yet_
-- Build: _not yet_
-- Unit tests: _not yet_
+- Dev server: `npm run dev` (http://localhost:8080/)
+- Build: `npm run build` (env `SITE_URL`, `SITE_INDEXABLE`)
+- Unit tests: `npm test` (no tests yet)
 - Backend tests: _not yet_
 
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 0: dev server 200s and styles applied at 360 px; build with `SITE_INDEXABLE` unset gives noindex + `Disallow: /`; with `true` gives no noindex, `Allow`, sitemap line; `npm test` runs clean. Live deploy not yet run.
 
 ## Known issues
 
-- _none_
+- Build does not yet fail on `TODO:` when indexable (validations arrive with Step 1 / Step 5). `dist/admin/` is an empty folder for now.
 
 ## TODO placeholders in content (agent lists every `TODO:` left on public pages)
 
-- _none yet_
+- `frontend/index.html`: `TODO: placeholder page` line (Step 1 replaces it)

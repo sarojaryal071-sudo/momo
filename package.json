@@ -1,0 +1,13 @@
+{
+  "name": "steam-and-spice",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5"
+  }
+}
