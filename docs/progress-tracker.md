@@ -71,14 +71,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1e — Contact links, sauce corrections and mobile fixes (D-029, D-030)
 
-- [x] Mobile header: one line with menu button; cart icon always visible — HASH, 53 px single line at 360 px on all five pages; cart icon and badge outside the menu; menu button opens, closes on Escape, link tap and outside tap, focus moves in and back; wide header unchanged
-- [x] Compact product cards on phones — HASH, image-left rows (about 190 px) below 48em, vertical grid cards from 48em; classes and data hooks unchanged
-- [x] "Added" state and sticky checkout bar — HASH, button says Added for 1.6 s, live region announces it; fixed bar "N items · £X" (count only if a price is unknown) with Go to checkout; absent on cart and done
-- [x] Home section spacing — HASH, one --section-gap between sections via .flow; coloured bands pad their own content; sauce tile no longer touches Made together
-- [x] Phone, WhatsApp and Instagram links (placeholder for Instagram) — HASH, wa.me/447413069241 in menu, footer, home ordering row, cart and done; Instagram line filled by build.mjs from siteConfig.socialLinks.instagram (empty = data-todo placeholder; tested with a temporary value)
-- [x] Sauce tile copy and alt text corrected — HASH, "The sauces", copy from brand-direction item 4; no tomato claims left (grep clean); shop photo alt says red sauce
-- [x] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist — HASH, framed rounded photo-sauce.webp, max 16rem; old red cutout-chutney files deleted; cutout-chutney (yellow) and cutout-hot-sauce were NOT present after the merge, so sauce cards keep drawn placeholders
-- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
+- [x] Mobile header: one line with menu button; cart icon always visible — b0c3ec2, 53 px single line at 360 px on all five pages; cart icon and badge outside the menu; menu button opens, closes on Escape, link tap and outside tap, focus moves in and back; wide header unchanged
+- [x] Compact product cards on phones — b0c3ec2, image-left rows (about 190 px) below 48em, vertical grid cards from 48em; classes and data hooks unchanged
+- [x] "Added" state and sticky checkout bar — b0c3ec2, button says Added for 1.6 s, live region announces it; fixed bar "N items · £X" (count only if a price is unknown) with Go to checkout; absent on cart and done
+- [x] Home section spacing — b0c3ec2, one --section-gap between sections via .flow; coloured bands pad their own content; sauce tile no longer touches Made together
+- [x] Phone, WhatsApp and Instagram links (placeholder for Instagram) — b0c3ec2, wa.me/447413069241 in menu, footer, home ordering row, cart and done; Instagram line filled by build.mjs from siteConfig.socialLinks.instagram (empty = data-todo placeholder; tested with a temporary value)
+- [x] Sauce tile copy and alt text corrected — b0c3ec2, "The sauces", copy from brand-direction item 4; no tomato claims left (grep clean); shop photo alt says red sauce
+- [x] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist — b0c3ec2, framed rounded photo-sauce.webp, max 16rem; old red cutout-chutney files deleted; cutout-chutney (yellow) and cutout-hot-sauce were NOT present after the merge, so sauce cards keep drawn placeholders
+- [x] Verified, merged to `main`, deploy confirmed — b0c3ec2, see log
 
 ## Step 2 — Cart and order flow (mock)
 
