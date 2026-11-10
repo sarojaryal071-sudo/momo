@@ -101,10 +101,10 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1h — Receipt, full-screen menu and pill options (owner request after Step 1g)
 
-- [x] Paper receipt on the Order received screen, with print / save as PDF and download — HASH, white paper with zigzag edges, typewriter face, dashed rules, order number, placed time, name, pickup, option lines, total; Print or save as PDF (window.print with a print-only receipt) and Download receipt (.txt)
-- [x] Full-screen animated menu with 3D pills (emerald palette) — HASH, phone menu is a full-screen emerald overlay that opens with a circle reveal, staggered 3D pills, ridge line, X button; focus bug fixed (keyboard vs pointer tracked); wide header unchanged
-- [x] Compact 3D pill options in the product window — HASH, options are wrapped compact pills with a solid edge, tick that springs in, tap again to remove; press-down state
-- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
+- [x] Paper receipt on the Order received screen, with print / save as PDF and download — 527c5fc, white paper with zigzag edges, typewriter face, dashed rules, order number, placed time, name, pickup, option lines, total; Print or save as PDF (window.print with a print-only receipt) and Download receipt (.txt)
+- [x] Full-screen animated menu with 3D pills (emerald palette) — 527c5fc, phone menu is a full-screen emerald overlay that opens with a circle reveal, staggered 3D pills, ridge line, X button; focus bug fixed (keyboard vs pointer tracked); wide header unchanged
+- [x] Compact 3D pill options in the product window — 527c5fc, options are wrapped compact pills with a solid edge, tick that springs in, tap again to remove; press-down state
+- [x] Verified, merged to `main`, deploy confirmed — 527c5fc, see log
 
 ## Step 2 — Cart and order flow (mock)
 
