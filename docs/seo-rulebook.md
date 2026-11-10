@@ -8,7 +8,7 @@ All indexable content exists in the HTML file as delivered. JavaScript enhances 
 
 ## 2. Launch gate
 
-The site is **not indexable** until the owner decides (decision D-015). `SITE_INDEXABLE` defaults to anything but `true`. While it is not `true`, every public page gets `<meta name="robots" content="noindex">` and `robots.txt` disallows everything. Do not submit anything to Google Search Console before then. `SITE_INDEXABLE=true` also requires zero `TODO:` text on indexable pages (the build fails otherwise).
+The site is **not indexable** until the owner decides (decision D-015). `SITE_INDEXABLE` defaults to anything but `true`. While it is not `true`, every public page gets `<meta name="robots" content="noindex">` and `robots.txt` disallows everything. Do not submit anything to Google Search Console before then. `SITE_INDEXABLE=true` also requires zero `TODO:` text and zero `data-placeholder` elements on indexable pages (the build fails otherwise).
 
 ## 3. Every public page needs
 

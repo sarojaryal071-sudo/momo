@@ -118,7 +118,7 @@ Inputs: `frontend/`, `admin/`, environment `SITE_URL`, `SUPABASE_URL`, `SUPABASE
 5. Download each product photo, resize it and write WebP into `dist/assets/products/`.
 6. Write `dist/data/products.json` (slug, name, unit_label, price_pence, available, photo) for the cart page.
 7. Generate `sitemap.xml` and `robots.txt` from `SITE_URL`. If `SITE_INDEXABLE` is not exactly `true`: add `<meta name="robots" content="noindex">` to every public page and make `robots.txt` disallow everything.
-8. Validate: every indexable page has a unique title, a meta description, a canonical URL and exactly one `h1`; no `TODO:` text remains when `SITE_INDEXABLE` is `true`. Fail the build otherwise.
+8. Validate: every indexable page has a unique title, a meta description, a canonical URL and exactly one `h1`; no `TODO:` text and no `data-placeholder` element remains when `SITE_INDEXABLE` is `true`. Fail the build otherwise.
 
 The script is plain Node (ES modules). The only dependency is `sharp`. It must not template, minify-rewrite or restructure hand-written HTML outside the marked regions.
 
