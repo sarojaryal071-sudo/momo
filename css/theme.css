@@ -1,0 +1,17 @@
+/* Design tokens. Change colours and fonts here only. All values are placeholders until branding is final. */
+:root {
+  --turmeric: #E3A018;   /* main accent */
+  --coriander: #5E7D3A;  /* secondary accent: borders, banners, large decoration only (low contrast for small text) */
+  --chutney: #B8321F;    /* buttons, links, highlights */
+  --cream: #F6EBD3;      /* page background */
+  --cream-light: #FBF4E4;
+  --charcoal: #23211E;   /* text, dark sections */
+  --clay: #8A5A3B;       /* small details */
+
+  --line: rgba(35, 33, 30, 0.25);
+
+  --font-head: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --max: 62rem;
+}
