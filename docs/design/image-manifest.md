@@ -20,7 +20,7 @@ Status: v2, 2026-11-10 (hero replaced). All images are in `frontend/assets/img/`
 | `pack-chicken.webp` (+ `-400`) | 800 x 800 | multiply | Product card, slug `chicken-momo` | "A bag of frozen momo tied with twine and a blank paper tag" |
 | `pack-veg.webp` (+ `-400`) | 800 x 800 | multiply | Product card, slug `veg-momo` | same wording |
 | `photo-kitchen-corner.webp` (+ `-800`) | 1024 x 687 | scene | Made-together band, how to cook | "A home kitchen corner with a brick wall, wooden counter and a bamboo steamer" |
-| `photo-plate.webp` (+ `-800`) | 1024 x 687 | scene | Spare (banner or shop header) | "A plate of steamed momo with a small bowl of tomato chutney" |
+| `photo-plate.webp` (+ `-800`) | 1024 x 687 | scene | Spare (banner or shop header) | "A plate of steamed momo with a small bowl of red sauce" |
 
 Variants named `-400`, `-300` and `-600` are the smaller sizes for `srcset`; the full-size file has no suffix. The old `placeholder-kitchen-corner*.webp` files can be deleted once nothing refers to them. `placeholder-og.webp` stays until the social preview image exists (Step 5).
 
