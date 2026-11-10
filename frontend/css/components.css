@@ -303,9 +303,9 @@ html:has(dialog[open]) { overflow: hidden; }
 .cart-total { font-size: var(--step-2); font-family: var(--font-head); color: var(--emerald); }
 .order-form { max-inline-size: var(--measure); margin-block-start: var(--space-xl); }
 .cart-wrap { container-type: inline-size; }
-/* Wide cart: lines and total on the left, the details form as a solid card on the right */
+/* Wide cart: the details form as a solid card on the left, lines and total on the right */
 @container (min-width: 52rem) {
-  [data-cart-content] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, var(--cart-form)); grid-template-areas: "lines form" "total form"; grid-template-rows: auto 1fr; gap: var(--space-s) var(--space-xl); align-items: start; max-inline-size: var(--cart-max); }
+  [data-cart-content] { display: grid; grid-template-columns: minmax(0, var(--cart-form)) minmax(0, 1fr); grid-template-areas: "form lines" "form total"; grid-template-rows: auto 1fr; gap: var(--space-s) var(--space-xl); align-items: start; max-inline-size: var(--cart-max); }
   [data-cart-content] .cart-lines { grid-area: lines; margin: 0; }
   [data-cart-content] .cart-total { grid-area: total; margin: 0; }
   [data-cart-content] .order-form { grid-area: form; max-inline-size: none; margin: 0; padding: var(--space-l); background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
