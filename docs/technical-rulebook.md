@@ -20,14 +20,14 @@ Status: v1, 2026-11-10. Rules and behaviour. Structure lives in `architecture-ru
 - Quantity per item: 1 to `max_qty_per_item` (default 10).
 - The server recomputes every price and the total. The total shown in the browser is a convenience, not a source of truth.
 - Field limits (enforced in the browser and again in the function): name 80 characters, phone 20, notes 500, at most 20 line items.
-- Order number: `<prefix>-<date>-<counter>`, date in UK time, for example `SS-1110-01`. Assigned only by the backend. See decision D-007 for the pending date-format question.
+- Order number: `<prefix>-<date>-<counter>`, date in UK time, for example `SS-1011-01` (DDMM, decision D-032). Assigned only by the backend. See decision D-007 for the pending date-format question.
 
 ## 3. Order flow, step by step
 
 1. Customer adds items on the shop page; the cart shows the count.
 2. Cart page lists items, quantities and the total, then the optional form: name, phone, pickup date, pickup time, notes. A visible hint says "Add your phone number so we can arrange pickup." Nothing is required. Pickup only and "pay cash on pickup" are stated next to the button.
 3. Clicking "Confirm order" disables the button and calls `submitOrder()`.
-4. The gateway returns `{ orderNumber, totalPence, emailed }`, or fails.
+4. The gateway returns `{ orderNumber, totalPence }`, or fails.
 5. The site builds the WhatsApp message and moves the customer to `done.html?o=<orderNumber>`, which shows the order number, a summary, and a large "Open WhatsApp" button. It also tries to open WhatsApp automatically once.
 6. The cart is cleared only after a successful save.
 
