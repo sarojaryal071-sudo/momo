@@ -50,13 +50,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1c — Rebuild the look to the approved reference (D-026)
 
-- [x] White page, cream demoted, grain removed — HASH, `--white` page, cream only on the ordering and how-to-cook bands, grain removed (now only on chalkboard and kraft tags)
-- [x] Header and footer to the reference — HASH, white header with wordmark, Shop, How to cook, cart icon and red badge; charcoal footer bar with phone glyph and ridge above
-- [x] Hero band with overlapping cut-out slot and ridge line — HASH, turmeric band, charcoal ridge line, cut-out slot bleeds right and overlaps the charcoal band, steam wisps
-- [x] Made together band, steps, chutney band, statement, chalkboard with kraft tag, ordering — HASH, charcoal band, red numerals row (container query), turmeric chutney band, centred statement, board with overlapping kraft tag, centred ordering
-- [x] Other pages aligned — HASH, shop, how to cook, cart, done on white with the same header and footer; fields white with charcoal border
-- [x] Cut-out image slots with honest placeholders — HASH, cutout-hero 1200x1200, cutout-momo 800x800, cutout-chutney 800x800 (transparent placeholders with labels); kitchen slot kept on how-to-cook
-- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
+- [x] White page, cream demoted, grain removed — 03a6944, `--white` page, cream only on the ordering and how-to-cook bands, grain removed (now only on chalkboard and kraft tags)
+- [x] Header and footer to the reference — 03a6944, white header with wordmark, Shop, How to cook, cart icon and red badge; charcoal footer bar with phone glyph and ridge above
+- [x] Hero band with overlapping cut-out slot and ridge line — 03a6944, turmeric band, charcoal ridge line, cut-out slot bleeds right and overlaps the charcoal band, steam wisps
+- [x] Made together band, steps, chutney band, statement, chalkboard with kraft tag, ordering — 03a6944, charcoal band, red numerals row (container query), turmeric chutney band, centred statement, board with overlapping kraft tag, centred ordering
+- [x] Other pages aligned — 03a6944, shop, how to cook, cart, done on white with the same header and footer; fields white with charcoal border
+- [x] Cut-out image slots with honest placeholders — 03a6944, cutout-hero 1200x1200, cutout-momo 800x800, cutout-chutney 800x800 (transparent placeholders with labels); kitchen slot kept on how-to-cook
+- [x] Verified, merged to `main`, deploy confirmed — 03a6944, see log
 
 ## Step 2 — Cart and order flow (mock)
 
