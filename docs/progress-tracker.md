@@ -37,6 +37,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] SEO basics on every page, JSON-LD, build validations (title, description, canonical, one `h1`) — 40f5af1
 - [ ] Verified (partial: local only): 360 px and desktop, source shows content without JS, Lighthouse, contrast ratios
 
+## Step 1b — Visual upgrade ("Made together", D-024, D-025)
+
+- [ ] Fluid tokens extended
+- [ ] Display font self-hosted with licence
+- [ ] SVG motifs (fold, ridge line, steam, kraft tag)
+- [ ] Home page rebuilt to the copy spine
+- [ ] Shop, how to cook, cart, done, header and footer updated
+- [ ] Image slots wired
+- [ ] Motion (two effects, reduced-motion safe)
+- [ ] Verified and merged to `main`
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
