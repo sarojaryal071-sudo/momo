@@ -147,8 +147,8 @@
   --receipt-max: 26rem;
 
   /* Cart page: wide layout */
-  --cart-max: 70rem;
   --cart-form: 22rem;
+  --cart-thumb: 4rem;
   --price-col: 4.5rem;
 
   /* Ambient background (D-042): three very soft colour spots behind the whole page, in palette colours only.

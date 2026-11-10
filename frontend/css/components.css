@@ -288,7 +288,9 @@ html:has(dialog[open]) { overflow: hidden; }
 /* Cart and done pages */
 .cart-lines { container-type: inline-size; margin: 0 0 var(--space-m); padding: 0; list-style: none; }
 .cart-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-m); padding-block: var(--space-s); border-block-end: var(--hairline) solid var(--line); }
-.cart-info { flex: 1 1 14rem; min-inline-size: 0; } /* only the name block grows; the stepper never does */
+.cart-info { flex: 1 1 14rem; min-inline-size: 0; display: flex; align-items: center; gap: var(--space-s); } /* only the name block grows; the stepper never does */
+.cart-text { min-inline-size: 0; }
+.cart-thumb { flex: none; inline-size: var(--cart-thumb); aspect-ratio: 1; min-block-size: 0; cursor: default; border-radius: var(--radius); }
 .cart-line h3, .cart-line p, .cart-line .qty { margin: 0; }
 /* Wide: each line is a grid, so name, stepper, price and Remove line up from row to row */
 @container (min-width: 30rem) {
@@ -302,10 +304,16 @@ html:has(dialog[open]) { overflow: hidden; }
 .line-price { font-weight: 700; min-inline-size: 4ch; text-align: end; }
 .cart-total { font-size: var(--step-2); font-family: var(--font-head); color: var(--emerald); }
 .order-form { max-inline-size: var(--measure); margin-block-start: var(--space-xl); }
-.cart-wrap { container-type: inline-size; }
-/* Wide cart: the details form as a solid card on the left, lines and total on the right */
+.cart-section { container-type: inline-size; }
+/* Wide cart: the details form as a solid card on the left; "Your cart", the lines and the total stacked on the right */
 @container (min-width: 52rem) {
-  [data-cart-content] { display: grid; grid-template-columns: minmax(0, var(--cart-form)) minmax(0, 1fr); grid-template-areas: "form lines" "form total"; grid-template-rows: auto 1fr; gap: var(--space-s) var(--space-xl); align-items: start; max-inline-size: var(--cart-max); }
+  .cart-wrap:has([data-cart-content]:not([hidden])) {
+    display: grid; grid-template-columns: minmax(0, var(--cart-form)) minmax(0, 1fr);
+    grid-template-areas: "form title" "form lines" "form total" "form .";
+    grid-template-rows: auto auto auto 1fr; column-gap: var(--space-xl); row-gap: var(--space-s); align-items: start;
+  }
+  .cart-wrap:has([data-cart-content]:not([hidden])) > h1 { grid-area: title; margin: 0; }
+  [data-cart-content] { display: contents; }
   [data-cart-content] .cart-lines { grid-area: lines; margin: 0; }
   [data-cart-content] .cart-total { grid-area: total; margin: 0; }
   [data-cart-content] .order-form { grid-area: form; max-inline-size: none; margin: 0; padding: var(--space-l); background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }

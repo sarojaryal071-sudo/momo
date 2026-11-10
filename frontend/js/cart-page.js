@@ -56,6 +56,21 @@ function qtyControl(line) {
   return wrap;
 }
 
+// Small picture in front of the item name: the product photo, or the drawn placeholder until it has one.
+function thumbFor(line) {
+  const p = line.product;
+  const box = el('div', 'cart-thumb card-media');
+  if (p && p.photo) {
+    if (String(p.photo).startsWith('pack-')) box.classList.add('card-media-multiply'); // opaque shots on white blend into the tile
+    const img = document.createElement('img');
+    Object.assign(img, { src: `assets/img/${p.photo}-400.webp`, width: 400, height: 400, alt: '', loading: 'lazy' });
+    box.append(img);
+  } else {
+    box.classList.add('card-art', p && p.kind === 'addon' ? 'card-art-bowl' : 'card-art-momo');
+  }
+  return box;
+}
+
 function render() {
   let lines = buildLines(getCart().items(), products);
   // A quantity above the stock is brought down to the stock, with a message on that line.
@@ -71,18 +86,20 @@ function render() {
   for (const line of lines) {
     const li = el('li', 'cart-line');
     const info = el('div', 'cart-info');
-    info.append(el('h3', '', line.product ? line.product.name : line.slug));
+    const text = el('div', 'cart-text');
+    info.append(thumbFor(line), text);
+    text.append(el('h3', '', line.product ? line.product.name : line.slug));
     if (line.unavailable) {
-      info.append(el('p', 'error', line.soldOut ? 'Sold out. It will be removed when you confirm.' : 'No longer available. It will be removed when you confirm.'));
+      text.append(el('p', 'error', line.soldOut ? 'Sold out. It will be removed when you confirm.' : 'No longer available. It will be removed when you confirm.'));
     } else {
       const sample = line.product.placeholder ? ' (sample price)' : '';
-      info.append(el('p', 'menu-meta', `${line.product.unit_label} \u2014 ${formatPrice(line.unitPence)} each${sample}`));
+      text.append(el('p', 'menu-meta', `${line.product.unit_label} \u2014 ${formatPrice(line.unitPence)} each${sample}`));
       if (line.customised) {
         const opts = el('p', 'line-options', line.optionText + ' ');
         opts.append(el('span', 'badge', 'Customised'));
-        info.append(opts);
+        text.append(opts);
       }
-      if (capped.has(lineKey(line.slug, line.options))) info.append(el('p', 'error', `Only ${line.maxQty} available, so we changed the quantity.`));
+      if (capped.has(lineKey(line.slug, line.options))) text.append(el('p', 'error', `Only ${line.maxQty} available, so we changed the quantity.`));
     }
     li.append(info);
     if (!line.unavailable) li.append(qtyControl(line), el('p', 'line-price', formatPrice(line.linePence)));
