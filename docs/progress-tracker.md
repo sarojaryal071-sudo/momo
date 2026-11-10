@@ -90,14 +90,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1g — UI polish and the new order flow (D-036, D-038, D-039)
 
-- [x] Glass and motion tokens — HASH, theme.css: glass, raised/pressed shadow, motion and sheet tokens; glass only on header, menu, dialog and backdrop, checkout bar; solid fallback behind @supports; no gradients
-- [x] Modal sheet: fixed header and footer, compact photo, scrolling middle, animation — HASH, 85dvh bottom sheet on phones, fixed header (thumbnail, name, price, close), only the middle scrolls, fixed footer with notes, stepper and Add to cart; swipe, backdrop, Escape and close button close it; centred 34rem dialog from 48em
-- [x] Tactile option buttons and press states — HASH, raised tiles with spring tick or dot, press-down on tiles, buttons, steppers and chips; movement only under prefers-reduced-motion: no-preference
-- [x] Menu glass panel and focus fix — HASH, glass panel with slide and fade; focus goes to the panel on touch (no ring) and to the first link on keyboard (ring); even 53 px rows
-- [x] Hour and minute pickup lists, `PICKUP_STEP_MINUTES` — HASH, two selects after the date, window text, minutes follow the hour, PICKUP_STEP_MINUTES = 1 and seed slot_minutes 1, customised notice still applied
-- [x] Name and phone required, phone echoed back, "Place order" — HASH, inline errors, aria-invalid, UK phone check, "We will message you on 07413 069241", button reads Place order
-- [x] "Order received" screen, failure path, no automatic WhatsApp — HASH, drawn check, Order received, not-confirmed highlight, summary, three steps, contact; no automatic WhatsApp and no Open WhatsApp order button; failure shows the WhatsApp message button and keeps the cart
-- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
+- [x] Glass and motion tokens — d0ae572, theme.css: glass, raised/pressed shadow, motion and sheet tokens; glass only on header, menu, dialog and backdrop, checkout bar; solid fallback behind @supports; no gradients
+- [x] Modal sheet: fixed header and footer, compact photo, scrolling middle, animation — d0ae572, 85dvh bottom sheet on phones, fixed header (thumbnail, name, price, close), only the middle scrolls, fixed footer with notes, stepper and Add to cart; swipe, backdrop, Escape and close button close it; centred 34rem dialog from 48em
+- [x] Tactile option buttons and press states — d0ae572, raised tiles with spring tick or dot, press-down on tiles, buttons, steppers and chips; movement only under prefers-reduced-motion: no-preference
+- [x] Menu glass panel and focus fix — d0ae572, glass panel with slide and fade; focus goes to the panel on touch (no ring) and to the first link on keyboard (ring); even 53 px rows
+- [x] Hour and minute pickup lists, `PICKUP_STEP_MINUTES` — d0ae572, two selects after the date, window text, minutes follow the hour, PICKUP_STEP_MINUTES = 1 and seed slot_minutes 1, customised notice still applied
+- [x] Name and phone required, phone echoed back, "Place order" — d0ae572, inline errors, aria-invalid, UK phone check, "We will message you on 07413 069241", button reads Place order
+- [x] "Order received" screen, failure path, no automatic WhatsApp — d0ae572, drawn check, Order received, not-confirmed highlight, summary, three steps, contact; no automatic WhatsApp and no Open WhatsApp order button; failure shows the WhatsApp message button and keeps the cart
+- [x] Verified, merged to `main`, deploy confirmed — d0ae572, see log
 
 ## Step 2 — Cart and order flow (mock)
 
