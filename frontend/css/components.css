@@ -86,19 +86,6 @@
 /* Notice strip (shown only when active, from Step 3) */
 .notice { background: var(--turmeric); color: var(--charcoal); padding: var(--space-xs) var(--gutter); text-align: center; }
 
-/* Quantity control */
-.qty { display: inline-flex; align-items: stretch; margin-block-end: var(--space-xs); }
-.qty-btn, .qty-input {
-  min-block-size: var(--tap); min-inline-size: var(--tap); font: inherit; text-align: center;
-  background: var(--white); color: var(--emerald); border: var(--hairline) solid var(--emerald); border-radius: 0;
-}
-.qty-btn { cursor: pointer; font-weight: 700; }
-.qty-btn:hover { background: var(--green-tint); }
-.qty-btn:first-child { border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); }
-.qty-btn:last-child { border-start-end-radius: var(--radius); border-end-end-radius: var(--radius); }
-.qty-input { inline-size: calc(var(--tap) * 1.2); border-inline: 0; color: var(--charcoal); }
-.added-note { min-block-size: 1.6em; margin: var(--space-2xs) 0 0; font-weight: 700; color: var(--emerald); }
-
 /* Labels and states */
 .tag {
   display: inline-block; margin: 0 0 var(--space-xs); padding: var(--tag-pad-block) var(--tag-pad-inline) var(--tag-pad-block) calc(var(--tag-pad-inline) + var(--tag-hole));
@@ -125,35 +112,74 @@ html:not(.js) .shop-tools { display: none; }
 .search-box input { min-block-size: var(--tap); min-inline-size: min(100%, 16rem); padding: var(--space-2xs) var(--space-s); font: inherit; background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); }
 .empty-note { padding: var(--space-l); background: var(--green-tint); border-radius: var(--radius-lg); font-size: var(--step-1); }
 
-/* Product cards: real listing content, a grid that looks right with 1 to 100 items (D-028).
+/* Product cards: small, real listing content, a grid that looks right with 1 to 100 items (D-028).
    Compact rows on phones (image left, details right); vertical grid cards from the tablet width. */
-.product-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-s); margin: 0; padding: 0; list-style: none; }
+.product-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xs); margin: 0; padding: 0; list-style: none; }
 .product-card { display: grid; grid-template-columns: var(--card-thumb) minmax(0, 1fr); background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); overflow: hidden; }
-.card-media { position: relative; isolation: isolate; background: var(--green-tint); display: grid; place-items: center; min-block-size: var(--card-thumb); }
+.card-media { position: relative; isolation: isolate; background: var(--green-tint); display: grid; place-items: center; min-block-size: var(--card-thumb); cursor: pointer; }
 .card-media img { display: block; inline-size: 100%; block-size: 100%; object-fit: contain; }
 .card-media-multiply img { mix-blend-mode: multiply; }
 .card-art::before { content: ""; position: absolute; inset: 22%; background: var(--sage); -webkit-mask: var(--art) center / contain no-repeat; mask: var(--art) center / contain no-repeat; }
 .card-art-momo { --art: url("../assets/svg/art-momo.svg"); }
 .card-art-bowl { --art: url("../assets/svg/art-bowl.svg"); }
 .card-soon { position: absolute; inset-inline: 0; inset-block-end: var(--space-3xs); text-align: center; font-size: var(--step--1); font-weight: 700; line-height: 1.2; color: var(--emerald); }
-.card-body { display: grid; grid-template-columns: auto minmax(0, 1fr); align-content: start; column-gap: var(--space-xs); padding: var(--space-xs) var(--space-s); }
-.card-body > * { grid-column: 1 / -1; }
-.card-body h3 { margin-block-end: 0; font-size: var(--step-0); }
+.card-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: center; align-items: center; column-gap: var(--space-xs); padding: var(--space-2xs) var(--space-s); }
+.card-body h3 { grid-column: 1 / -1; margin-block-end: 0; font-size: var(--step-0); }
+.card-link { color: var(--emerald); text-decoration: none; }
+.card-link:hover { text-decoration: underline; }
 .card-meta { margin: 0; font-size: var(--step--1); }
-.card-price { margin: 0 0 var(--space-2xs); font-family: var(--font-head); font-size: var(--step-1); color: var(--emerald); }
-.card-body .qty { margin: 0 0 var(--space-2xs); }
-.card-body .btn { inline-size: 100%; padding-inline: var(--space-xs); }
-.card-body .added-note { margin-block-start: var(--space-3xs); min-block-size: 0; font-size: var(--step--1); }
+.card-price { margin: 0; font-family: var(--font-head); font-size: var(--step-1); color: var(--emerald); }
+.card-action { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2xs) var(--space-xs); margin-block-start: var(--space-3xs); }
+.card-action .badge { margin: 0; }
+.btn-add { min-inline-size: calc(var(--tap) * 1.6); }
+.added-note { flex-basis: 100%; min-block-size: 0; margin: 0; font-size: var(--step--1); font-weight: 700; color: var(--emerald); }
+.added-note:empty { display: none; }
 @media (min-width: 48em) {
   .product-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min)), var(--card-max))); justify-content: start; gap: var(--space-m); }
   .product-card { display: flex; flex-direction: column; }
   .card-media { aspect-ratio: 1; min-block-size: 0; }
-  .card-body { display: flex; flex-direction: column; flex: 1; padding: var(--space-s); }
-  .card-body h3 { margin-block-end: var(--space-3xs); font-size: var(--step-1); }
-  .card-meta { margin: 0 0 var(--space-2xs); font-size: inherit; }
-  .card-price { margin-block-end: var(--space-s); font-size: var(--step-2); }
-  .card-body .qty { align-self: flex-start; margin-block-end: var(--space-xs); margin-block-start: auto; }
-  .card-body .added-note { min-block-size: 1.6em; font-size: inherit; }
+  .card-body { display: flex; flex-direction: column; align-items: flex-start; flex: 1; padding: var(--space-s); }
+  .card-body h3 { font-size: var(--step-1); margin-block-end: var(--space-3xs); }
+  .card-meta { font-size: inherit; margin-block-end: var(--space-2xs); }
+  .card-price { font-size: var(--step-2); margin-block-end: var(--space-s); }
+  .card-action { margin-block-start: auto; }
+}
+
+/* Compact quantity stepper: card (after adding), details window and cart */
+.stepper { display: inline-flex; align-items: stretch; }
+.stepper .qty-btn, .stepper .qty-input { min-block-size: var(--tap); min-inline-size: var(--tap); font: inherit; text-align: center; background: var(--white); color: var(--emerald); border: var(--hairline) solid var(--emerald); border-radius: 0; }
+.stepper .qty-btn { cursor: pointer; font-weight: 700; }
+.stepper .qty-btn:hover:not(:disabled) { background: var(--green-tint); }
+.stepper .qty-btn:disabled { color: var(--line); border-color: var(--line); cursor: not-allowed; }
+.stepper .qty-btn:first-child { border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); }
+.stepper .qty-btn:last-child { border-start-end-radius: var(--radius); border-end-end-radius: var(--radius); }
+.stepper-count, .stepper .qty-input { display: grid; place-items: center; inline-size: calc(var(--tap) * 0.9); border-block: var(--hairline) solid var(--emerald); font-weight: 700; color: var(--charcoal); }
+.stepper .qty-input { border-inline: 0; border-radius: 0; padding: 0; }
+
+/* Details window: a bottom sheet on phones, a centred panel from the tablet width */
+.product-dialog { inline-size: 100%; max-inline-size: none; max-block-size: 92dvh; margin: auto 0 0; padding: 0; border: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--white); color: var(--charcoal); box-shadow: var(--shadow-card); overflow-y: auto; }
+.product-dialog::backdrop { background: color-mix(in srgb, var(--charcoal) 55%, transparent); }
+html:has(dialog[open]) { overflow: hidden; }
+.dialog-panel { position: relative; display: grid; gap: var(--space-xs); padding: var(--space-m); }
+.dialog-panel > * { margin: 0; }
+.dialog-close { position: absolute; inset-block-start: var(--space-xs); inset-inline-end: var(--space-xs); z-index: 1; display: grid; place-items: center; min-inline-size: var(--tap); min-block-size: var(--tap); color: var(--emerald); background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); cursor: pointer; }
+.dialog-media { cursor: default; inline-size: min(100%, 14rem); aspect-ratio: 1; min-block-size: 0; justify-self: center; border-radius: var(--radius-lg); }
+.dialog-section h3 { margin-block-end: var(--space-3xs); font-size: var(--step-0); }
+.dialog-form { display: grid; gap: var(--space-s); }
+.dialog-form > * { margin: 0; }
+.opt-group { margin: 0; padding: 0; border: 0; display: grid; gap: var(--space-2xs); }
+.opt-group legend { padding: 0; margin-block-end: var(--space-2xs); font-weight: 700; color: var(--emerald); }
+.opt { display: flex; align-items: center; gap: var(--space-xs); min-block-size: var(--tap); padding-inline: var(--space-xs); border: var(--hairline) solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.opt:has(input:checked) { border-color: var(--emerald); background: var(--green-tint); }
+.opt input { inline-size: 1.25rem; block-size: 1.25rem; accent-color: var(--emerald); }
+.opt-delta { margin-inline-start: auto; font-weight: 700; }
+.custom-note { padding: var(--space-xs) var(--space-s); background: var(--peach-tint); border-radius: var(--radius); font-weight: 700; color: var(--emerald); }
+.stock-line { font-weight: 700; color: var(--emerald); }
+.dialog-buy { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); }
+.dialog-buy .btn { flex: 1 1 12rem; }
+.allergy-line { font-size: var(--step--1); }
+@media (min-width: 48em) {
+  .product-dialog { margin: auto; max-inline-size: var(--dialog-max); max-block-size: 90dvh; border-radius: var(--radius-lg); }
 }
 
 /* Sticky checkout bar: appears only when the cart has items (script), never on the cart or done pages */
@@ -170,6 +196,7 @@ html:not(.js) .shop-tools { display: none; }
 .cart-line > div { flex: 1 1 14rem; }
 .cart-line h3, .cart-line p, .cart-line .qty { margin: 0; }
 .menu-meta { font-weight: 700; }
+.line-options { font-size: var(--step--1); }
 .line-price { font-weight: 700; min-inline-size: 4ch; text-align: end; }
 .cart-total { font-size: var(--step-2); font-family: var(--font-head); color: var(--emerald); }
 .order-form { max-inline-size: var(--measure); margin-block-start: var(--space-xl); }

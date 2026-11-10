@@ -2,6 +2,8 @@
 // Shop growth rules (D-028). Counts of products, not prices.
 export const HOME_PRODUCT_LIMIT = 8; // most product cards on the home page
 export const SEARCH_MIN_PRODUCTS = 8; // the shop search box appears from this many products
+export const LOW_STOCK_THRESHOLD = 5; // "Only N left" shows at or below this many
+export const CUSTOM_MIN_LEAD_HOURS = 48; // mock value: minimum notice for a cart with a customised item (Step 3 reads the setting)
 export const KIND_LABELS = { pack: 'Momo', addon: 'Sauces' }; // filter chip labels by product kind
 
 export const siteConfig = {
@@ -19,6 +21,8 @@ export const siteConfig = {
     notesMax: 500,
     waLinkMax: 1800,
   },
+  lowStockThreshold: LOW_STOCK_THRESHOLD,
+  customMinLeadHours: CUSTOM_MIN_LEAD_HOURS,
   homeProductLimit: HOME_PRODUCT_LIMIT,
   searchMinProducts: SEARCH_MIN_PRODUCTS,
   kindLabels: KIND_LABELS,

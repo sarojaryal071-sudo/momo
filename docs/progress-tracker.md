@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1e done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
+- Current step: **Step 1f done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -82,11 +82,11 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1f — Product details window, options, stock and custom lead time (D-031)
 
-- [ ] Small cards with Add and compact stepper
-- [ ] Details dialog (info, options, stock line, live total, allergy line)
-- [ ] Seed data for options and stock; constants `LOW_STOCK_THRESHOLD` and `CUSTOM_MIN_LEAD_HOURS`
-- [ ] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options
-- [ ] Verified, merged to `main`, deploy confirmed
+- [x] Small cards with Add and compact stepper — HASH, 108 px cards at 360 px (six fit one screen); one small Add; plain items swap to a compact - 1 + stepper and back at 0; sold-out card has no button; also fixed: home cards had no script before (shop.js now loads on home)
+- [x] Details dialog (info, options, stock line, live total, allergy line) — HASH, native dialog per product, bottom sheet on phones and centred panel from 48em; focus in and back, Escape and backdrop close, page scroll locked, live total, customised note with earliest pickup, Only N left, stock cap, allergy line
+- [x] Seed data for options and stock; constants `LOW_STOCK_THRESHOLD` and `CUSTOM_MIN_LEAD_HOURS` — HASH, stock_quantity and option_groups in products.seed.json (sample, flagged); LOW_STOCK_THRESHOLD 5 and CUSTOM_MIN_LEAD_HOURS 48 in site-config.js; products.json carries both; launch gate also catches stock_placeholder
+- [x] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options — HASH, options stored as non-default ids per line, separate lines per option set, Customised label, compact stepper, stock cap message, date list uses the 48 h notice only for customised carts (checked with a fake Friday clock), WhatsApp and done page list options
+- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -162,6 +162,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `scripts/build.mjs` | Build v1: copy to `dist/`, noindex, sitemap, robots | 0 |
 | `.github/workflows/deploy.yml` | Pages deploy on push to `main` and manual | 0 |
 | `frontend/{index,shop,how-to-cook}.html` | The three public pages, hand-written, shared header/footer copied in | 1 |
+| `frontend/js/shop.js` | Cards: Add, stepper, details dialog, chips and search (loaded on home and shop) | 1f |
 | `frontend/js/menu.js`, `checkout-bar.js`, `js-flag.js` | Phone menu, sticky checkout bar, early `js` class (no flash) | 1e |
 | `frontend/css/motifs.css` | Motif masks, hero panel, trust row, tiles, Made together, fold flow, ordering row, steam, reveal | 1b-1d |
 | `frontend/assets/img/` | AI mood images per `docs/design/image-manifest.md` (cut-outs, two pack shots, two scenes) plus `placeholder-og.webp`; replace with real photos later | 1d |
@@ -192,6 +193,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 1f: `npm test` 30 pass (7 new; no existing assertion changed), `npm run build` passes. With a temporary test set (removed): at 360 px cards are 108 px, six visible in one screen; momo Add opens the dialog first; dialog focus in, Escape and backdrop close and return focus; options change the total live; customised note appears ("Customised: needs 2 days' notice. Earliest pickup: ..."); plain item Add becomes a stepper, caps at stock, back to Add at 0; sold-out card has no button; low stock shows "Only 4 left" and caps qty, customised choice lifts the cap and hides the stock line; cart keeps separate lines, shows Customised label, caps over-stock and flags sold-out lines; date list on a fake Friday: standard cart starts Saturday 14, customised cart starts Sunday 15 with the sentence; WhatsApp text lists "Customised: Hot". JS off: card name, size, price and the name link are present. Keyboard-only: Add, options, add to cart, checkout bar to cart. No horizontal overflow on five pages at 360 and 1280 px.
 - 2026-11-10, step 1e: `npm test` 23 pass, `npm run build` passes. At 360 px all five pages: header 53 px (one line), no horizontal overflow, cart icon visible; menu opens/closes by button, Escape, link tap and outside tap, focus moves in and returns, tab order skip > brand > cart > menu. Shop: compact rows (about 190 px), Added state for 1.6 s, bar "1 item" then "2 items · £11.11" linking to cart.html; bar visible on home and how-to-cook, absent on cart and done. Instagram: placeholder with data-todo (2 places per page); with a temporary URL (reverted) both became real links with rel=noopener. `grep -ri tomato frontend` finds nothing. Phone number is in: cart.html, done.html, how-to-cook.html, index.html, shop.html, frontend/js/site-config.js, scripts/build.mjs, tests/whatsapp.test.mjs. Sauce images present after merge: photo-sauce.webp only. Kept the button label "Confirm order" on the cart page (the step says keep it as it is today).
 - 2026-11-10, step 1d: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow; CLS 0.0000; JS off shows all home content and all 12 test cards, chips and search hidden; reduced motion stops steam and shows all sections; focus rings emerald on white, peach on emerald. Shop with the 2 real products: chips yes (2 kinds), no search; temporary 12-item set (deleted): chips and search appear, chip and search filtering work, a no-match shows the message; 0 products shows "New items are coming soon."; 1 product shows no chips. `?kind=addon` preselects Sauces. Home transfer after scrolling the whole page: 230.7 KB raw / 197 KB gzip over 22 requests (images 173 KB, font 27 KB); above the fold only about 105 KB. Fixed a Step 2 bug: shop.js did not update the header count on load (now imports main.js).
 - 2026-11-10, step 1c: `npm test` 23 pass, `npm run build` passes. Home, shop, how-to-cook, cart, done at 320, 360 and 1280 px (home also at 768 and 1600): no horizontal overflow; headline on two lines at every width; hero image overlaps the charcoal band; CLS 0.0000; JS off shows all home content; reduced motion stops steam and shows all sections; cart badge updates (1 item). Home transfer about 94.7 KB raw / 70.4 KB gzip over 17 requests (cut-out placeholders 31 KB of that). Contrast: charcoal/white 16.06, chutney/white 5.98, white/chutney 5.98, charcoal/turmeric 7.12, cream/charcoal 13.57, white/clay 5.82, clay/white 5.82, charcoal/cream 13.57; chutney button against turmeric edge 2.65 (text inside passes). Focus ring checked on white (charcoal), turmeric (charcoal), charcoal board (cream).

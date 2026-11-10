@@ -46,3 +46,8 @@ test('UK phone conversion', () => {
   assert.equal(toWhatsAppNumber('12345'), null);
   assert.equal(toWhatsAppNumber('+1 202 555 0100'), null);
 });
+
+test('options are listed under their line', () => {
+  const msg = buildMessage({ orderNumber: 'SS-TEST-01', lines: [{ qty: 2, name: 'Frozen chicken momo', unitLabel: '40 pieces', linePence: 2100, optionText: 'No onion, Hot' }], totalPence: 2100 });
+  assert.equal(msg, 'Hi! Order SS-TEST-01\n- 2 x Frozen chicken momo (40 pieces) £21\n  Customised: No onion, Hot\nTotal £21\nPay cash on pickup.');
+});

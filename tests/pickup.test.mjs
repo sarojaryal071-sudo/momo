@@ -48,3 +48,22 @@ test('UK summer time is used for the lead time', () => {
   const opts = getPickupOptions({ settings: { min_lead_hours: 0, max_days_ahead: 1 }, rules: [{ weekday: 4, start_time: '00:00', end_time: '02:00', slot_minutes: 60, active: true }], exceptions: [] }, new Date('2026-07-01T23:30:00Z'));
   assert.deepEqual(opts.map((o) => [o.date, o.times[0].value]), [['2026-07-02', '01:00']]);
 });
+
+// Customised orders need a longer notice (D-031)
+import { earliestPickup, noticeText } from '../frontend/js/pickup.js';
+
+test('noticeText shows whole days or hours', () => {
+  assert.equal(noticeText(48), '2 days');
+  assert.equal(noticeText(24), '1 day');
+  assert.equal(noticeText(36), '36 hours');
+});
+
+test('a customised cart uses the longer minimum notice, a standard cart does not', () => {
+  const cfg = { settings: { min_lead_hours: 24, max_days_ahead: 14 }, rules: [{ weekday: 6, start_time: '10:00', end_time: '13:00', slot_minutes: 60, active: true }, { weekday: 0, start_time: '10:00', end_time: '13:00', slot_minutes: 60, active: true }], exceptions: [] };
+  const thursday = new Date('2026-11-12T12:00:00Z');
+  assert.equal(getPickupOptions(cfg, thursday)[0].date, '2026-11-14'); // 24 h: Saturday is fine
+  const custom = getPickupOptions(cfg, thursday, { customised: true, customLeadHours: 72 });
+  assert.equal(custom[0].date, '2026-11-15'); // 72 h: Saturday 10:00 is too soon, Sunday is the first day
+  assert.equal(earliestPickup(cfg, thursday, 72).date, '2026-11-15');
+  assert.equal(getPickupOptions(cfg, thursday, { customised: true, customLeadHours: 12 })[0].date, '2026-11-14'); // never shorter than the usual notice
+});

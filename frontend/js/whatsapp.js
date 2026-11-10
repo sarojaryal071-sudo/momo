@@ -5,10 +5,13 @@ import { siteConfig } from './site-config.js';
 const UK_PREFIX = '44';
 const UK_NUMBER_RE = /^44\d{9,10}$/;
 
-// lines: [{ qty, name, unitLabel, linePence }]. Empty optional parts are left out.
+// lines: [{ qty, name, unitLabel, linePence, optionText? }]. Empty optional parts are left out; options are listed under their line.
 export function buildMessage({ orderNumber, lines, totalPence, pickup, name, notes }) {
   const out = [orderNumber ? `Hi! Order ${orderNumber}` : "Hi! I'd like to place an order"];
-  for (const l of lines) out.push(`- ${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} ${formatPrice(l.linePence)}`);
+  for (const l of lines) {
+    out.push(`- ${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} ${formatPrice(l.linePence)}`);
+    if (l.optionText) out.push(`  Customised: ${l.optionText}`);
+  }
   out.push(`Total ${formatPrice(totalPence)}`);
   if (pickup) out.push(`Pickup: ${pickup}`);
   if (name) out.push(`Name: ${name}`);

@@ -58,8 +58,8 @@ if (useSeed) {
 }
 
 if (products.length) {
-  const slim = products.map(({ slug, name, unit_label, price_pence, available, placeholder, photo }) =>
-    ({ slug, name, unit_label, price_pence, available, photo: photo ?? null, ...(placeholder ? { placeholder: true } : {}) }));
+  const slim = products.map(({ slug, name, unit_label, price_pence, available, placeholder, photo, stock_quantity, stock_placeholder, option_groups }) =>
+    ({ slug, name, unit_label, price_pence, available, photo: photo ?? null, stock_quantity: stock_quantity ?? null, option_groups: option_groups ?? [], ...(placeholder ? { placeholder: true } : {}), ...(stock_placeholder ? { stock_placeholder: true } : {}) }));
   await writeFile(join(dist, 'data/products.json'), JSON.stringify(slim, null, 2) + '\n');
 }
 

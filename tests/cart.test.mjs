@@ -50,3 +50,52 @@ test('totals skip unavailable and unknown items', () => {
   assert.equal(cartTotal(lines), 2150);
   assert.deepEqual(lines.map((l) => l.unavailable), [false, false, true, true]);
 });
+
+// Options, stock and customised lines (D-031)
+const optionProducts = [{
+  slug: 'm', name: 'M', unit_label: '40 pieces', price_pence: 1000, available: true, stock_quantity: 3,
+  option_groups: [
+    { id: 'leave-out', label: 'Leave out', kind: 'multiple', options: [{ id: 'no-onion', label: 'No onion', price_delta_pence: 0, is_default: false }] },
+    { id: 'spice', label: 'Spice level', kind: 'single', options: [
+      { id: 'medium', label: 'Medium', price_delta_pence: 0, is_default: true },
+      { id: 'hot', label: 'Hot', price_delta_pence: 50, is_default: false },
+    ] },
+  ],
+}];
+
+test('the same product with different options is a different line', () => {
+  const cart = createCart({ storage: memoryStorage(), maxQty: 10, maxItems: 20 });
+  cart.add('m', 1); cart.add('m', 1, ['no-onion']); cart.add('m', 2, ['no-onion']); cart.add('m', 1, ['hot', 'no-onion']); cart.add('m', 1, ['no-onion', 'hot']);
+  assert.deepEqual(cart.items(), [{ slug: 'm', qty: 1 }, { slug: 'm', qty: 3, options: ['no-onion'] }, { slug: 'm', qty: 2, options: ['hot', 'no-onion'] }]);
+  assert.equal(cart.qtyOf('m', ['no-onion']), 3);
+  cart.setQty('m', 1, ['no-onion']); cart.remove('m');
+  assert.deepEqual(cart.items(), [{ slug: 'm', qty: 1, options: ['no-onion'] }, { slug: 'm', qty: 2, options: ['hot', 'no-onion'] }]);
+});
+
+test('unit price adds the option price changes and the line is marked customised', () => {
+  const [plain, custom] = buildLines([{ slug: 'm', qty: 2 }, { slug: 'm', qty: 2, options: ['hot', 'no-onion'] }], optionProducts);
+  assert.equal(plain.customised, false);
+  assert.equal(plain.unitPence, 1000);
+  assert.equal(custom.customised, true);
+  assert.equal(custom.unitPence, 1050);
+  assert.equal(custom.linePence, 2100);
+  assert.equal(custom.optionText, 'Hot, No onion');
+});
+
+test('stock limits standard lines only', () => {
+  const [over, custom] = buildLines([{ slug: 'm', qty: 5 }, { slug: 'm', qty: 5, options: ['no-onion'] }], optionProducts);
+  assert.equal(over.overStock, true);
+  assert.equal(over.maxQty, 3);
+  assert.equal(custom.overStock, false);
+  assert.equal(custom.maxQty, 10);
+  const sold = buildLines([{ slug: 'm', qty: 1 }, { slug: 'm', qty: 1, options: ['hot'] }], [{ ...optionProducts[0], stock_quantity: 0 }]);
+  assert.equal(sold[0].unavailable, true);
+  assert.equal(sold[0].soldOut, true);
+  assert.equal(sold[1].unavailable, false);
+});
+
+test('an option that no longer exists is ignored', () => {
+  const [l] = buildLines([{ slug: 'm', qty: 1, options: ['gone'] }], optionProducts);
+  assert.equal(l.customised, false);
+  assert.equal(l.unitPence, 1000);
+});

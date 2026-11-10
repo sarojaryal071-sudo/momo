@@ -17,7 +17,7 @@ if (order) {
   for (const l of order.lines) {
     const li = document.createElement('li');
     li.className = 'cart-line';
-    li.textContent = `${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} — ${formatPrice(l.linePence)}`;
+    li.textContent = `${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} — ${formatPrice(l.linePence)}${l.optionText ? ` · Customised: ${l.optionText}` : ''}`;
     list.append(li);
   }
   $('[data-done-total]').textContent = formatPrice(order.totalPence);

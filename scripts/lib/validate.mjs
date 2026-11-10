@@ -7,4 +7,4 @@ export function launchBlockers(html) {
 }
 
 // Seed data marked as sample values.
-export const hasPlaceholderData = (json) => /"placeholder"\s*:\s*true/.test(json);
+export const hasPlaceholderData = (json) => /"(?:[a-z]+_)?placeholder"\s*:\s*true/.test(json); // also "stock_placeholder"

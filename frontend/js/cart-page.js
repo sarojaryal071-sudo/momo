@@ -1,9 +1,9 @@
 // Cart page: lines, totals, optional details, confirm. Customer text is only ever written with textContent.
 import './menu.js';
-import { buildLines, cartTotal, formatPrice, getCart, updateHeaderCount } from './cart.js';
+import { buildLines, cartTotal, formatPrice, getCart, lineKey, updateHeaderCount } from './cart.js';
 import { loadPickup, loadProducts } from './data.js';
 import { submitOrder } from './order-gateway.js';
-import { dateLabel, getPickupOptions } from './pickup.js';
+import { dateLabel, getPickupOptions, noticeText } from './pickup.js';
 import { siteConfig } from './site-config.js';
 import { buildOrderLink } from './whatsapp.js';
 
@@ -20,6 +20,7 @@ const timeSel = $('#f-time');
 
 let products = [];
 let pickupOptions = [];
+let pickupConfig = null;
 
 const el = (tag, cls, text) => {
   const n = document.createElement(tag);
@@ -29,21 +30,22 @@ const el = (tag, cls, text) => {
 };
 
 function qtyControl(line) {
-  const wrap = el('div', 'qty');
+  const wrap = el('div', 'qty stepper');
   wrap.setAttribute('role', 'group');
   const name = line.product ? line.product.name : line.slug;
   wrap.setAttribute('aria-label', `Quantity of ${name}`);
-  const minus = el('button', 'qty-btn', '−');
+  const minus = el('button', 'qty-btn', '\u2212');
   minus.type = 'button';
   minus.setAttribute('aria-label', `Decrease quantity of ${name}`);
   const input = el('input', 'qty-input');
-  Object.assign(input, { type: 'number', min: 1, max: limits.maxQtyPerItem, value: line.qty });
+  Object.assign(input, { type: 'number', min: 1, max: line.maxQty, value: line.qty });
   input.inputMode = 'numeric';
   input.setAttribute('aria-label', `Quantity of ${name}`);
   const plus = el('button', 'qty-btn', '+');
   plus.type = 'button';
   plus.setAttribute('aria-label', `Increase quantity of ${name}`);
-  const set = (v) => { getCart().setQty(line.slug, v); render(); };
+  plus.disabled = line.qty >= line.maxQty;
+  const set = (v) => { getCart().setQty(line.slug, v, line.options); render(); };
   minus.addEventListener('click', () => set(line.qty - 1));
   plus.addEventListener('click', () => set(line.qty + 1));
   input.addEventListener('change', () => set(input.value));
@@ -52,7 +54,13 @@ function qtyControl(line) {
 }
 
 function render() {
-  const lines = buildLines(getCart().items(), products);
+  let lines = buildLines(getCart().items(), products);
+  // A quantity above the stock is brought down to the stock, with a message on that line.
+  const capped = new Set();
+  for (const l of lines) {
+    if (l.overStock && !l.unavailable) { getCart().setQty(l.slug, l.maxQty, l.options); capped.add(lineKey(l.slug, l.options)); }
+  }
+  if (capped.size) lines = buildLines(getCart().items(), products);
   updateHeaderCount();
   emptyBox.hidden = lines.length > 0;
   content.hidden = lines.length === 0;
@@ -62,21 +70,46 @@ function render() {
     const info = el('div');
     info.append(el('h3', '', line.product ? line.product.name : line.slug));
     if (line.unavailable) {
-      info.append(el('p', 'error', 'No longer available. It will be removed when you confirm.'));
+      info.append(el('p', 'error', line.soldOut ? 'Sold out. It will be removed when you confirm.' : 'No longer available. It will be removed when you confirm.'));
     } else {
       const sample = line.product.placeholder ? ' (sample price)' : '';
-      info.append(el('p', 'menu-meta', `${line.product.unit_label} — ${formatPrice(line.product.price_pence)} each${sample}`));
+      info.append(el('p', 'menu-meta', `${line.product.unit_label} \u2014 ${formatPrice(line.unitPence)} each${sample}`));
+      if (line.customised) {
+        const opts = el('p', 'line-options', line.optionText + ' ');
+        opts.append(el('span', 'badge', 'Customised'));
+        info.append(opts);
+      }
+      if (capped.has(lineKey(line.slug, line.options))) info.append(el('p', 'error', `Only ${line.maxQty} available, so we changed the quantity.`));
     }
     li.append(info);
     if (!line.unavailable) li.append(qtyControl(line), el('p', 'line-price', formatPrice(line.linePence)));
     const remove = el('button', 'btn btn-secondary', 'Remove');
     remove.type = 'button';
     remove.append(Object.assign(el('span', 'visually-hidden'), { textContent: `: ${line.product ? line.product.name : line.slug}` }));
-    remove.addEventListener('click', () => { getCart().remove(line.slug); render(); });
+    remove.addEventListener('click', () => { getCart().remove(line.slug, line.options); render(); });
     li.append(remove);
     list.append(li);
   }
   $('[data-cart-total]').textContent = formatPrice(cartTotal(lines));
+  refreshPickup(lines);
+}
+
+// The date list follows the cart: a customised item needs the longer notice, nothing else changes it.
+function refreshPickup(lines) {
+  if (!pickupConfig) return;
+  const customised = lines.some((l) => l.customised && !l.unavailable);
+  const keep = dateSel.value;
+  pickupOptions = getPickupOptions(pickupConfig, new Date(), { customised, customLeadHours: siteConfig.customMinLeadHours });
+  dateSel.replaceChildren(new Option('No date chosen', ''));
+  pickupOptions.forEach((o) => dateSel.append(new Option(o.label, o.date)));
+  dateSel.value = pickupOptions.some((o) => o.date === keep) ? keep : '';
+  fillTimes();
+  const note = $('[data-lead-note]');
+  note.hidden = !customised;
+  if (customised) {
+    const first = pickupOptions[0];
+    note.textContent = `Customised items need ${noticeText(siteConfig.customMinLeadHours)}' notice.${first ? ` Earliest pickup: ${first.label}.` : ' No pickup dates are available yet.'}`;
+  }
 }
 
 function fillTimes() {
@@ -93,7 +126,7 @@ function readOrder(lines) {
   const pickupTime = String(data.get('pickupTime') || '');
   const time = pickupTime ? (timeSel.selectedOptions[0]?.textContent || pickupTime).split(' to ')[0] : '';
   return {
-    items: lines.map((l) => ({ slug: l.slug, qty: l.qty })),
+    items: lines.map((l) => ({ slug: l.slug, qty: l.qty, options: l.options })),
     name: clean('name', limits.nameMax),
     phone: clean('phone', limits.phoneMax),
     notes: clean('notes', limits.notesMax),
@@ -110,7 +143,7 @@ async function confirm(e) {
   if (!lines.length) { render(); errorBox.textContent = 'There is nothing available in your cart.'; return; }
   const order = readOrder(lines);
   const totalPence = cartTotal(lines);
-  const summary = lines.map((l) => ({ qty: l.qty, name: l.product.name, unitLabel: l.product.unit_label, linePence: l.linePence }));
+  const summary = lines.map((l) => ({ qty: l.qty, name: l.product.name, unitLabel: l.product.unit_label, linePence: l.linePence, optionText: l.customised ? l.optionText : '' }));
   confirmBtn.disabled = true;
   try {
     const result = await submitOrder({ ...order, totalPenceHint: totalPence });
@@ -134,10 +167,8 @@ async function init() {
   $('#f-notes').maxLength = limits.notesMax;
   try {
     products = await loadProducts();
-    const pickup = await loadPickup();
-    pickupOptions = getPickupOptions(pickup);
-    pickupOptions.forEach((o) => dateSel.append(new Option(o.label, o.date)));
-    if (!pickup.placeholder) $('#pickup-sample').remove();
+    pickupConfig = await loadPickup();
+    if (!pickupConfig.placeholder) $('#pickup-sample').remove();
   } catch {
     errorBox.textContent = 'We could not load the shop data. Please reload, or call us to order.';
   }

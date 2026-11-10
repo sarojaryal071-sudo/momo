@@ -69,7 +69,8 @@
   --band-pad-quiet: clamp(4rem, 2.5rem + 8vw, 9rem);
   --card-min: 14rem;
   --card-max: 16rem;
-  --card-thumb: clamp(6.5rem, 28vw, 9rem);
+  --card-thumb: clamp(5.5rem, 24vw, 7.5rem);
+  --dialog-max: 34rem;
   --photo-small: 16rem;
   --section-gap: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
   --menu-row: 3.25rem;

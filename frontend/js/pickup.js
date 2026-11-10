@@ -27,9 +27,17 @@ function slotsFor(start, end, slotMinutes) {
   return out;
 }
 
+// "2 days" for a whole number of days, otherwise "36 hours".
+export function noticeText(hours) {
+  if (hours % 24 === 0) { const d = hours / 24; return `${d} ${d === 1 ? 'day' : 'days'}`; }
+  return `${hours} hours`;
+}
+
 // Returns [{ date: '2026-11-14', label, times: [{ value: '10:00', label: '10:00 to 11:00' }] }].
-export function getPickupOptions(config, now = new Date()) {
-  const { min_lead_hours: lead, max_days_ahead: maxDays } = config.settings;
+// When the cart holds a customised item, `customLeadHours` replaces the usual minimum notice.
+export function getPickupOptions(config, now = new Date(), { customised = false, customLeadHours } = {}) {
+  const { min_lead_hours: usualLead, max_days_ahead: maxDays } = config.settings;
+  const lead = customised && Number.isFinite(customLeadHours) ? Math.max(usualLead, customLeadHours) : usualLead;
   const ukNow = ukParts(now);
   const todayMs = Date.UTC(ukNow.y, ukNow.m - 1, ukNow.d);
   const nowWallMin = todayMs / MS_PER_MINUTE + ukNow.hh * MINUTES_PER_HOUR + ukNow.mm;
@@ -63,3 +71,6 @@ export function getPickupOptions(config, now = new Date()) {
   }
   return options;
 }
+
+// The first date a customised order can be collected, or null when none is offered.
+export const earliestPickup = (config, now, customLeadHours) => getPickupOptions(config, now, { customised: true, customLeadHours })[0] || null;
