@@ -69,6 +69,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Image slots and intentional placeholders — 3826637, all manifest images wired (hero, momo packs with multiply, chutney, steps, kitchen, plate on shop); sauce pots use drawn sage placeholders; old placeholder-kitchen files deleted
 - [x] Verified, merged to `main`, deploy confirmed — 3826637, see log
 
+## Step 1e — Contact links, sauce corrections and mobile fixes (D-029, D-030)
+
+- [ ] Mobile header: one line with menu button; cart icon always visible
+- [ ] Compact product cards on phones
+- [ ] "Added" state and sticky checkout bar
+- [ ] Home section spacing
+- [ ] Phone, WhatsApp and Instagram links (placeholder for Instagram)
+- [ ] Sauce tile copy and alt text corrected
+- [ ] Sauce tile uses `photo-sauce`; product cards keep placeholders unless sauce cut-outs exist
+- [ ] Verified, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
