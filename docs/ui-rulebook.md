@@ -4,22 +4,33 @@ Status: v1, 2026-11-10. The brand name and all colours are placeholders until br
 
 ## 1. Feel
 
-Himalayan and earthy. Warm brick, wood, steam, chalkboard, kraft paper, prayer-flag colours used sparingly. It should feel like a person's home kitchen, not a startup landing page. The tone is simple and direct. The emotional pull ("taste of home" for Nepalis, "a taste of the Himalayas" for everyone else) comes from the hero line and the images, not from long paragraphs.
+Premium, clean and earthy (decision D-027): a white page, deep emerald and warm copper, calm space, real food photography, one hand-drawn motif language. Warm like a person's home kitchen, not a startup landing page and not a discount supermarket. The tone is simple and direct. The emotional pull ("taste of home" for Nepalis, "a taste of the Himalayas" for everyone else) comes from the hero line and the images, not from long paragraphs.
 
 ## 2. Colour tokens (already in `css/theme.css`; keep the names)
 
-| Token | Value | Use |
-|---|---|---|
-| `--turmeric` | `#E3A018` | Main accent: highlights, badges, big decorative shapes. Charcoal text on turmeric passes; turmeric text on cream does not. |
-| `--coriander` | `#5E7D3A` | Secondary: borders, banners, large decoration. Low contrast for small text on cream. |
-| `--chutney` | `#B8321F` | Buttons, links, key highlights. White text on chutney passes. |
-| `--white` | `#FFFFFF` | Page background (decision D-026). |
-| `--cream` | `#F6EBD3` | Light tint for one or two calm bands only. No longer the page background. |
-| `--cream-light` | `#FBF4E4` | Optional soft tint for raised areas or form fields if white needs warmth. |
-| `--charcoal` | `#23211E` | Body text, dark sections. |
-| `--clay` | `#8A5A3B` | Small details, captions, dividers. |
+Palette: **Emerald & Copper** (decision D-027). Contrast ratios below were calculated by the planning chat; re-check every pair you actually use and report the numbers.
 
-Run a real contrast check on every text and background pair you use and report the ratios. Do not add colours without asking. No purple or violet anywhere.
+| Token | Value | Use | Contrast notes |
+|---|---|---|---|
+| `--white` | `#FFFFFF` | Page background, cards. | |
+| `--emerald` | `#004D3B` | Primary: headings, buttons (white text), header text, footer band, strong bands. | 9.88 with white either way. Safe for all text. |
+| `--green` | `#0F8A72` | Hover and active states, borders, icons, large decoration. | 4.29 with white: **large text and UI parts only**, never small text. |
+| `--sage` | `#7FB99B` | Decoration: ridge line, dividers, icon strokes, tinted tiles. | 4.38 on emerald: never for text. |
+| `--green-tint` | `#EAF3EE` (derived) | Hero panel and calm bands. | Emerald on it 8.73, charcoal 14.19. |
+| `--copper` | `#B87333` | Numerals, large display accents, borders, icon accents. | 3.79 with white: **large text and decoration only**. Never small text; never white text on copper buttons. Not for text on emerald (2.61). |
+| `--peach` | `#E8B189` | Warm tile and band, kraft tag fill. | Emerald on it 5.22, charcoal 8.47. Text on emerald footer 5.22. |
+| `--peach-tint` | `#FBEEE2` (derived) | Soft warm band or form hint. | Emerald on it 8.67. |
+| `--charcoal` | `#23211E` | Body text. | 16.06 on white. |
+| `--chutney` | `#B8321F` | Only for the chutney accent, errors and "unavailable". Never a main button colour. | 5.98 with white. |
+| `--turmeric` | `#E3A018` | Small highlights only (badge dot, the chutney tile). Never text on white. | 2.26 with white. Charcoal on it 7.12. |
+
+Retired: `--coriander`, `--clay`, `--cream`, `--cream-light`. Remove them once nothing uses them.
+
+Buttons: emerald background, white text, a darker emerald on hover (derive with `color-mix`). Links: emerald, underlined. Focus ring: emerald on white and tinted areas; **peach or white on emerald** areas.
+
+Do not add colours without asking. No purple or violet anywhere. No gradients: use flat tints.
+
+**Shape and depth (D-027).** Two radius tokens: `--radius` (small, for buttons and fields) and `--radius-lg` (cards and panels). Chips may be pill-shaped. One subtle shadow token `--shadow-card` for product cards and the hero image cut-out (soft, low opacity, no coloured glow). Product cards are real listing content, so a grid of them is allowed; decorative repeated cards are still not.
 
 ## 2b. Fluid sizing and soft-coded values (decision D-022)
 

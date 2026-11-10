@@ -55,12 +55,13 @@ Items marked [CONFIRM] must not appear as plain text until the owner confirms; u
 
 **Principle: restraint with one strong idea.** Each section says one thing. Large fluid type. Generous space. Colour comes in broad flat bands, not scattered accents.
 
-- **Colour bands.** Full-width bands of charcoal, turmeric, chutney red and coriander on a white page (D-026), with the existing palette only; cream appears only as a light tint on one or two calm bands. Text and background pairs must pass the contrast rules.
+- **Colour (D-027).** White page, with emerald bands and footer, soft green and peach tints, and copper accents, from the Emerald & Copper palette in `docs/ui-rulebook.md` section 2. Flat colour, no gradients. Text and background pairs must pass the contrast rules.
 - **The fold.** A hand-drawn, slightly imperfect pleat pattern, drawn as SVG, used as section divider and as a border for the chalkboard panel. It is the signature motif.
 - **The ridge line.** One continuous hand-drawn line of mountains, as a single-stroke SVG across the hero and above the footer.
 - **Steam.** Two or three small drifting wisps over the hero image or the steamer illustration.
 - **Kraft tag.** A small label component echoing her sign (kraft paper, twine), used for prices, "Pickup only" and availability.
-- **Chalkboard panel.** Keep it, with real text, as the menu.
+- **Product cards, not a chalkboard (D-027).** Products appear as clean cards (image, name, size, price, Add to cart). The chalkboard panel is retired as the product list; the kraft tag stays.
+- **Trust row.** A calm row of four short statements with small line icons drawn as SVG (homemade, frozen, pickup only, pay cash). No stock icon sets.
 - **Type.** Bigger and tighter display headings in a warm serif, plain body text. One self-hosted open-licence serif is allowed (D-025).
 - **Images.** Few, large, warm and imperfect; honest alt text. Four slots until her real photos exist: hero, momo close-up, chutney bowl, kitchen corner. The layout must look good with placeholders and with real images.
 - **Motion.** At most two subtle effects: slow steam drift and a gentle fade-in as sections appear. Content is fully visible without JavaScript and when reduced motion is requested.
@@ -82,4 +83,4 @@ Answers go into the About section and the chutney and hero copy, in her own word
 
 ## 8. Design reference (D-026)
 
-Approved reference: direction A, turmeric hero, white page. Images: `docs/design/home-reference-a-narrow.jpg` (phone) and `docs/design/home-reference-a-wide.jpg` (wider layout). They are mockups made with an image generator: use them for layout, colour, type scale, rhythm and component shapes, not for pixels. The photos in them (steamer, momo, chutney bowl) are AI placeholders; the real images come later. Text in the mockups matches section 4.
+Approved reference (D-027, hybrid): `docs/design/hybrid-reference-grocery.jpg` for structure (clean header, rounded hero panel with cut-out image, trust row, product cards, tiles, banner, multi-column footer) and `docs/design/palette-emerald-copper.jpg` (bottom-right quadrant of a palette sheet) for colour. They are AI mockups: use them for layout, rhythm, colour and component shapes, not pixels. Do not copy their content (see D-027 for what is excluded). Our copy is in section 4; the story bands from "Made together" remain. The earlier direction A references were removed.

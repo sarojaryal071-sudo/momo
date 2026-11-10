@@ -1,3 +1,5 @@
+> **SUPERSEDED by `step-1d-hybrid-premium.md` (decision D-027).** Already built and merged. Do not redo it. The reference images it mentions were removed. Kept for history only.
+
 # Step 1c — Rebuild the look to the approved reference
 
 Prerequisite: Step 1b is merged (it is). Read `CLAUDE.md`, `docs/brand-direction.md` (sections 5 and 8), and `docs/ui-rulebook.md` sections 2, 2b and 5 only. Do only this step. Add the checklist at the bottom to `docs/progress-tracker.md` first.

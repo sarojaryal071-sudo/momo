@@ -71,7 +71,7 @@ Conventions: files and folders `kebab-case`; database tables and columns `snake_
 
 All tables have `created_at`. Use `uuid` ids unless noted. Money is `integer` pence.
 
-- `products` — id, slug (unique), name, kind (`pack` or `addon`), unit_label (for example "40 pieces"), price_pence, available (bool), photo_path (nullable), sort_order, active (bool), updated_at.
+- `products` — id, slug (unique), name, kind (`pack` or `addon`), category (nullable text, for filter chips once the catalogue grows, decision D-028), unit_label (for example "40 pieces"), price_pence, available (bool), photo_path (nullable), sort_order, active (bool), updated_at.
 - `pickup_rules` — id, weekday (0 to 6, Sunday is 0), start_time, end_time, slot_minutes (default 60), active.
 - `pickup_exceptions` — id, date, kind (`closed` or `extra`), start_time, end_time (null when closed all day), note.
 - `site_notice` — single row (id = 1): message, active, updated_at.
