@@ -146,6 +146,22 @@
   --tooth: 0.5rem;
   --receipt-max: 26rem;
 
+  /* Cart page: wide layout */
+  --cart-max: 70rem;
+  --cart-form: 22rem;
+  --price-col: 4.5rem;
+
+  /* Ambient background (D-042): three very soft colour spots behind the whole page, in palette colours only.
+     --ambient-opacity: 0 switches the layer off. The only gradients allowed on the site. */
+  --ambient-opacity: 0.18;
+  --ambient-a: var(--emerald);
+  --ambient-b: var(--peach);
+  --ambient-c: var(--sage);
+  --ambient-a-pos: 6% 4%;
+  --ambient-b-pos: 96% 46%;
+  --ambient-c-pos: 4% 96%;
+  --ambient-r: clamp(18rem, 55vw, 42rem);
+
   /* Details window */
   --sheet-height: 85dvh;
   --handle-w: 2.5rem;
@@ -182,4 +198,5 @@
    (max-width: 47.99em) is the same breakpoint seen from the phone side: it styles the full-screen menu.
    Not a width: (prefers-reduced-motion: no-preference) wraps movement (press-down, slide-in), so nothing moves for
    people who ask for less motion; base.css stops animations and transitions for (prefers-reduced-motion: reduce).
-   (print) lets the receipt print on its own. */
+   (print) lets the receipt print on its own. (prefers-reduced-transparency) and (prefers-contrast: more) remove the
+   ambient background. The cart page switches to two columns with a container query at 52rem of page width. */

@@ -70,7 +70,7 @@ function render() {
   list.replaceChildren();
   for (const line of lines) {
     const li = el('li', 'cart-line');
-    const info = el('div');
+    const info = el('div', 'cart-info');
     info.append(el('h3', '', line.product ? line.product.name : line.slug));
     if (line.unavailable) {
       info.append(el('p', 'error', line.soldOut ? 'Sold out. It will be removed when you confirm.' : 'No longer available. It will be removed when you confirm.'));

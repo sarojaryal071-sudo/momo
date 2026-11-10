@@ -125,6 +125,7 @@
 /* Forms */
 .field { display: grid; gap: var(--space-3xs); margin-block-end: var(--space-s); }
 .field label { font-weight: 700; }
+.field input, .field textarea, .field select { inline-size: 100%; min-inline-size: 0; }
 .field input, .field textarea, .field select {
   min-block-size: var(--tap); padding: var(--space-2xs) var(--space-xs); font: inherit;
   background: var(--white); color: var(--charcoal);
@@ -208,7 +209,7 @@ html:not(.js) .shop-tools { display: none; }
 .chip[aria-pressed="true"]:hover, .opt:has(input:checked):hover { background: var(--emerald-dark); }
 
 /* Compact quantity stepper: a pill with round minus and plus buttons */
-.stepper { display: inline-flex; align-items: center; padding: var(--space-3xs); }
+.stepper { flex: none; display: inline-flex; align-items: center; justify-self: start; padding: var(--space-3xs); }
 .stepper .qty-btn { display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap); padding: 0; font: inherit; font-size: var(--step-1); font-weight: 700; color: var(--emerald); background: transparent; border: 0; border-radius: 50%; box-shadow: none; cursor: pointer; transition: background var(--dur-fast), translate var(--dur-base) var(--ease-spring); }
 .stepper .qty-btn:hover:not(:disabled) { background: var(--pill-fill-light-hover); }
 .stepper .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -285,15 +286,30 @@ html:has(dialog[open]) { overflow: hidden; }
 .contact-line, .order-contact { margin-block-start: var(--space-m); }
 
 /* Cart and done pages */
-.cart-lines { margin: 0 0 var(--space-m); padding: 0; list-style: none; }
+.cart-lines { container-type: inline-size; margin: 0 0 var(--space-m); padding: 0; list-style: none; }
 .cart-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-m); padding-block: var(--space-s); border-block-end: var(--hairline) solid var(--line); }
-.cart-line > div { flex: 1 1 14rem; }
+.cart-info { flex: 1 1 14rem; min-inline-size: 0; } /* only the name block grows; the stepper never does */
 .cart-line h3, .cart-line p, .cart-line .qty { margin: 0; }
+/* Wide: each line is a grid, so name, stepper, price and Remove line up from row to row */
+@container (min-width: 30rem) {
+  .cart-line { display: grid; grid-template-columns: minmax(0, 1fr) auto var(--price-col) auto; gap: var(--space-xs) var(--space-s); }
+  .cart-line > .stepper { grid-column: 2; }
+  .cart-line > .line-price { grid-column: 3; }
+  .cart-line > .btn { grid-column: 4; min-block-size: var(--tap); padding-inline: var(--space-s); }
+}
 .menu-meta { font-weight: 700; }
 .line-options { font-size: var(--step--1); }
 .line-price { font-weight: 700; min-inline-size: 4ch; text-align: end; }
 .cart-total { font-size: var(--step-2); font-family: var(--font-head); color: var(--emerald); }
 .order-form { max-inline-size: var(--measure); margin-block-start: var(--space-xl); }
+.cart-wrap { container-type: inline-size; }
+/* Wide cart: lines and total on the left, the details form as a solid card on the right */
+@container (min-width: 52rem) {
+  [data-cart-content] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, var(--cart-form)); grid-template-areas: "lines form" "total form"; grid-template-rows: auto 1fr; gap: var(--space-s) var(--space-xl); align-items: start; max-inline-size: var(--cart-max); }
+  [data-cart-content] .cart-lines { grid-area: lines; margin: 0; }
+  [data-cart-content] .cart-total { grid-area: total; margin: 0; }
+  [data-cart-content] .order-form { grid-area: form; max-inline-size: none; margin: 0; padding: var(--space-l); background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+}
 
 /* How to cook */
 .cook-steps { max-inline-size: var(--measure); padding-inline-start: var(--space-m); }
@@ -302,6 +318,7 @@ html:has(dialog[open]) { overflow: hidden; }
 
 /* Cart form: pickup time as hour and minute lists */
 .pickup-time { margin: 0 0 var(--space-s); padding: 0; border: 0; }
+.pickup-time .hint { margin-block-end: var(--space-2xs); }
 .pickup-time legend { padding: 0; margin-block-end: var(--space-2xs); font-weight: 700; }
 .time-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-s); }
 

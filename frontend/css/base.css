@@ -12,6 +12,18 @@ body {
   font: var(--step-0)/var(--line-height-body) var(--font-body);
 }
 
+/* Ambient background (D-042): one fixed, non-interactive layer of three soft colour spots behind the page. It never moves,
+   so it is painted once and does not repaint on scroll. --ambient-opacity: 0 switches it off. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: var(--ambient-opacity);
+  background:
+    radial-gradient(circle var(--ambient-r) at var(--ambient-a-pos), var(--ambient-a), transparent),
+    radial-gradient(circle var(--ambient-r) at var(--ambient-b-pos), var(--ambient-b), transparent),
+    radial-gradient(circle var(--ambient-r) at var(--ambient-c-pos), var(--ambient-c), transparent);
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { body::before { display: none; } }
+@media print { body::before { display: none; } }
+
 main { flex: 1; }
 [hidden] { display: none !important; }
 
