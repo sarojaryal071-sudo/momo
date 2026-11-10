@@ -99,6 +99,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] "Order received" screen, failure path, no automatic WhatsApp — d0ae572, drawn check, Order received, not-confirmed highlight, summary, three steps, contact; no automatic WhatsApp and no Open WhatsApp order button; failure shows the WhatsApp message button and keeps the cart
 - [x] Verified, merged to `main`, deploy confirmed — d0ae572, see log
 
+## Step 1h — Receipt, full-screen menu and pill options (owner request after Step 1g)
+
+- [ ] Paper receipt on the Order received screen, with print / save as PDF and download
+- [ ] Full-screen animated menu with 3D pills (emerald palette)
+- [ ] Compact 3D pill options in the product window
+- [ ] Verified, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
