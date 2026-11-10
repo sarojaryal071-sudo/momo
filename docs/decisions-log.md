@@ -28,6 +28,8 @@ Status: v1, 2026-11-10. Add new decisions at the bottom with the next number. Ch
 | D-021 | Order alerts go to the owner by email through a provider called from the `place-order` edge function. | Provider not chosen yet (Resend free tier is the suggestion). Email address never goes in the repo. |
 | D-022 | **Soft-coded and fluid, never hard-coded.** Sizes, spacing, type and widths are fluid (`clamp()`, `rem`, `%`, `ch`, viewport and container units) and defined once as tokens in `theme.css`, used by name. Limits, timeouts and business values are named constants in one config place or in the `settings` table, not literals scattered in code. | Added 2026-11-10 by the owner. Rules in `docs/ui-rulebook.md` section 2b and `docs/technical-rulebook.md` section 1. Interpretation: "soft-coded" means defined once and configurable; "fluid" means layouts adapt continuously instead of snapping between fixed sizes. |
 | D-023 | **Owner-approved sample values.** Until she confirms real figures, sauce pot prices, steam time and pickup hours may use obvious fake sample values so the pages and flows can be built and tested. | Each is marked `data-placeholder` in HTML (or `"placeholder": true` in seed JSON) and shows a visible "sample" label. Does **not** cover allergens, storage or food-safety advice, pickup location, or any legal or health wording: those stay `TODO:`. The database seed keeps sauce pots unavailable until real prices are set in admin. An indexable build and the launch checklist fail while any `data-placeholder` or `TODO:` remains. Added 2026-11-10 by the owner. |
+| D-024 | **Story world: "Made together."** The site is built around momo as a shared ritual and the table brought to wherever home is now. Visual direction: warm craft, illustrated, professional and plain, in the spirit of Dishoom's one-story-world approach. | Real meaning comes only from sourced facts (table in `docs/brand-direction.md` section 2) and the owner's friend's own answers. Never claim an origin (it is disputed), and never use "authentic" or similar unconfirmed words. No religious symbols or national flag as decoration. Inspiration only, nothing copied. Added 2026-11-10 by the owner. |
+| D-025 | One self-hosted open-licence serif for headings is allowed (Latin subset, `woff2`, about 80 KB at most, `font-display: swap`, licence file included). Body text stays on the system stack. | Supersedes "no web-font downloads" for this one font. Added 2026-11-10 to make the type feel designed. |
 
 ## Open items
 
@@ -38,5 +40,6 @@ Status: v1, 2026-11-10. Add new decisions at the bottom with the next number. Ch
 - [ ] Sauce pot prices
 - [ ] Cooking instructions (steam time from frozen)
 - [ ] Final brand name and logo
+- [ ] Her answers to the five story questions (`docs/brand-direction.md` section 7)
 - [ ] Email provider choice (D-021)
 - [ ] Council registration, allergens, privacy wording, data retention period for orders

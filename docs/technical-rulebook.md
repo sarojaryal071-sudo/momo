@@ -85,7 +85,7 @@ In `mock` mode (before the backend exists) the gateway returns a clearly fake nu
 ## 8. Performance budget (mobile)
 
 - Largest Contentful Paint under 2.5 s on a mid-range phone with a normal connection. Lighthouse performance 90 or better on `index.html` and `shop.html`.
-- Public JavaScript under 50 KB gzipped in total. No web-font downloads at launch (system font stacks).
+- Public JavaScript under 50 KB gzipped in total. One self-hosted heading font is allowed (decision D-025, about 80 KB at most); body text uses the system stack and no other web fonts are downloaded.
 - Images: WebP, explicit `width` and `height`, `loading="lazy"` below the fold, hero image sized for mobile first.
 
 ## 9. Testing and verification

@@ -22,6 +22,7 @@ The planning chat (claude.ai) never writes code. It writes these docs and instru
 | Orders, money, WhatsApp, security rules, accessibility, testing, git | `docs/technical-rulebook.md` |
 | Colours, type, layout, images, copy tone | `docs/ui-rulebook.md` |
 | Titles, meta, structured data, sitemap, noindex, launch gate | `docs/seo-rulebook.md` |
+| Story, voice, exact copy, allowed facts, visual motifs | `docs/brand-direction.md` |
 | What to skip, how much to check, how to record progress | `docs/usage-rules.md` |
 
 ## Hard rules

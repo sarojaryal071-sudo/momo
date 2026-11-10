@@ -41,7 +41,7 @@ Nothing visual is hard-coded. Everything scales smoothly with the screen and is 
 
 ## 3. Typography and texture
 
-- Headings: warm serif stack (already defined in `--font-head`). Body: system sans (`--font-body`). No web-font downloads.
+- Headings: one self-hosted open-licence serif (decision D-025) with the existing serif stack as fallback in `--font-head`. Body: system sans (`--font-body`). No other web-font downloads. Story, voice and motifs: `docs/brand-direction.md`.
 - Faint paper grain on the page background (already in `base.css`). Keep the opacity low.
 - Chalk-style underline or hand-drawn rule under key headings, done with CSS or a small inline SVG, not an image dependency.
 - Large, confident headings; short lines; generous spacing. Body copy max about 60 characters wide.
