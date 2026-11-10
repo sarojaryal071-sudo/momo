@@ -9,7 +9,8 @@ Status: v1, 2026-11-10. Rules and behaviour. Structure lives in `architecture-ru
 - Semantic HTML first. One `h1` per page. Landmarks: `header`, `nav`, `main`, `footer`.
 - Write user-supplied text into the page with `textContent`, never `innerHTML`. This matters most in the admin, which displays customer names and notes.
 - Small files, one job each. No dead code, no commented-out blocks, no unused CSS.
-- Colours only through tokens in `css/theme.css`. No hex values in other CSS files.
+- Colours, sizes, spacing, radii and timings only through tokens in `frontend/css/theme.css`. No hex values and no pixel values in other CSS files (see `ui-rulebook.md` section 2b). Layouts are fluid, not fixed.
+- **No magic numbers.** Quantity limits, text-length limits, timeouts, pickup lead times, the WhatsApp link length cap, retry counts and similar values are named constants in one config place: `frontend/js/site-config.js` in the browser, the `settings` table where the owner should be able to change them, and one constants file inside each edge function. The browser and the function must read the same limits (the function is the authority). Business content (prices, product names, pickup times, notices) is data, never code.
 - Text for people is written in the HTML, not assembled in JavaScript, except order messages and error messages.
 
 ## 2. Money and orders

@@ -6,6 +6,15 @@ Prerequisite: Step 0 done and deployed. Read `CLAUDE.md`, the UI rulebook and th
 
 The public pages, hand-written, mobile first, readable by Google, using local seed data for products. No cart, no ordering yet (the buttons exist but are inert or link to the shop).
 
+## Do first: fluid tokens (decision D-022)
+
+Before any page work, do this once and add it as the first unchecked item of Step 1 in `docs/progress-tracker.md`:
+
+- Extend `frontend/css/theme.css` with the fluid type scale, spacing scale, layout, and control tokens listed in `docs/ui-rulebook.md` section 2b. Keep the existing colour and font token names.
+- Convert `frontend/css/base.css` so it uses only tokens: the focus ring (`3px` and offset), the paper-grain and heading sizes, and the `.wrap` and `.section` rules. The visually-hidden helper is the only exempt rule.
+- Document the (at most two) media-query widths in a comment block in `theme.css`.
+- Check only that `index.html` still renders at 360 px and at desktop width. No other verification for this item.
+
 ## Do
 
 1. **Shared pieces** (copied by hand into each page, no templating): header with brand name, nav (Home, Shop, How to cook), a cart link with a count placeholder, and a phone or WhatsApp link; footer with the phone number, "Pickup only", and a short line. Add `frontend/css/components.css` for buttons, header, footer, forms, notice strip, and the chalkboard menu panel. Colours only via tokens.

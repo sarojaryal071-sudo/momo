@@ -20,6 +20,25 @@ Himalayan and earthy. Warm brick, wood, steam, chalkboard, kraft paper, prayer-f
 
 Run a real contrast check on every text and background pair you use and report the ratios. Do not add colours without asking. No purple or violet anywhere.
 
+## 2b. Fluid sizing and soft-coded values (decision D-022)
+
+Nothing visual is hard-coded. Everything scales smoothly with the screen and is defined once.
+
+**Tokens, defined once in `frontend/css/theme.css`, used by name everywhere else:**
+- Type scale `--step--1` to `--step-5`, each a `clamp()` between a phone size and a desktop size in `rem` (the body is `--step-0`).
+- Spacing scale `--space-3xs` to `--space-3xl`, each a `clamp()` in `rem` with a small viewport-based part.
+- Layout: `--gutter` (fluid side padding), `--wrap` (max content width, as already exists in `--max`), `--measure` (about `60ch`).
+- Controls: `--tap` (minimum touch target, about `2.75rem`), `--radius` (small; the brand is not pill-shaped), `--hairline` (border width), `--ring-width` and `--ring-offset` (focus ring).
+- Tune the numbers while building; keep the names stable.
+
+**Rules:**
+- Pixel values appear **only inside token definitions** in `theme.css`. Component and page CSS use tokens, `rem`, `%`, `ch`, `fr`, `vw`, `svh` and `dvh`, or container units. The one exception is the visually-hidden helper.
+- No fixed `width` or `height` on layout boxes. Use `min-`/`max-` sizes, `aspect-ratio`, `min-block-size` with `clamp()`, and intrinsic grids such as `repeat(auto-fit, minmax(min(100%, 16rem), 1fr))`.
+- Prefer layouts that adapt without breakpoints. Where something must change at a width, prefer a container query. Media queries are a last resort: use `em` units, define at most two of them (document them in a comment block in `theme.css`, since CSS variables cannot be used in media queries), and never write a one-off breakpoint in a component.
+- Images and media: `max-inline-size: 100%`, `height: auto`, with `width` and `height` attributes only to reserve space (the CSS still scales them).
+- Text scales with the user's browser setting: never set font sizes in `px`, and the page must remain usable at 200 percent zoom and at widths from 320 px up.
+- Colours, sizes, radii, shadows (if any), durations and z-indexes: tokens, not literals.
+
 ## 3. Typography and texture
 
 - Headings: warm serif stack (already defined in `--font-head`). Body: system sans (`--font-body`). No web-font downloads.
