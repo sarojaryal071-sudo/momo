@@ -36,6 +36,7 @@
   --transition: 150ms;
 
   --font-head: "Young Serif", "Young Serif Fallback", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; /* receipt */
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
   --max: 70rem;
@@ -73,7 +74,6 @@
   --dialog-max: 34rem;
   --photo-small: 16rem;
   --section-gap: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
-  --menu-row: 3.25rem;
   --z-menu: 20;
   --z-bar: 30;
   --checkout-bar-space: 5rem;
@@ -120,6 +120,16 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
+  /* 3D pills: a solid edge underneath, pressed down on tap (no gradients) */
+  --depth: 0.3125rem;
+  --depth-sm: 0.1875rem;
+  --stagger: 70ms;
+  --menu-origin: calc(100% - var(--gutter) - 1.25rem) 1.75rem;
+
+  /* Paper receipt */
+  --tooth: 0.5rem;
+  --receipt-max: 26rem;
+
   /* Details window */
   --sheet-height: 85dvh;
   --handle-w: 2.5rem;
@@ -153,5 +163,7 @@
    repeated here and nowhere else in the CSS but the rule itself. Used for: the header (phone menu below it,
    inline nav from it) and the product cards (compact rows below it, vertical grid cards from it).
    - (min-width: 48em)
+   (max-width: 47.99em) is the same breakpoint seen from the phone side: it styles the full-screen menu.
    Not a width: (prefers-reduced-motion: no-preference) wraps movement (press-down, slide-in), so nothing moves for
-   people who ask for less motion; base.css stops animations and transitions for (prefers-reduced-motion: reduce). */
+   people who ask for less motion; base.css stops animations and transitions for (prefers-reduced-motion: reduce).
+   (print) lets the receipt print on its own. */

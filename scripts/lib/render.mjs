@@ -61,7 +61,9 @@ function optionGroupHtml(p, g) {
   const inputs = g.options.map((o) => `<label class="opt"><input type="${single ? 'radio' : 'checkbox'}" name="opt-${esc(p.slug)}-${esc(g.id)}" value="${esc(o.id)}" data-delta="${o.price_delta_pence || 0}" data-default="${o.is_default ? 'true' : 'false'}"${o.is_default ? ' checked' : ''}> <span>${esc(o.label)}</span>${delta(o)}</label>`).join('\n      ');
   return `<fieldset class="opt-group" data-group="${esc(g.id)}" data-kind="${esc(g.kind)}">
       <legend>${esc(g.label)}${g.placeholder ? SAMPLE_TAG : ''}</legend>
+      <div class="opt-list">
       ${inputs}
+      </div>
     </fieldset>`;
 }
 

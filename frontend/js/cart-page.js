@@ -196,7 +196,7 @@ async function confirm(e) {
   confirmBtn.disabled = true;
   try {
     const result = await submitOrder({ ...order, totalPenceHint: totalPence });
-    try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name })); } catch { /* the done page copes without it */ }
+    try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name, placedAt: new Date().toISOString() })); } catch { /* the done page copes without it */ }
     getCart().clear();
     location.href = `done.html?o=${encodeURIComponent(result.orderNumber)}`;
   } catch {

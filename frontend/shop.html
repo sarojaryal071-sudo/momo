@@ -29,7 +29,7 @@
       <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
       <div class="header-tools">
         <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
-        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7 H20 M4 12 H20 M4 17 H20"/></svg><span class="visually-hidden">Menu</span></button>
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="icon-open" d="M4 7 H20 M4 12 H20 M4 17 H20"/><path class="icon-close" d="M5 5 L19 19 M19 5 L5 19"/></svg><span class="visually-hidden">Menu</span></button>
       </div>
       <nav id="site-menu" class="site-menu" aria-label="Main" tabindex="-1" data-menu>
         <ul class="nav-list">
@@ -101,14 +101,18 @@
       </section>
       <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
       <legend>Leave out <span class="sample-label">sample</span></legend>
+      <div class="opt-list">
       <label class="opt"><input type="checkbox" name="opt-chicken-momo-leave-out" value="no-onion" data-delta="0" data-default="false"> <span>No onion</span></label>
       <label class="opt"><input type="checkbox" name="opt-chicken-momo-leave-out" value="no-coriander" data-delta="0" data-default="false"> <span>No coriander</span></label>
+      </div>
     </fieldset>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
+      <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
+      </div>
     </fieldset>
       <!-- TODO: owner and council to approve the allergy wording below -->
       <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
@@ -158,14 +162,18 @@
       </section>
       <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
       <legend>Leave out <span class="sample-label">sample</span></legend>
+      <div class="opt-list">
       <label class="opt"><input type="checkbox" name="opt-veg-momo-leave-out" value="no-onion" data-delta="0" data-default="false"> <span>No onion</span></label>
       <label class="opt"><input type="checkbox" name="opt-veg-momo-leave-out" value="no-coriander" data-delta="0" data-default="false"> <span>No coriander</span></label>
+      </div>
     </fieldset>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
+      <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
+      </div>
     </fieldset>
       <!-- TODO: owner and council to approve the allergy wording below -->
       <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
@@ -215,9 +223,11 @@
       </section>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
+      <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
+      </div>
     </fieldset>
       <!-- TODO: owner and council to approve the allergy wording below -->
       <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
@@ -267,9 +277,11 @@
       </section>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
+      <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
+      </div>
     </fieldset>
       <!-- TODO: owner and council to approve the allergy wording below -->
       <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>

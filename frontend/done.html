@@ -21,7 +21,7 @@
       <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
       <div class="header-tools">
         <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
-        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7 H20 M4 12 H20 M4 17 H20"/></svg><span class="visually-hidden">Menu</span></button>
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="icon-open" d="M4 7 H20 M4 12 H20 M4 17 H20"/><path class="icon-close" d="M5 5 L19 19 M19 5 L5 19"/></svg><span class="visually-hidden">Menu</span></button>
       </div>
       <nav id="site-menu" class="site-menu" aria-label="Main" tabindex="-1" data-menu>
         <ul class="nav-list">
@@ -40,29 +40,49 @@
   <main id="main" class="flow">
     <section class="section done">
       <div class="wrap">
-        <div class="done-head">
+        <div class="done-head no-print">
           <svg class="done-check" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" pathLength="1"/><path d="M19 33 L28 42 L45 23" pathLength="1"/></svg>
           <h1>Order received</h1>
         </div>
         <div class="done-content">
-          <p class="lead" data-done-number></p>
-          <p class="done-highlight">Your order is not confirmed until we message you.</p>
-          <div class="done-summary" data-done-summary hidden>
-            <h2 class="rule">Your order</h2>
-            <ul class="cart-lines" data-done-lines></ul>
-            <p class="cart-total">Total <strong data-done-total></strong></p>
-            <p data-done-name></p>
-            <p data-done-pickup></p>
+          <p class="lead no-print" data-done-number-lead></p>
+          <p class="done-highlight no-print">Your order is not confirmed until we message you.</p>
+          <div class="receipt-stage" data-done-summary hidden>
+            <article class="receipt" aria-label="Order receipt">
+              <header class="receipt-head">
+                <p class="receipt-brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</p>
+                <p class="receipt-kicker">Order receipt</p>
+                <p class="receipt-number" data-done-number></p>
+                <p class="receipt-small" data-done-placed></p>
+              </header>
+              <dl class="receipt-meta">
+                <div><dt>Name</dt><dd data-done-name></dd></div>
+                <div><dt>Pickup</dt><dd data-done-pickup></dd></div>
+              </dl>
+              <ul class="receipt-lines" data-done-lines></ul>
+              <p class="receipt-total"><span>Total</span><strong data-done-total></strong></p>
+              <footer class="receipt-foot">
+                <p>Pickup only. Pay cash when you pick up.</p>
+                <p>Not confirmed until we message you.</p>
+                <p>Thank you for ordering from Steam &amp; Spice.</p>
+              </footer>
+            </article>
           </div>
-          <p data-done-missing hidden>We cannot show your summary on this device. Please call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a>.</p>
-          <h2 class="rule">What happens next</h2>
-          <ol class="next-steps">
-            <li>We will message you on WhatsApp to confirm your order.</li>
-            <li>Pick up at <span data-done-when>the time we agree</span>. We will send the full address then.</li>
-            <li>Pay cash when you pick up.</li>
-          </ol>
-          <p class="contact-line">Questions? Call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></p>
-          <p><a href="shop.html">Back to the shop</a></p>
+          <p class="done-actions no-print" data-done-actions hidden>
+            <button type="button" class="btn" data-print>Print or save as PDF</button>
+            <button type="button" class="btn btn-secondary" data-download>Download receipt</button>
+          </p>
+          <p class="no-print" data-done-missing hidden>We cannot show your receipt on this device. Please call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a>.</p>
+          <div class="no-print">
+            <h2 class="rule">What happens next</h2>
+            <ol class="next-steps">
+              <li>We will message you on WhatsApp to confirm your order.</li>
+              <li>Pick up at <span data-done-when>the time we agree</span>. We will send the full address then.</li>
+              <li>Pay cash when you pick up.</li>
+            </ol>
+            <p class="contact-line">Questions? Call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></p>
+            <p><a href="shop.html">Back to the shop</a></p>
+          </div>
         </div>
       </div>
     </section>
