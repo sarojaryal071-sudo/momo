@@ -111,7 +111,6 @@
   --glass-edge: color-mix(in srgb, var(--white) 60%, transparent);
   --glass-blur: 0.75rem;
   --glass-shadow: 0 0.5rem 2rem color-mix(in srgb, var(--charcoal) 16%, transparent), inset 0 0 0 var(--hairline) var(--glass-edge);
-  --glass-backdrop: color-mix(in srgb, var(--charcoal) 45%, transparent);
 
   /* Motion */
   --dur-fast: 120ms;
@@ -120,9 +119,26 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* 3D pills: a solid edge underneath, pressed down on tap (no gradients) */
-  --depth: 0.3125rem;
-  --depth-sm: 0.1875rem;
+  /* Glass pills (D-041): translucent fill, blur, hairline light border, inner top highlight, soft shadow. No gradients,
+     no thick coloured edges. Two variants: on-light (emerald text) and on-dark (white text on the emerald glass layer). */
+  --pill-fill-light: color-mix(in srgb, var(--white) 70%, transparent);
+  --pill-fill-light-hover: color-mix(in srgb, var(--white) 88%, transparent);
+  --pill-border-light: color-mix(in srgb, var(--emerald) 28%, transparent);
+  --pill-fill-dark: color-mix(in srgb, var(--white) 12%, transparent);
+  --pill-fill-dark-hover: color-mix(in srgb, var(--white) 16%, transparent);
+  --pill-fill-dark-current: color-mix(in srgb, var(--white) 19%, transparent);
+  --pill-border-dark: color-mix(in srgb, var(--white) 38%, transparent);
+  --pill-highlight: inset 0 var(--hairline) 0 color-mix(in srgb, var(--white) 75%, transparent);
+  --pill-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--charcoal) 16%, transparent);
+  --pill-shadow-dark: 0 0.25rem 0.75rem color-mix(in srgb, var(--charcoal) 30%, transparent);
+  --pill-shadow-pressed: 0 0.0625rem 0.125rem color-mix(in srgb, var(--charcoal) 20%, transparent);
+  --pill-solid-dark: color-mix(in srgb, var(--emerald) 78%, var(--white)); /* solid fallback behind the on-dark glass pills */
+  --glass-emerald: color-mix(in srgb, var(--emerald) 90%, transparent);
+  --glass-blur-strong: 1.5rem;
+  --glass-scrim: color-mix(in srgb, var(--emerald) 32%, transparent);
+  --depth: 0.25rem;
+  --menu-pill-max: 22rem;
+  --close-size: 3rem;
   --stagger: 70ms;
   --menu-origin: calc(100% - var(--gutter) - 1.25rem) 1.75rem;
 

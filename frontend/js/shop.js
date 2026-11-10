@@ -4,6 +4,7 @@ import './main.js';
 import { buildLines, formatPrice, getCart, updateHeaderCount } from './cart.js';
 import { updateCheckoutBar } from './checkout-bar.js';
 import { loadPickup } from './data.js';
+import { usedKeyboard } from './input-mode.js';
 import { earliestPickup, noticeText } from './pickup.js';
 import { siteConfig } from './site-config.js';
 
@@ -176,7 +177,8 @@ function openDialog(card, from) {
   if (!dlg || dlg.open) return;
   opener = from;
   resetDialog(dlg);
-  dlg.showModal();
+  dlg.showModal(); // the panel has autofocus, so a touch or mouse open leaves no focus ring on the close button
+  if (usedKeyboard()) dlg.querySelector('[data-dialog-close]').focus();
   updateDialog(dlg);
 }
 

@@ -87,7 +87,7 @@ function dialogHtml(p) {
       </div>`
     : (soldOut ? '' : '<p class="stock-line">Not available yet</p>');
   return `<dialog class="product-dialog" aria-labelledby="dlg-${esc(p.slug)}-title" data-dialog>
-  <div class="dialog-panel">
+  <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
       ${mediaHtml(p, '6rem', ' dialog-media')}

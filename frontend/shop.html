@@ -32,16 +32,28 @@
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="icon-open" d="M4 7 H20 M4 12 H20 M4 17 H20"/><path class="icon-close" d="M5 5 L19 19 M19 5 L5 19"/></svg><span class="visually-hidden">Menu</span></button>
       </div>
       <nav id="site-menu" class="site-menu" aria-label="Main" tabindex="-1" data-menu>
+        <div class="menu-bar">
+          <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
+          <div class="menu-bar-tools">
+            <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
+            <button type="button" class="menu-close" aria-label="Close menu" data-menu-close><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+          </div>
+        </div>
+        <div class="menu-body">
         <ul class="nav-list">
           <li><a href="index.html">Home</a></li>
           <li><a href="shop.html" aria-current="page">Shop</a></li>
           <li><a href="how-to-cook.html">How to cook</a></li>
         </ul>
+        <div class="menu-contact-group">
+        <p class="menu-label">Get in touch</p>
         <ul class="menu-contact">
           <li><a class="contact-item" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a></li>
           <li class="menu-extra"><a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></li>
           <li class="menu-extra"><!-- build:instagram --><span class="contact-item"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7 h.01"/></svg><span data-todo>TODO: Instagram link</span></span><!-- /build:instagram --></li>
         </ul>
+        </div>
+        </div>
       </nav>
     </div>
   </header>
@@ -83,7 +95,7 @@
     </div>
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-chicken-momo-title" data-dialog>
-  <div class="dialog-panel">
+  <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
       <div class="card-media dialog-media card-media-multiply"><img src="assets/img/pack-chicken.webp" srcset="assets/img/pack-chicken-400.webp 400w, assets/img/pack-chicken.webp 800w" sizes="6rem" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
@@ -144,7 +156,7 @@
     </div>
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-veg-momo-title" data-dialog>
-  <div class="dialog-panel">
+  <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
       <div class="card-media dialog-media card-media-multiply"><img src="assets/img/pack-veg.webp" srcset="assets/img/pack-veg-400.webp 400w, assets/img/pack-veg.webp 800w" sizes="6rem" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
@@ -205,7 +217,7 @@
     </div>
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-chutney-pot-title" data-dialog>
-  <div class="dialog-panel">
+  <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
       <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
@@ -259,7 +271,7 @@
     </div>
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-hot-sauce-pot-title" data-dialog>
-  <div class="dialog-panel">
+  <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
       <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>

@@ -50,35 +50,53 @@
 .contact-item { display: inline-flex; align-items: center; gap: var(--space-2xs); }
 .menu-toggle[aria-expanded="false"] .icon-close, .menu-toggle[aria-expanded="true"] .icon-open { display: none; }
 
-/* Phone: the menu is a full-screen emerald overlay with 3D pills. The wordmark, cart and close button stay above it. */
+/* The menu bar, body and label only exist inside the phone overlay; on wide screens the lists sit inline in the header. */
+.menu-bar, .menu-label { display: none; }
+.menu-body, .menu-contact-group { display: contents; }
+
+/* Phone (D-041): the menu is a full-screen emerald-tinted glass layer over the blurred page. Its own top bar holds the
+   wordmark, the cart and a large close button, so nothing depends on the header underneath. Links are on-dark glass pills. */
 @media (max-width: 47.99em) {
   .js .site-menu {
-    position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; justify-content: center; gap: var(--space-l);
-    padding: calc(var(--tap) + var(--space-xl)) var(--gutter) calc(var(--space-l) + env(safe-area-inset-bottom));
+    position: fixed; inset: 0; z-index: 5; display: flex; flex-direction: column; padding: 0 var(--gutter) calc(var(--space-l) + env(safe-area-inset-bottom));
     background: var(--emerald); color: var(--white); overflow-y: auto; overscroll-behavior: contain; visibility: hidden;
     clip-path: circle(0 at var(--menu-origin));
     transition: clip-path var(--dur-slow) var(--ease-out), visibility 0s var(--dur-slow);
   }
   .js .site-menu.is-open { visibility: visible; clip-path: circle(150% at var(--menu-origin)); transition: clip-path var(--dur-slow) var(--ease-out), visibility 0s; }
-  .js .site-menu::after { content: ""; position: fixed; inset-inline: 0; inset-block-end: 0; pointer-events: none; block-size: var(--ridge-height); background: var(--sage); -webkit-mask: url("../assets/svg/ridge.svg") center bottom / 100% 100% no-repeat; mask: url("../assets/svg/ridge.svg") center bottom / 100% 100% no-repeat; }
-  .js .nav-list, .js .menu-contact { display: grid; gap: var(--space-s); justify-items: stretch; }
-  .js .menu-contact { grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
-  .js .site-menu a, .js .menu-contact .contact-item {
-    display: flex; align-items: center; justify-content: center; gap: var(--space-xs); min-block-size: calc(var(--tap) * 1.35);
-    padding-inline: var(--space-l); border-radius: var(--radius-pill); background: var(--white); color: var(--emerald);
-    font-family: var(--font-head); font-size: var(--step-2); text-decoration: none; text-align: center;
-    box-shadow: 0 var(--depth) 0 var(--sage), 0 calc(var(--depth) + var(--space-xs)) var(--space-s) color-mix(in srgb, var(--charcoal) 35%, transparent);
-    transition: translate var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+  @supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
+    .js .site-menu { background: var(--glass-emerald); -webkit-backdrop-filter: blur(var(--glass-blur-strong)); backdrop-filter: blur(var(--glass-blur-strong)); }
   }
-  .js .menu-contact a, .js .menu-contact .contact-item { min-block-size: calc(var(--tap) * 1.1); background: var(--green-tint); font-family: var(--font-body); font-size: var(--step-0); font-weight: 700; }
-  .js .site-menu a[aria-current="page"] { background: var(--peach); }
-  .js .site-menu a:focus-visible { outline-color: var(--ring-color-on-dark); }
+  .js .site-menu::after { content: ""; position: fixed; inset-inline: 0; inset-block-end: 0; pointer-events: none; block-size: var(--ridge-height); background: var(--sage); opacity: 0.7; -webkit-mask: url("../assets/svg/ridge.svg") center bottom / 100% 100% no-repeat; mask: url("../assets/svg/ridge.svg") center bottom / 100% 100% no-repeat; }
+  .js .menu-bar { flex: none; display: flex; align-items: center; justify-content: space-between; min-block-size: calc(var(--close-size) + var(--space-m)); padding-block: var(--space-xs); }
+  .js .menu-bar .brand, .js .menu-bar .cart-link { color: var(--white); }
+  .js .menu-bar-tools { display: flex; align-items: center; gap: var(--space-xs); }
+  .js .menu-bar .cart-badge { background: var(--white); color: var(--emerald); }
+  .js .menu-close { display: grid; place-items: center; inline-size: var(--close-size); block-size: var(--close-size); padding: 0; color: var(--white); background: var(--pill-solid-dark); border: var(--hairline) solid var(--pill-border-dark); border-radius: 50%; box-shadow: var(--pill-highlight), var(--pill-shadow-dark); cursor: pointer; }
+  .js .menu-body { display: grid; justify-items: center; align-content: center; gap: var(--space-xl); margin-block: auto; padding-block: var(--space-m); }
+  .js .menu-contact-group { display: grid; justify-items: center; gap: var(--space-xs); inline-size: 100%; }
+  .js .menu-label { display: block; margin: 0; font-size: var(--step--1); font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white); }
+  .js .nav-list, .js .menu-contact { display: grid; gap: var(--space-s); inline-size: min(100%, var(--menu-pill-max)); margin: 0; padding: 0; list-style: none; }
+  .js .menu-contact { gap: var(--space-xs); }
+  .js .site-menu .nav-list a, .js .menu-contact .contact-item {
+    display: flex; align-items: center; justify-content: center; gap: var(--space-xs); min-block-size: calc(var(--tap) * 1.4); padding-inline: var(--space-l);
+    border: var(--hairline) solid var(--pill-border-dark); border-radius: var(--radius-pill); background: var(--pill-solid-dark); color: var(--white);
+    font-family: var(--font-head); font-size: var(--step-2); text-decoration: none; text-align: center;
+    box-shadow: var(--pill-highlight), var(--pill-shadow-dark);
+    transition: background var(--dur-fast), box-shadow var(--dur-fast), translate var(--dur-base) var(--ease-spring);
+  }
+  .js .menu-contact .contact-item { min-block-size: calc(var(--tap) * 1.1); font-family: var(--font-body); font-size: var(--step-0); font-weight: 700; }
+  @supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
+    .js .site-menu .nav-list a, .js .menu-contact .contact-item, .js .menu-close { background: var(--pill-fill-dark); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+    .js .site-menu .nav-list a:hover, .js .menu-contact a.contact-item:hover, .js .menu-close:hover { background: var(--pill-fill-dark-hover); }
+    .js .site-menu .nav-list a[aria-current="page"] { background: var(--pill-fill-dark-current); }
+  }
+  .js .site-menu .nav-list a[aria-current="page"]::before { content: ""; flex: none; inline-size: var(--space-2xs); block-size: var(--space-2xs); border-radius: 50%; background: var(--white); }
+  .js .site-menu a:focus-visible, .js .menu-close:focus-visible { outline-color: var(--ring-color-on-dark); }
   .menu-open { overflow: hidden; }
-  .menu-open .brand, .menu-open .cart-link, .menu-open .menu-toggle { position: relative; z-index: 2; color: var(--white); }
-  .menu-open .cart-badge { background: var(--white); color: var(--emerald); }
 }
 @media (max-width: 47.99em) and (prefers-reduced-motion: no-preference) {
-  .js .site-menu a:active { translate: 0 var(--depth); box-shadow: 0 0 0 var(--sage); }
+  .js .site-menu a:active, .js .menu-close:active { translate: 0 var(--depth); box-shadow: var(--pill-highlight), var(--pill-shadow-pressed); }
   .js .site-menu.is-open li { animation: menu-item var(--dur-base) var(--ease-spring) both; animation-delay: calc(var(--i) * var(--stagger) + var(--dur-base)); }
   .js .nav-list li:nth-child(1) { --i: 1; } .js .nav-list li:nth-child(2) { --i: 2; } .js .nav-list li:nth-child(3) { --i: 3; }
   .js .menu-contact li:nth-child(1) { --i: 4; } .js .menu-contact li:nth-child(2) { --i: 5; } .js .menu-contact li:nth-child(3) { --i: 6; }
@@ -136,9 +154,6 @@
 html:not(.js) .shop-tools { display: none; }
 .shop-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-s); margin-block-end: var(--space-m); }
 .chips { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
-.chip { min-block-size: var(--tap); padding-inline: var(--space-m); font: inherit; font-weight: 700; color: var(--emerald); background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius-pill); cursor: pointer; }
-.chip:hover { background: var(--green-tint); }
-.chip[aria-pressed="true"] { background: var(--emerald); color: var(--white); }
 .search-box input { min-block-size: var(--tap); min-inline-size: min(100%, 16rem); padding: var(--space-2xs) var(--space-s); font: inherit; background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); }
 .empty-note { padding: var(--space-l); background: var(--green-tint); border-radius: var(--radius-lg); font-size: var(--step-1); }
 
@@ -161,7 +176,7 @@ html:not(.js) .shop-tools { display: none; }
 .card-price { margin: 0; font-family: var(--font-head); font-size: var(--step-1); color: var(--emerald); }
 .card-action { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2xs) var(--space-xs); margin-block-start: var(--space-3xs); }
 .card-action .badge { margin: 0; }
-.btn-add { min-inline-size: calc(var(--tap) * 1.6); }
+
 .added-note { flex-basis: 100%; min-block-size: 0; margin: 0; font-size: var(--step--1); font-weight: 700; color: var(--emerald); }
 .added-note:empty { display: none; }
 @media (min-width: 48em) {
@@ -175,63 +190,78 @@ html:not(.js) .shop-tools { display: none; }
   .card-action { margin-block-start: auto; }
 }
 
-/* Compact quantity stepper: card (after adding), details window and cart */
-.stepper { display: inline-flex; align-items: stretch; }
-.stepper .qty-btn, .stepper .qty-input { min-block-size: var(--tap); min-inline-size: var(--tap); font: inherit; text-align: center; background: var(--white); color: var(--emerald); border: var(--hairline) solid var(--emerald); border-radius: 0; }
-.stepper .qty-btn { cursor: pointer; font-weight: 700; box-shadow: var(--shadow-raised); }
-.stepper .qty-btn:hover:not(:disabled) { background: var(--green-tint); }
-.stepper .qty-btn:disabled { color: var(--line); border-color: var(--line); cursor: not-allowed; }
-.stepper .qty-btn:first-child { border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); }
-.stepper .qty-btn:last-child { border-start-end-radius: var(--radius); border-end-end-radius: var(--radius); }
-.stepper-count, .stepper .qty-input { display: grid; place-items: center; inline-size: calc(var(--tap) * 0.9); border-block: var(--hairline) solid var(--emerald); font-weight: 700; color: var(--charcoal); }
-.stepper .qty-input { border-inline: 0; border-radius: 0; padding: 0; }
-
-/* Details window (D-039): a bottom sheet on phones, a centred dialog from the tablet width.
-   Three zones: fixed header (close, thumbnail, name, price), scrolling middle, fixed footer (notes, stepper, add). */
-.product-dialog { inline-size: 100%; max-inline-size: none; block-size: var(--sheet-height); max-block-size: var(--sheet-height); margin: auto 0 0; padding: 0; border: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--glass-solid); color: var(--charcoal); box-shadow: var(--glass-shadow); overflow: hidden; overscroll-behavior: contain; }
-.product-dialog[open] { display: block; }
-.product-dialog::backdrop { background: var(--glass-backdrop); }
+/* Glass pills on light (D-041): filter chips, option pills, the card Add button and the quantity stepper share one look:
+   translucent fill, blur, hairline border, inner top highlight, soft shadow. Selected is solid emerald with white text. */
+:is(.chip, .opt, .btn-add, .stepper) {
+  background: var(--glass-solid); color: var(--emerald); border: var(--hairline) solid var(--pill-border-light); border-radius: var(--radius-pill);
+  box-shadow: var(--pill-highlight), var(--pill-shadow);
+  transition: background var(--dur-fast), box-shadow var(--dur-fast), color var(--dur-fast), translate var(--dur-base) var(--ease-spring);
+}
+.chip, .btn-add { min-block-size: var(--tap); padding-inline: var(--space-m); font: inherit; font-weight: 700; cursor: pointer; }
+.btn-add { min-inline-size: calc(var(--tap) * 2); }
+.btn-add:hover { background: var(--glass-solid); }
 @supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
-  .product-dialog { background: var(--glass-bg); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  :is(.chip, .opt, .btn-add, .stepper) { background: var(--pill-fill-light); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  :is(.chip, .opt, .btn-add):hover { background: var(--pill-fill-light-hover); }
+}
+.chip[aria-pressed="true"], .opt:has(input:checked) { background: var(--emerald); color: var(--white); border-color: var(--emerald); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.chip[aria-pressed="true"]:hover, .opt:has(input:checked):hover { background: var(--emerald-dark); }
+
+/* Compact quantity stepper: a pill with round minus and plus buttons */
+.stepper { display: inline-flex; align-items: center; padding: var(--space-3xs); }
+.stepper .qty-btn { display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap); padding: 0; font: inherit; font-size: var(--step-1); font-weight: 700; color: var(--emerald); background: transparent; border: 0; border-radius: 50%; box-shadow: none; cursor: pointer; transition: background var(--dur-fast), translate var(--dur-base) var(--ease-spring); }
+.stepper .qty-btn:hover:not(:disabled) { background: var(--pill-fill-light-hover); }
+.stepper .qty-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.stepper-count, .stepper .qty-input { display: grid; place-items: center; inline-size: calc(var(--tap) * 0.9); padding: 0; font: inherit; font-weight: 700; text-align: center; color: var(--charcoal); background: transparent; border: 0; border-radius: 0; }
+
+/* Details window (D-039, D-041): a bottom sheet on phones, a centred dialog from the tablet width. It is as tall as its
+   content, up to the sheet height. Fixed header, scrolling middle, pinned footer. */
+.product-dialog { inline-size: 100%; max-inline-size: none; block-size: fit-content; max-block-size: var(--sheet-height); margin: auto 0 0; padding: 0; border: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--glass-solid); color: var(--charcoal); box-shadow: var(--glass-shadow); overflow: hidden; overscroll-behavior: contain; }
+.product-dialog[open] { display: block; }
+.product-dialog::backdrop { background: var(--glass-scrim); }
+@supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
+  .product-dialog { background: var(--glass-bg-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
   .product-dialog::backdrop { -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
 }
 html:has(dialog[open]) { overflow: hidden; }
-.dialog-panel { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; block-size: 100%; }
-.dialog-handle { justify-self: center; inline-size: var(--handle-w); block-size: var(--handle-h); margin-block: var(--space-xs) 0; border-radius: var(--radius-pill); background: var(--line); touch-action: none; }
-.dialog-head { position: relative; display: flex; align-items: center; gap: var(--space-s); padding: var(--space-xs) calc(var(--tap) + var(--space-s)) var(--space-xs) var(--space-m); border-block-end: var(--hairline) solid var(--glass-border); touch-action: none; }
+.dialog-panel { display: flex; flex-direction: column; max-block-size: var(--sheet-height); }
+.dialog-panel:focus { outline: none; }
+.dialog-handle { flex: none; align-self: center; inline-size: var(--handle-w); block-size: var(--handle-h); margin-block: var(--space-xs) 0; border-radius: var(--radius-pill); background: var(--line); touch-action: none; }
+.dialog-head { position: relative; flex: none; display: flex; align-items: center; gap: var(--space-s); padding: var(--space-xs) calc(var(--close-size) + var(--space-m)) var(--space-xs) var(--space-m); border-block-end: var(--hairline) solid var(--glass-border); touch-action: none; }
 .dialog-head h2 { margin: 0; font-size: var(--step-2); }
 .dialog-head .card-price { margin: 0; font-size: var(--step-1); }
 .dialog-title { min-inline-size: 0; }
 .dialog-media { flex: none; inline-size: var(--dialog-thumb); aspect-ratio: 1; min-block-size: 0; cursor: default; border-radius: var(--radius); }
-.dialog-close { position: absolute; inset-block-start: var(--space-xs); inset-inline-end: var(--space-xs); display: grid; place-items: center; min-inline-size: var(--tap); min-block-size: var(--tap); color: var(--emerald); background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); box-shadow: var(--shadow-raised); cursor: pointer; }
-.dialog-body { overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--space-s); align-content: start; padding: var(--space-s) var(--space-m); }
+.dialog-close { position: absolute; inset-block-start: var(--space-xs); inset-inline-end: var(--space-xs); display: grid; place-items: center; inline-size: var(--close-size); block-size: var(--close-size); padding: 0; color: var(--emerald); background: var(--glass-solid); border: var(--hairline) solid var(--pill-border-light); border-radius: 50%; box-shadow: var(--pill-highlight), var(--pill-shadow); cursor: pointer; }
+@supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) { .dialog-close { background: var(--pill-fill-light); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); } }
+.dialog-body { flex: 1 1 auto; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--space-s); align-content: start; padding: var(--space-s) var(--space-m); }
 .dialog-body > * { margin: 0; }
 .dialog-body .card-meta { font-size: var(--step-0); }
 .dialog-section h3 { margin-block-end: var(--space-3xs); font-size: var(--step-0); }
-.dialog-foot { display: grid; gap: var(--space-xs); padding: var(--space-xs) var(--space-m) calc(var(--space-xs) + env(safe-area-inset-bottom)); border-block-start: var(--hairline) solid var(--glass-border); background: var(--glass-solid); }
+.dialog-foot { flex: none; display: grid; gap: var(--space-xs); padding: var(--space-xs) var(--space-m) calc(var(--space-xs) + env(safe-area-inset-bottom)); border-block-start: var(--hairline) solid var(--glass-border); background: var(--glass-solid); }
 .dialog-foot > * { margin: 0; }
 .dialog-foot:empty { display: none; }
-.opt-group { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
-.opt-group legend { padding: 0; margin-block-end: var(--space-2xs); font-weight: 700; color: var(--emerald); }
 .custom-note { padding: var(--space-xs) var(--space-s); background: var(--peach-tint); border-radius: var(--radius); font-weight: 700; color: var(--emerald); }
 .stock-line { font-weight: 700; color: var(--emerald); }
 .dialog-buy { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--space-xs); }
-.dialog-buy .btn { flex: 1 1 auto; min-inline-size: 0; }
+.dialog-buy .btn { flex: 1 1 auto; min-inline-size: 0; border-radius: var(--radius-pill); }
 [data-dialog-total] { white-space: pre; }
 .allergy-line { font-size: var(--step--1); }
 
-/* 3D option pills: compact, tap to select, tap again to remove (checkboxes). A solid edge sits under each pill. */
-.opt-list { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-xs); padding-block-end: var(--depth); }
-.opt { position: relative; display: inline-flex; align-items: center; gap: 0; min-block-size: var(--tap); padding-inline: var(--space-m); background: var(--white); color: var(--emerald); font-weight: 700; border: var(--hairline) solid var(--emerald); border-radius: var(--radius-pill); box-shadow: 0 var(--depth-sm) 0 var(--sage); cursor: pointer; transition: box-shadow var(--dur-fast), background var(--dur-fast), color var(--dur-fast), translate var(--dur-fast) var(--ease-out); }
-.opt:has(input:checked) { background: var(--emerald); color: var(--white); box-shadow: 0 var(--depth-sm) 0 var(--emerald-dark); }
+/* Option pills: compact, wrapping rows with even gaps; tap to select, tap again to remove (checkboxes) */
+.opt-group { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
+.opt-group legend { padding: 0; margin-block-end: var(--space-2xs); font-weight: 700; color: var(--emerald); }
+.opt-list { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.opt { position: relative; display: inline-flex; align-items: center; min-block-size: var(--tap); padding-inline: var(--space-m); font-weight: 700; cursor: pointer; }
 .opt:has(input:focus-visible) { outline: var(--ring-width) solid var(--ring-color); outline-offset: var(--ring-offset); }
 .opt input { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .opt::before { content: ""; flex: none; inline-size: 0; block-size: 1.125rem; margin-inline-end: 0; background: currentColor; -webkit-mask: url("../assets/svg/tick.svg") center / contain no-repeat; mask: url("../assets/svg/tick.svg") center / contain no-repeat; transition: inline-size var(--dur-base) var(--ease-spring), margin var(--dur-base) var(--ease-spring); }
 .opt:has(input:checked)::before { inline-size: 1.125rem; margin-inline-end: var(--space-2xs); }
 .opt-delta { margin-inline-start: var(--space-2xs); font-weight: 400; }
 @media (prefers-reduced-motion: no-preference) {
-  .opt:active { translate: 0 var(--depth-sm); box-shadow: 0 0 0 var(--sage); }
-  .btn:active:not(:disabled), .stepper .qty-btn:active:not(:disabled), .chip:active { translate: 0 var(--press); box-shadow: var(--shadow-pressed); }
+  :is(.chip, .opt, .btn-add):active { translate: 0 var(--depth); box-shadow: var(--pill-shadow-pressed); }
+  .btn:active:not(:disabled), .stepper .qty-btn:active:not(:disabled) { translate: 0 var(--press); }
+  .btn:active:not(:disabled) { box-shadow: var(--shadow-pressed); }
   .product-dialog[open] { animation: sheet-in var(--dur-base) var(--ease-spring); }
   .product-dialog[open]::backdrop { animation: fade-in var(--dur-base) var(--ease-out); }
 }
@@ -239,9 +269,9 @@ html:has(dialog[open]) { overflow: hidden; }
 @keyframes fade-in { from { opacity: 0; } }
 @keyframes dialog-in { from { opacity: 0; scale: 0.96; } }
 @media (min-width: 48em) {
-  .product-dialog { margin: auto; block-size: auto; max-block-size: 90dvh; max-inline-size: var(--dialog-max); border-radius: var(--radius-lg); }
+  .product-dialog { margin: auto; max-block-size: 90dvh; max-inline-size: var(--dialog-max); border-radius: var(--radius-lg); }
   .dialog-handle { display: none; }
-  .dialog-panel { grid-template-rows: auto minmax(0, 1fr) auto; max-block-size: 90dvh; }
+  .dialog-panel { max-block-size: 90dvh; }
 }
 @media (min-width: 48em) and (prefers-reduced-motion: no-preference) { .product-dialog[open] { animation: dialog-in var(--dur-base) var(--ease-out); } }
 
