@@ -60,14 +60,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1d — Hybrid premium rebuild (D-027, D-028)
 
-- [x] Emerald & Copper tokens in; retired tokens removed — HASH, theme.css rebuilt on the D-027 palette plus radius, shadow, card and motif tokens; coriander, clay, cream, cream-light, chalk and chutney-dark removed (grep finds none)
-- [x] Header and footer rebuilt (footer columns, ridge line) — HASH, white header with fold mark, nav, phone, cart badge; emerald four-column footer with sage ridge line above and (c) line
-- [x] Hero panel with cut-out slot, trust row — HASH, green-tint rounded panel, cut-out overlaps its base with drop shadow, steam wisps, sage ridge, four-item trust row with drawn icons
-- [x] Product cards on home and shop; `HOME_PRODUCT_LIMIT`, `SEARCH_MIN_PRODUCTS` constants; chips and search thresholds — HASH, cards from data with photo or drawn placeholder; constants in site-config.js (HOME_PRODUCT_LIMIT 8, SEARCH_MIN_PRODUCTS 8, KIND_LABELS); chips with 2+ kinds, search at 8+, empty state, ?kind= from footer links
-- [x] Two tiles, Made together band, steps with illustration, statement, ordering row — HASH, emerald Pickup tile + peach chutney tile, emerald Made together band with kitchen photo, copper-numeral flow with step cut-outs and drawn arrows, statement, peach-tint ordering row with kraft tag
-- [x] Cart, done, how to cook aligned — HASH, same header, footer and palette; fields white with emerald border; how-to-cook uses the kitchen photo
-- [x] Image slots and intentional placeholders — HASH, all manifest images wired (hero, momo packs with multiply, chutney, steps, kitchen, plate on shop); sauce pots use drawn sage placeholders; old placeholder-kitchen files deleted
-- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
+- [x] Emerald & Copper tokens in; retired tokens removed — 3826637, theme.css rebuilt on the D-027 palette plus radius, shadow, card and motif tokens; coriander, clay, cream, cream-light, chalk and chutney-dark removed (grep finds none)
+- [x] Header and footer rebuilt (footer columns, ridge line) — 3826637, white header with fold mark, nav, phone, cart badge; emerald four-column footer with sage ridge line above and (c) line
+- [x] Hero panel with cut-out slot, trust row — 3826637, green-tint rounded panel, cut-out overlaps its base with drop shadow, steam wisps, sage ridge, four-item trust row with drawn icons
+- [x] Product cards on home and shop; `HOME_PRODUCT_LIMIT`, `SEARCH_MIN_PRODUCTS` constants; chips and search thresholds — 3826637, cards from data with photo or drawn placeholder; constants in site-config.js (HOME_PRODUCT_LIMIT 8, SEARCH_MIN_PRODUCTS 8, KIND_LABELS); chips with 2+ kinds, search at 8+, empty state, ?kind= from footer links
+- [x] Two tiles, Made together band, steps with illustration, statement, ordering row — 3826637, emerald Pickup tile + peach chutney tile, emerald Made together band with kitchen photo, copper-numeral flow with step cut-outs and drawn arrows, statement, peach-tint ordering row with kraft tag
+- [x] Cart, done, how to cook aligned — 3826637, same header, footer and palette; fields white with emerald border; how-to-cook uses the kitchen photo
+- [x] Image slots and intentional placeholders — 3826637, all manifest images wired (hero, momo packs with multiply, chutney, steps, kitchen, plate on shop); sauce pots use drawn sage placeholders; old placeholder-kitchen files deleted
+- [x] Verified, merged to `main`, deploy confirmed — 3826637, see log
 
 ## Step 2 — Cart and order flow (mock)
 
