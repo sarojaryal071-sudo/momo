@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-10 (Step 0 build, coding agent)
-- Current step: **Step 1 — code done locally; deployed-URL checks and Lighthouse pending (Step 0 live deploy still waiting on owner)**
-- Next action: Once the owner has switched Pages and merged to `main`, open the three pages on the live URL, run Lighthouse on `index.html` and `shop.html` (no Lighthouse in the agent sandbox), tick the last Step 0 item and the Step 1 verify item. Do not start Step 2 before then unless the owner says so.
+- Last updated: 2026-11-10 (Step 2 build, coding agent)
+- Current step: **Step 2 — built and verified locally on the mock gateway; deployed-URL checks pending (Step 0 live deploy and Step 1 Lighthouse still waiting on owner)**
+- Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -39,17 +39,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 2 — Cart and order flow (mock)
 
-- [ ] `site-config.js` (mock backend, WhatsApp number marked `TODO`)
-- [ ] `cart.js` with persistence and header count
-- [ ] Shop add-to-cart controls working
-- [ ] `cart.html` with totals, unavailable-item handling, empty state
-- [ ] Optional order form with phone hint, honeypot, "Pickup only. Pay cash on pickup."
-- [ ] `pickup.js` and `data/pickup.seed.json`
-- [ ] `order-gateway.js` (mock plus supabase stub, 8 s timeout)
-- [ ] `whatsapp.js` (message, link, UK phone conversion)
-- [ ] `done.html` with order number, summary, WhatsApp button
-- [ ] `npm test` covers cart, price, pickup, WhatsApp, phone conversion
-- [ ] Verified: full flow with empty and filled fields, failure path, keyboard run
+- [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
+- [x] `cart.js` with persistence and header count — 746822c, slug+qty in localStorage, header count on every page
+- [x] Shop add-to-cart controls working — 746822c, qty control + add + live-region note; keyboard add worked
+- [x] `cart.html` with totals, unavailable-item handling, empty state — 746822c, lines, totals, unavailable flagged and dropped, empty state
+- [x] Optional order form with phone hint, honeypot, "Pickup only. Pay cash on pickup." — 746822c, all optional, hint, honeypot, pickup-only line
+- [x] `pickup.js` and `data/pickup.seed.json` — 746822c, UK-time slots, lead time, max days, exceptions; seed is sample (D-023)
+- [x] `order-gateway.js` (mock plus supabase stub, 8 s timeout) — 746822c, mock returns SS-TEST-01; supabase stub throws; 8 s timeout (tested)
+- [x] `whatsapp.js` (message, link, UK phone conversion) — 746822c, message, wa.me link, trim notes, UK phone conversion
+- [x] `done.html` with order number, summary, WhatsApp button — 746822c, order number, summary, big button, one auto-open after 1.5 s
+- [x] `npm test` covers cart, price, pickup, WhatsApp, phone conversion — 746822c, 23 tests pass
+- [ ] Verified (partial: local dev server only): full flow with empty and filled fields, failure path, keyboard run done locally; live URL and real-phone WhatsApp check pending
 
 ## Step 3 — Supabase backend and real orders
 
@@ -93,7 +93,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [ ] Add repository variables `SITE_URL` (`https://sarojaryal071-sudo.github.io/momo`) and `SITE_INDEXABLE` (`false`)
 - [ ] Confirm +44 7413 069241 is also the WhatsApp number
 - [ ] Decide order number date format: MMDD or DDMM (decision D-007)
-- [ ] Sauce pot prices, cooking times, pickup slots and capacity
+- [ ] Real sauce pot prices, steam time, pickup hours and capacity (sample values in use, D-023; each marked `data-placeholder` or `"placeholder": true`)
 - [ ] Supabase project, admin user, email provider key, GitHub token, `SUPABASE_*` variables (Step 3)
 - [ ] Generate AI mood images for the slots listed after Step 1
 
@@ -105,7 +105,6 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `docs/` | Decisions log, rulebooks, usage rules, this tracker, `instructions/step-0` to `step-5` | planning |
 | `PROJECT_NOTES.md` | Human overview | planning |
 | `frontend/css/base.css`, `frontend/css/theme.css` | Base styles and tokens | 0 |
-| `frontend/index.html` | Placeholder home page with a `TODO:` line | 0 |
 | `admin/` , `backend/supabase/{migrations,functions}` | Empty (`.gitkeep`); `backend/README.md` is one line | 0 |
 | `package.json`, `package-lock.json`, `.gitignore` | Scripts dev/build/test, `sharp` only | 0 |
 | `scripts/dev.mjs` | Static dev server (`frontend/` at `/`, `admin/` at `/admin/`, port 8080 or `PORT`) | 0 |
@@ -117,24 +116,40 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `frontend/assets/img/placeholder-*.webp`, `assets/icons/favicon.svg` | Flat-colour placeholder images and favicon | 1 |
 | `scripts/lib/render.mjs` | Renders the `build:products` regions and Product JSON-LD | 1 |
 | `tests/regions.test.mjs` | Checks the source fallback regions match the seed | 1 |
+| `frontend/cart.html`, `frontend/done.html` | Cart with order form; confirmation with WhatsApp button; both `noindex` | 2 |
+| `frontend/js/site-config.js` | Backend choice, WhatsApp number, limits, timeouts (single config place) | 2 |
+| `frontend/js/cart.js`, `main.js` | Cart store, lines and totals, `formatPrice`, header count | 2 |
+| `frontend/js/shop.js`, `cart-page.js`, `done.js`, `data.js` | Page scripts and data loading (products.json, seed fallback) | 2 |
+| `frontend/js/pickup.js`, `data/pickup.seed.json` | Pickup dates and times; sample hours | 2 |
+| `frontend/js/order-gateway.js`, `whatsapp.js` | Mock/supabase gateway with timeout; message, link, phone conversion | 2 |
+| `scripts/lib/validate.mjs` | Launch blockers: `TODO:`, `data-placeholder`, `"placeholder": true` | 2 |
+| `tests/{cart,pickup,whatsapp,gateway,launch-gate}.test.mjs` | Unit tests for Step 2 and the launch gate | 2 |
 
 ## Test and run commands (agent fills in once they exist)
 
 - Dev server: `npm run dev` (http://localhost:8080/)
 - Build: `npm run build` (env `SITE_URL`, `SITE_INDEXABLE`)
-- Unit tests: `npm test` (no tests yet)
+- Unit tests: `npm test` (23 tests: regions, cart, pickup, whatsapp, gateway, launch gate; the launch-gate test runs two builds)
 - Backend tests: _not yet_
 
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 2: merged origin/main (D-023). `npm test` 23 pass. Dev server at 360 px: added both packs and a sauce pot (header count 4), edited qty, removed a line, reload kept cart (£40). Empty-field confirm -> `done.html?o=SS-TEST-01`, cart cleared. Filled confirm: pickup, name and notes appear in the message; notes with `<b>` shown as text. Forced failure (backend `broken`): plain error text, WhatsApp link without number opened, cart kept, button re-enabled. Keyboard: tab order sane, Enter adds and submits, focus ring visible. Only console errors: expected 404 for `data/products.json` on the dev server (seed fallback used). Not done: live URL, real WhatsApp on a phone.
 - 2026-11-10, step 1: merged origin/main (D-022). `npm test` 3 pass; `npm run build` validations pass (3 pages, titles and descriptions in range, one h1, canonical); `SITE_INDEXABLE=true` build fails on the `TODO:` text as intended; 3 pages at 320, 360 and 1280 px had no horizontal overflow; screenshots checked for home and shop. Contrast ratios: charcoal/cream 13.57, chutney link/cream 5.05, cream-light/chutney 5.45, cream/charcoal 13.57, charcoal/turmeric 7.12, clay/cream 4.92, cream-light/clay 5.31. Lighthouse not run (not available).
 - 2026-11-10, step 0: dev server 200s and styles applied at 360 px; build with `SITE_INDEXABLE` unset gives noindex + `Disallow: /`; with `true` gives no noindex, `Allow`, sitemap line; `npm test` runs clean. Live deploy not yet run.
 
 ## Known issues
 
-- Cart link points at `shop.html` (`data-cart-link`) until Step 2 adds `cart.html`. Add-to-cart buttons are inert. Unpriced add-ons omit `data-price-pence`. Product JSON-LD has no `image` yet. `dist/admin/` is an empty folder.
+- Dev server has no `data/products.json` (build writes it), so `data.js` falls back to the seed after one 404. Unpriced add-ons omit `data-price-pence`. Product JSON-LD skips sample-priced products and has no `image` yet. `dist/admin/` is an empty folder. Done page auto-opens WhatsApp once per order number per tab session. The mock total comes from the browser (`totalPenceHint`); the real backend recomputes (Step 3). Sample label wording is "sample".
 
 ## TODO placeholders in content (agent lists every `TODO:` left on public pages)
 
-- `index.html`: pickup area/location wording. `shop.html`: allergen info; sauce pot prices (x2). `how-to-cook.html`: steam time, storage advice.
+- `index.html`: pickup area/location wording. `shop.html`: allergen info. `how-to-cook.html`: storage advice. (Sauce pot prices, steam time and pickup hours are now sample values, not TODOs.)
+
+## Sample values (D-023, block launch until replaced)
+
+- `frontend/data/products.seed.json`: chutney pot £1.11, hot sauce pot £2.22 (`"placeholder": true`).
+- `frontend/how-to-cook.html`: steam time 12 minutes (`data-placeholder`).
+- `frontend/data/pickup.seed.json`: Saturday and Sunday 10:00 to 18:00, 24 h lead, 14 days (`"placeholder": true`); `cart.html` shows a sample-hours note (`data-placeholder`).
+- Indexable build fails while any of these remain (tested).
