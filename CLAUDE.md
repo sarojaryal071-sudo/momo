@@ -1,18 +1,28 @@
 # Steam & Spice (placeholder name) — instructions for the coding agent
 
 Homemade frozen momo shop, UK, pickup only. A public static website plus a small admin panel backed by Supabase.
-This file is loaded automatically. Read it fully, then read the docs below before changing anything.
+This file is loaded automatically. Read it fully, then follow "Start of every session" below.
 
 The planning chat (claude.ai) never writes code. It writes these docs and instructions. You write all code.
 
-## Read first, in this order
+## Start of every session (keep it cheap)
 
-1. `docs/decisions-log.md` — what is decided, and why. Never reverse a decision silently.
-2. `docs/architecture-rulebook.md` — folders, data ownership, build pipeline, backend.
-3. `docs/technical-rulebook.md` — rules for code, orders, security, testing.
-4. `docs/ui-rulebook.md` — look and feel, palette, copy tone.
-5. `docs/seo-rulebook.md` — what Google must be able to read, and launch gates.
-6. `docs/instructions/step-N-*.md` — build steps. Do only the step you are given, never work from a later step.
+1. Read this file, then `docs/progress-tracker.md` (current step, next action, file map, what is already verified).
+2. Read the step file you were given: `docs/instructions/step-N-*.md`. Do only unchecked items of that step, never work from a later step.
+3. Read rulebook sections only when the work needs them, using the doc map below. Read all rulebooks in full only in the first session of Step 0, or if the owner asks.
+4. Follow `docs/usage-rules.md`. It limits re-checking, regression runs and exploration. Do not re-audit finished work.
+5. As the last action of every phase, update `docs/progress-tracker.md` (rules in usage-rules section 7).
+
+## Doc map (read only what the task touches)
+
+| If the work involves | Read |
+|---|---|
+| Whether something is decided, open items | `docs/decisions-log.md` |
+| Folders, database tables, security policies, edge functions, build script | `docs/architecture-rulebook.md` |
+| Orders, money, WhatsApp, security rules, accessibility, testing, git | `docs/technical-rulebook.md` |
+| Colours, type, layout, images, copy tone | `docs/ui-rulebook.md` |
+| Titles, meta, structured data, sitemap, noindex, launch gate | `docs/seo-rulebook.md` |
+| What to skip, how much to check, how to record progress | `docs/usage-rules.md` |
 
 ## Hard rules
 
@@ -31,7 +41,7 @@ The planning chat (claude.ai) never writes code. It writes these docs and instru
 
 - Small commits with clear messages. Run the step's verification before pushing to `main`.
 - Pushing to `main` triggers a deploy once Step 0 has set up the Pages workflow.
-- Do a real live run of every flow you build (open it in a browser or call it for real). Unit tests alone do not count.
+- Do a real live run of every flow you build (open it in a browser or call it for real). Unit tests alone do not count. Check only what the change touched (regression table in `docs/usage-rules.md`); never re-run earlier steps' checks.
 - If a rule, a step or a decision looks wrong, stop, explain, and ask. Do not work around it.
 
 ## Report at the end of every step
@@ -42,6 +52,9 @@ The planning chat (claude.ai) never writes code. It writes these docs and instru
 4. Deviations from the docs, with reasons.
 5. Every `TODO:` placeholder left in the content.
 6. Questions for the owner.
+7. Confirmation that `docs/progress-tracker.md` is updated.
+
+Keep the report under about 40 lines. No recap of earlier steps, no pasted file contents.
 
 ## Facts you may use
 
