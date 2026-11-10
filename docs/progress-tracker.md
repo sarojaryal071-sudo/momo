@@ -82,11 +82,11 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1f — Product details window, options, stock and custom lead time (D-031)
 
-- [x] Small cards with Add and compact stepper — HASH, 108 px cards at 360 px (six fit one screen); one small Add; plain items swap to a compact - 1 + stepper and back at 0; sold-out card has no button; also fixed: home cards had no script before (shop.js now loads on home)
-- [x] Details dialog (info, options, stock line, live total, allergy line) — HASH, native dialog per product, bottom sheet on phones and centred panel from 48em; focus in and back, Escape and backdrop close, page scroll locked, live total, customised note with earliest pickup, Only N left, stock cap, allergy line
-- [x] Seed data for options and stock; constants `LOW_STOCK_THRESHOLD` and `CUSTOM_MIN_LEAD_HOURS` — HASH, stock_quantity and option_groups in products.seed.json (sample, flagged); LOW_STOCK_THRESHOLD 5 and CUSTOM_MIN_LEAD_HOURS 48 in site-config.js; products.json carries both; launch gate also catches stock_placeholder
-- [x] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options — HASH, options stored as non-default ids per line, separate lines per option set, Customised label, compact stepper, stock cap message, date list uses the 48 h notice only for customised carts (checked with a fake Friday clock), WhatsApp and done page list options
-- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
+- [x] Small cards with Add and compact stepper — 38debc9, 108 px cards at 360 px (six fit one screen); one small Add; plain items swap to a compact - 1 + stepper and back at 0; sold-out card has no button; also fixed: home cards had no script before (shop.js now loads on home)
+- [x] Details dialog (info, options, stock line, live total, allergy line) — 38debc9, native dialog per product, bottom sheet on phones and centred panel from 48em; focus in and back, Escape and backdrop close, page scroll locked, live total, customised note with earliest pickup, Only N left, stock cap, allergy line
+- [x] Seed data for options and stock; constants `LOW_STOCK_THRESHOLD` and `CUSTOM_MIN_LEAD_HOURS` — 38debc9, stock_quantity and option_groups in products.seed.json (sample, flagged); LOW_STOCK_THRESHOLD 5 and CUSTOM_MIN_LEAD_HOURS 48 in site-config.js; products.json carries both; launch gate also catches stock_placeholder
+- [x] Cart lines with options, customised lead time in the pickup picker, WhatsApp message with options — 38debc9, options stored as non-default ids per line, separate lines per option set, Customised label, compact stepper, stock cap message, date list uses the 48 h notice only for customised carts (checked with a fake Friday clock), WhatsApp and done page list options
+- [x] Verified, merged to `main`, deploy confirmed — 38debc9, see log
 
 ## Step 2 — Cart and order flow (mock)
 
