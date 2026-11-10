@@ -141,3 +141,23 @@ The script is plain Node (ES modules). The only dependency is `sharp`. It must n
 - Put any secret in the repo.
 - Let the browser write to `orders`, or trust a price sent by the browser.
 - Change a rule or decision silently. Flag deviations in the report.
+
+## 11. Options, stock and custom lead time (D-031)
+
+Extends sections 4 to 6.
+
+**Tables** (all with `created_at`, money in integer pence):
+- `product_option_groups` — id, product_id, label ("Spice level"), kind (`single` or `multiple`), sort_order, active.
+- `product_options` — id, group_id, label ("No onion"), price_delta_pence (integer, may be 0, may not be negative), is_default (bool, at most one per `single` group), sort_order, active.
+- `product_stock` — product_id (pk), quantity (integer, at least 0), updated_at. Kept **separate from `products`** on purpose: the rebuild webhook is on `products` and the option tables only, so taking an order (which lowers stock) never starts a site rebuild.
+- `settings` new keys: `custom_min_lead_hours` (default 48), `low_stock_threshold` (default 5). Both public-readable.
+- `orders.items` snapshot gains, per line: `options` (array of group label, option label, price delta) and `customised` (bool).
+
+**Rules.**
+- A line is **customised** when it contains any non-default option. Customised lines are made to order and do not touch `product_stock` (confirm with the owner).
+- Earliest pickup: `custom_min_lead_hours` if any line is customised, otherwise `min_lead_hours`. `max_days_ahead` applies to both.
+- Unit price = `products.price_pence` + the sum of the chosen options' `price_delta_pence`. The browser sends only slug, quantity and chosen option ids. The server recomputes everything and rejects unknown, inactive or mismatched options (an option from another product, two options in a `single` group).
+- Standard lines: `quantity` must not exceed the stock; the stock is lowered inside the same transaction that takes the order number, with a row lock, so two buyers never share the last item. Stock 0 shows "Sold out" and the product cannot be added.
+- Stock and options are read by the browser at runtime (public `select`, active rows only) so a stale static page never shows the wrong stock. Option groups and options may also be rendered into the HTML at build time as the no-JavaScript fallback, but runtime data wins.
+
+**Security.** Option tables and `product_stock`: anyone may `select` (options only where `active`); only admins write. Stock is lowered only by `place_order` (security definer), never by the browser.

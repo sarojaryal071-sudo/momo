@@ -27,6 +27,15 @@ Write `backend/README.md` as a step-by-step guide for these actions in plain lan
 7. **Notice banner**: `notice.js` fetches `site_notice` and shows the strip on every public page when active; silent on failure; reserve space so the layout does not jump.
 8. **Tests**: a script (documented in `backend/README.md`) that proves: anonymous users cannot read or write `orders`, cannot read inactive products or non-public settings; a tampered price is ignored; two simultaneous orders get different numbers; a sold-out product is rejected; an order with every optional field empty succeeds.
 
+## Added by decision D-031 (options, stock, custom lead time)
+
+Read `docs/architecture-rulebook.md` section 11 first. In addition to the list above:
+- Migrations for `product_option_groups`, `product_options`, `product_stock`, the new `settings` keys (`custom_min_lead_hours` 48, `low_stock_threshold` 5) and their row-level security. The database webhook that triggers a rebuild covers `products`, `product_option_groups` and `product_options` only, **not** `product_stock`.
+- `place_order` (SQL function) and the `place-order` edge function: accept option ids per line, recompute every price with the option price changes, derive the `customised` flag, apply `custom_min_lead_hours` to the pickup check when any line is customised, check and lower stock for standard lines in the same locked transaction, and store the options and flag in the order snapshot. Reject an option from another product, an inactive option, two options in one `single` group and a quantity above the stock.
+- Seed: the sauces and momo get a few sample option groups only if the owner has listed them; otherwise seed none. Stock seeded with a sample quantity marked as sample.
+- Frontend: replace the mock option, stock and lead-time sources from Step 1f with the real ones (runtime `fetch` with the anon key; keep the mock selectable).
+- Tests: a tampered option price is ignored; an option from another product is rejected; two simultaneous orders for the last item let only one succeed and the stock never goes below 0; a customised order inside the custom notice period is rejected and a standard order is not; a customised order does not lower stock.
+
 ## Do not
 
 Put the service-role key, GitHub token, email key or owner email in the repo, the browser, or workflow variables. Build the admin panel (Step 4). Add payments or customer accounts.

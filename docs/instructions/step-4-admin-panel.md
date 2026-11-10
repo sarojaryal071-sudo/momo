@@ -17,6 +17,12 @@ A mobile-friendly admin panel at `/admin/` where the owner sees orders by pickup
 7. **Export**: a button on the orders page that downloads orders for a chosen date range as CSV (supports later record-keeping and data-retention decisions).
 8. **Design**: reuse `theme.css` and `base.css`; the admin is plain and clear, not decorative. Big touch targets, designed for a phone first. `noindex` meta and a restrictive Content-Security-Policy on every admin page. No links to `/admin/` from public pages.
 
+## Added by decision D-031 (options, stock, custom lead time)
+
+- **Products page**: for each product, edit its option groups (label, single or multiple choice, order, active) and the options in them (label, price change in pence, default, order, active), with big touch targets and a clear preview of how the customer will see it. Edit the **stock** number per product (and a quick "+/-" control); show "Sold out" at 0.
+- **Settings page**: edit `custom_min_lead_hours` (shown in hours with a plain-language hint such as "48 = 2 days") and `low_stock_threshold`.
+- **Orders page**: show the chosen options and a "Customised" label on each line, so she knows what to prepare, and include them in the WhatsApp message template and the CSV export.
+
 ## Do not
 
 Add roles beyond one admin allowlist, hard-delete orders, show customer data on any public page, or add analytics.
