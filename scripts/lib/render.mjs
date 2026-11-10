@@ -78,6 +78,8 @@ export function renderRegion(page, products, siteUrl = '') {
 <ul class="pack-board">
 ${packs.map((p) => `<li class="pack-row" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}"><span class="pack-name">${esc(p.name)}</span> <span class="pack-meta">${metaHtml(p)}</span></li>`).join('\n')}
 </ul>
+<p class="board-action"><a class="btn" href="shop.html">See the full menu</a></p>
+<p class="tag board-tag">Pickup only</p>
 </div>`;
   }
   return `<section class="menu-board" aria-labelledby="menu-title">

@@ -12,7 +12,7 @@
   display: inline-flex; align-items: center; justify-content: center;
   min-block-size: var(--tap); padding: var(--space-2xs) var(--space-m);
   font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
-  background: var(--chutney); color: var(--cream-light);
+  background: var(--chutney); color: var(--white);
   border: var(--hairline) solid var(--chutney); border-radius: var(--radius);
   transition: background var(--transition);
 }
@@ -22,7 +22,7 @@
 .btn:disabled { cursor: not-allowed; opacity: 0.7; }
 
 /* Header */
-.site-header { border-block-end: var(--hairline) solid var(--line); background: var(--cream-light); }
+.site-header { background: var(--white); }
 .header-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2xs) var(--space-l); padding-block: var(--space-xs); }
 .brand { font-family: var(--font-head); font-size: var(--step-3); line-height: var(--line-height-head); font-weight: 400; letter-spacing: var(--tracking-display); color: var(--charcoal); text-decoration: none; }
 .nav-list, .header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-s); margin: 0; padding: 0; list-style: none; }
@@ -31,20 +31,28 @@
   color: var(--charcoal); text-underline-offset: var(--space-3xs);
 }
 .site-header a[aria-current="page"] { font-weight: 700; text-decoration-color: var(--chutney); text-decoration-thickness: var(--ring-width); }
-.cart-link { font-weight: 700; }
+.cart-link { position: relative; min-inline-size: var(--tap); justify-content: center; }
+.cart-icon { inline-size: 1.6rem; block-size: 1.6rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cart-badge {
+  position: absolute; inset-block-start: var(--space-3xs); inset-inline-end: 0; display: grid; place-items: center;
+  min-inline-size: var(--badge); block-size: var(--badge); padding-inline: var(--space-3xs);
+  background: var(--chutney); color: var(--white); font-size: var(--step--1); font-weight: 700; line-height: 1; border-radius: 50%;
+}
 
 /* Footer */
-.site-footer { background: var(--charcoal); color: var(--cream); padding-block: var(--space-l); }
+.site-footer { background: var(--charcoal); color: var(--cream); padding-block: var(--space-m); margin-block-start: var(--ridge-height); }
 .site-footer a { color: var(--cream); }
-.footer-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-s) var(--space-l); }
-.footer-row p { margin: 0 0 var(--space-2xs); }
+.footer-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2xs) var(--space-l); }
+.footer-row p { margin: 0; }
+.phone-link { display: inline-flex; align-items: center; gap: var(--space-2xs); min-block-size: var(--tap); font-weight: 700; }
+.phone-icon { inline-size: 1.25rem; block-size: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* Forms (used from Step 2) */
 .field { display: grid; gap: var(--space-3xs); margin-block-end: var(--space-s); }
 .field label { font-weight: 700; }
 .field input, .field textarea {
   min-block-size: var(--tap); padding: var(--space-2xs) var(--space-xs); font: inherit;
-  background: var(--cream-light); color: var(--charcoal);
+  background: var(--white); color: var(--charcoal);
   border: var(--hairline) solid var(--charcoal); border-radius: var(--radius);
 }
 
@@ -53,7 +61,7 @@
 
 /* Chalkboard menu panel */
 .menu-board {
-  position: relative; background: var(--charcoal); color: var(--cream);
+  position: relative; background: var(--charcoal) url("../assets/svg/grain-light.svg") 0 0 / var(--grain-size); color: var(--cream);
   padding: calc(var(--space-l) + var(--fold-height)) var(--space-l); border-radius: var(--radius);
 }
 .menu-board h2 { margin-block-end: var(--space-m); }
@@ -73,11 +81,11 @@
 
 /* Page layouts */
 .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--space-l); align-items: center; }
-.split img { inline-size: 100%; object-fit: cover; border-radius: var(--radius); }
-.kicker { font-weight: 700; color: var(--clay); margin-block-end: var(--space-2xs); }
+
+.kicker { font-weight: 700; color: var(--clay); }
 .lead { font-size: var(--step-1); }
 .band-dark { background: var(--charcoal); color: var(--cream); }
-.band-light { background: var(--cream-light); }
+.band-light { background: var(--cream); }
 .pack-list { margin: 0 0 var(--space-m); padding: 0; list-style: none; max-inline-size: var(--measure); }
 .pack-row { display: grid; gap: var(--space-3xs); padding-block: var(--space-xs); border-block-end: var(--hairline) solid var(--line); font-size: var(--step-1); }
 .pack-name { font-family: var(--font-head); font-weight: 400; }
@@ -103,7 +111,7 @@
 .qty { display: inline-flex; align-items: stretch; margin-block-end: var(--space-xs); }
 .qty-btn, .qty-input {
   min-block-size: var(--tap); min-inline-size: var(--tap); font: inherit; text-align: center;
-  background: var(--cream-light); color: var(--charcoal); border: var(--hairline) solid var(--charcoal); border-radius: 0;
+  background: var(--white); color: var(--charcoal); border: var(--hairline) solid var(--charcoal); border-radius: 0;
 }
 .qty-btn { cursor: pointer; font-weight: 700; }
 .qty-btn:first-child { border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); }
@@ -123,4 +131,4 @@
 .error { color: var(--chutney); font-weight: 700; }
 .notice-line { font-weight: 700; }
 .btn-big { min-block-size: calc(var(--tap) * 1.4); font-size: var(--step-1); padding-inline: var(--space-l); }
-.field select { min-block-size: var(--tap); padding: var(--space-2xs) var(--space-xs); font: inherit; background: var(--cream-light); color: var(--charcoal); border: var(--hairline) solid var(--charcoal); border-radius: var(--radius); }
+.field select { min-block-size: var(--tap); padding: var(--space-2xs) var(--space-xs); font: inherit; background: var(--white); color: var(--charcoal); border: var(--hairline) solid var(--charcoal); border-radius: var(--radius); }

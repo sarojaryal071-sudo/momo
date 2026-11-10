@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1b done and merged to `main`; Steps 0 to 2 live-URL checks still open**
+- Current step: **Step 1c done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -50,13 +50,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1c — Rebuild the look to the approved reference (D-026)
 
-- [ ] White page, cream demoted, grain removed
-- [ ] Header and footer to the reference
-- [ ] Hero band with overlapping cut-out slot and ridge line
-- [ ] Made together band, steps, chutney band, statement, chalkboard with kraft tag, ordering
-- [ ] Other pages aligned
-- [ ] Cut-out image slots with honest placeholders
-- [ ] Verified, merged to `main`, deploy confirmed
+- [x] White page, cream demoted, grain removed — HASH, `--white` page, cream only on the ordering and how-to-cook bands, grain removed (now only on chalkboard and kraft tags)
+- [x] Header and footer to the reference — HASH, white header with wordmark, Shop, How to cook, cart icon and red badge; charcoal footer bar with phone glyph and ridge above
+- [x] Hero band with overlapping cut-out slot and ridge line — HASH, turmeric band, charcoal ridge line, cut-out slot bleeds right and overlaps the charcoal band, steam wisps
+- [x] Made together band, steps, chutney band, statement, chalkboard with kraft tag, ordering — HASH, charcoal band, red numerals row (container query), turmeric chutney band, centred statement, board with overlapping kraft tag, centred ordering
+- [x] Other pages aligned — HASH, shop, how to cook, cart, done on white with the same header and footer; fields white with charcoal border
+- [x] Cut-out image slots with honest placeholders — HASH, cutout-hero 1200x1200, cutout-momo 800x800, cutout-chutney 800x800 (transparent placeholders with labels); kitchen slot kept on how-to-cook
+- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -132,7 +132,9 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `scripts/build.mjs` | Build v1: copy to `dist/`, noindex, sitemap, robots | 0 |
 | `.github/workflows/deploy.yml` | Pages deploy on push to `main` and manual | 0 |
 | `frontend/{index,shop,how-to-cook}.html` | The three public pages, hand-written, shared header/footer copied in | 1 |
-| `frontend/css/motifs.css` | Step 1b: motif masks, bands, display type, steam, fold steps, reveal | 1b |
+| `frontend/css/motifs.css` | Step 1b/1c: motif masks, hero band, bands, display type, steam, fold steps, kraft tags, reveal | 1b, 1c |
+| `frontend/assets/img/cutout-{hero,momo,chutney}.webp` (+ `-600`/`-400` sizes) | Transparent cut-out slots: 1200x1200, 800x800, 800x800; labelled placeholders until the owner supplies real cut-outs | 1c |
+| `frontend/assets/svg/grain-light.svg` | Light grain for the chalkboard and kraft tags only | 1c |
 | `frontend/assets/fonts/` | Young Serif latin woff2 (27 KB) and its OFL licence | 1b |
 | `frontend/assets/svg/` | fold, ridge, steam, kraft-tag SVG motifs | 1b |
 | `frontend/css/components.css` | Buttons, header, footer, forms, notice, chalkboard, layouts; tokens only | 1 |
@@ -159,6 +161,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 1c: `npm test` 23 pass, `npm run build` passes. Home, shop, how-to-cook, cart, done at 320, 360 and 1280 px (home also at 768 and 1600): no horizontal overflow; headline on two lines at every width; hero image overlaps the charcoal band; CLS 0.0000; JS off shows all home content; reduced motion stops steam and shows all sections; cart badge updates (1 item). Home transfer about 94.7 KB raw / 70.4 KB gzip over 17 requests (cut-out placeholders 31 KB of that). Contrast: charcoal/white 16.06, chutney/white 5.98, white/chutney 5.98, charcoal/turmeric 7.12, cream/charcoal 13.57, white/clay 5.82, clay/white 5.82, charcoal/cream 13.57; chutney button against turmeric edge 2.65 (text inside passes). Focus ring checked on white (charcoal), turmeric (charcoal), charcoal board (cream).
 - 2026-11-10, step 1b: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow. Home CLS 0.0000; font loads; home transfer 65.9 KB raw / about 42.9 KB gzip over 17 requests (font 27.0 KB, SVGs 1.6 KB, CSS 20.9 KB raw). JS off: all home content present. Reduced motion: animations off, content visible. Focus ring visible on every band after switching it to charcoal (cream on dark). Contrast: cream/charcoal 13.57, charcoal/turmeric 7.12, cream-light/clay 5.31, chutney/cream 5.05, clay/cream 4.92, cream-light/chutney 5.45. Lighthouse not run (owner uses PageSpeed Insights).
 - 2026-11-10, step 1b deploy: pushed to `main` (3f473e7); Actions run 4 build and deploy jobs both succeeded (npm ci, build, upload, deploy-pages). The agent sandbox cannot reach github.io (proxy refuses the connection), so the live pages were not opened by the agent: the owner should open https://sarojaryal071-sudo.github.io/momo/ and check them.
 - 2026-11-10, step 2: merged origin/main (D-023). `npm test` 23 pass. Dev server at 360 px: added both packs and a sauce pot (header count 4), edited qty, removed a line, reload kept cart (£40). Empty-field confirm -> `done.html?o=SS-TEST-01`, cart cleared. Filled confirm: pickup, name and notes appear in the message; notes with `<b>` shown as text. Forced failure (backend `broken`): plain error text, WhatsApp link without number opened, cart kept, button re-enabled. Keyboard: tab order sane, Enter adds and submits, focus ring visible. Only console errors: expected 404 for `data/products.json` on the dev server (seed fallback used). Not done: live URL, real WhatsApp on a phone.

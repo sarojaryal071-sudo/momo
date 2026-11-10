@@ -20,7 +20,8 @@
   --turmeric: #E3A018;   /* main accent */
   --coriander: #5E7D3A;  /* secondary accent: borders, banners, large decoration only (low contrast for small text) */
   --chutney: #B8321F;    /* buttons, links, highlights */
-  --cream: #F6EBD3;      /* page background */
+  --white: #FFFFFF;      /* page background (D-026) */
+  --cream: #F6EBD3;      /* light tint for one or two calm bands */
   --cream-light: #FBF4E4;
   --charcoal: #23211E;   /* text, dark sections */
   --clay: #8A5A3B;       /* small details */
@@ -73,7 +74,7 @@
   --line-height-head: 1.15;
 
   /* Visual upgrade (Step 1b) */
-  --step-6: clamp(3rem, 1.4rem + 8.5vw, 8.5rem);
+  --step-6: clamp(3rem, 1.4rem + 6vw, 6rem);
   --line-height-display: 0.98;
   --tracking-display: -0.02em;
   --band-pad: clamp(3.5rem, 2rem + 6vw, 7rem);
@@ -81,8 +82,11 @@
   --fold-height: clamp(1rem, 0.8rem + 1vw, 1.5rem);
   --ridge-height: clamp(3.5rem, 2rem + 7vw, 8rem);
   --steam-height: clamp(4rem, 3rem + 6vw, 8rem);
-  --numeral: clamp(5rem, 2.5rem + 12vw, 12rem);
-  --numeral-indent: clamp(0rem, -2rem + 12vw, 6rem);
+  --overlap: clamp(1.5rem, 0.8rem + 4vw, 4.5rem);
+  --hero-image: clamp(10rem, 2rem + 38vw, 40rem);
+  --badge: 1.25rem;
+  --cutout-small: clamp(10rem, 6rem + 20vw, 18rem);
+  --grain-size: 10rem;
   --tag-pad-block: var(--space-3xs);
   --tag-pad-inline: var(--space-s);
   --tag-hole: var(--space-m);
@@ -91,9 +95,6 @@
   --reveal-duration: 700ms;
   --drift-distance: 2rem;
   --drift-duration: 10s;
-  --ratio-hero: 8 / 5;
-  --ratio-closeup: 4 / 3;
-  --ratio-chutney: 1;
   --ratio-kitchen: 3 / 2;
 }
 
