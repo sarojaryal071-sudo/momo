@@ -108,12 +108,12 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1i — Glass pills fix: menu, product sheet, options (D-040, D-041)
 
-- [x] Glass pill tokens and press state — HASH, theme.css: on-light and on-dark pill fills, borders, highlight, shadows, glass-emerald layer, scrim, close size; no thick edges; press moves down --depth (movement only under no-preference)
-- [x] Full-screen menu: tinted glass layer, visible X and wordmark, centred pills, contact group — HASH, emerald-tinted glass layer (90%, blur), own top bar with wordmark, cart and 48 px glass X, centred on-dark pills (min(100%, 22rem)), current page marked with a dot, Get in touch group, ridge; Tab stays inside the layer; X, Escape, link tap and tap outside close it
-- [x] Product sheet: focus fix, light glass, content height, pinned footer — HASH, panel gets focus on touch (no ring on X), keyboard goes to X; light glass sheet sized to content up to 85dvh, pinned footer, light emerald scrim with blur
-- [x] Option pills and stepper restyled — HASH, on-light glass pills, selected solid emerald with spring tick, pill stepper with round 44 px buttons and dimmed disabled minus
-- [x] Filter chips and card controls match — HASH, chips, card Add to cart and stepper share the glass pill and press feel
-- [x] Checked in own screenshots, merged to `main`, deploy confirmed — HASH, see log
+- [x] Glass pill tokens and press state — 3bdb668, theme.css: on-light and on-dark pill fills, borders, highlight, shadows, glass-emerald layer, scrim, close size; no thick edges; press moves down --depth (movement only under no-preference)
+- [x] Full-screen menu: tinted glass layer, visible X and wordmark, centred pills, contact group — 3bdb668, emerald-tinted glass layer (90%, blur), own top bar with wordmark, cart and 48 px glass X, centred on-dark pills (min(100%, 22rem)), current page marked with a dot, Get in touch group, ridge; Tab stays inside the layer; X, Escape, link tap and tap outside close it
+- [x] Product sheet: focus fix, light glass, content height, pinned footer — 3bdb668, panel gets focus on touch (no ring on X), keyboard goes to X; light glass sheet sized to content up to 85dvh, pinned footer, light emerald scrim with blur
+- [x] Option pills and stepper restyled — 3bdb668, on-light glass pills, selected solid emerald with spring tick, pill stepper with round 44 px buttons and dimmed disabled minus
+- [x] Filter chips and card controls match — 3bdb668, chips, card Add to cart and stepper share the glass pill and press feel
+- [x] Checked in own screenshots, merged to `main`, deploy confirmed — 3bdb668, see log
 
 ## Step 2 — Cart and order flow (mock)
 
