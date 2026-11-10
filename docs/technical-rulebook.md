@@ -98,5 +98,5 @@ In `mock` mode (before the backend exists) the gateway returns a clearly fake nu
 ## 10. Git
 
 - Commit small and often. Message: imperative, one line, for example `Add cart page with quantity controls`.
-- Push to `main` only when the step's verification passes. Never force-push.
+- Merge into `main` at the end of every step, after that step's verification passes and the tracker is updated, so the owner can see the result live. Never force-push.
 - Never commit `node_modules`, `dist`, or any `.env` file.

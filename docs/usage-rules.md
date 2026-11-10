@@ -64,6 +64,7 @@ At the end of every phase, as the last action before reporting, update `docs/pro
 4. Append one line to the verification log: what you ran and what you saw.
 5. Update "Known issues", "TODO placeholders" and "Owner actions".
 6. Commit the tracker with the code in the same commit.
+7. Commit everything and merge it into `main` (fast-forward, never force), push, and note in the report whether the deploy ran. Only `main` deploys, so an unmerged step is invisible to the owner. If you cannot push to `main`, state that in the first line of the report and name the branch to merge.
 
 Edit only the lines that changed. Keep the tracker under about 200 lines; compress old verification lines instead of deleting history.
 

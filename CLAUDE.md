@@ -41,7 +41,7 @@ The planning chat (claude.ai) never writes code. It writes these docs and instru
 ## Working method
 
 - Small commits with clear messages. Run the step's verification before pushing to `main`.
-- Pushing to `main` triggers a deploy once Step 0 has set up the Pages workflow.
+- **After every step, commit everything and merge it into `main`.** That is the only way the owner sees real updates, because only `main` deploys. Order: step verification, tracker update, commit all changes (`git status` must be clean), merge or fast-forward into `main`, push, then confirm the deploy workflow ran and say what the live URL shows. Never force-push. If your session cannot push to `main` (for example it is limited to its own branch), say so in the first line of your report and name the branch to merge. Do not skip the merge step silently.
 - Do a real live run of every flow you build (open it in a browser or call it for real). Unit tests alone do not count. Check only what the change touched (regression table in `docs/usage-rules.md`); never re-run earlier steps' checks.
 - If a rule, a step or a decision looks wrong, stop, explain, and ask. Do not work around it.
 
