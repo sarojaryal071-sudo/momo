@@ -39,14 +39,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1b — Visual upgrade ("Made together", D-024, D-025)
 
-- [x] Fluid tokens extended — HASH, theme.css: display step, band/ridge/fold/steam/numeral/tag/motion tokens, ring colours
-- [x] Display font self-hosted with licence — HASH, Young Serif (SIL OFL), 26,992 bytes woff2 + OFL text, swap, Times-matched fallback (size-adjust 120.6%)
-- [x] SVG motifs (fold, ridge line, steam, kraft tag) — HASH, fold, ridge, steam, kraft-tag: 1,554 bytes total, used as masks on currentColor
-- [x] Home page rebuilt to the copy spine — HASH, exact brand-direction strings; [CONFIRM] items are `data-todo`
-- [x] Shop, how to cook, cart, done, header and footer updated — HASH, fold-bordered chalkboard, kraft price tags, ridge above footer, wordmark; behaviour and markup hooks unchanged
-- [x] Image slots wired — HASH, srcset + fixed aspect-ratio + width/height; placeholders kept
-- [x] Motion (two effects, reduced-motion safe) — HASH, steam drift + scroll-driven fade-in; both off under reduced motion
-- [x] Verified and merged to `main` — HASH, see log; deploy status recorded in the log
+- [x] Fluid tokens extended — 2ec61ed, theme.css: display step, band/ridge/fold/steam/numeral/tag/motion tokens, ring colours
+- [x] Display font self-hosted with licence — 2ec61ed, Young Serif (SIL OFL), 26,992 bytes woff2 + OFL text, swap, Times-matched fallback (size-adjust 120.6%)
+- [x] SVG motifs (fold, ridge line, steam, kraft tag) — 2ec61ed, fold, ridge, steam, kraft-tag: 1,554 bytes total, used as masks on currentColor
+- [x] Home page rebuilt to the copy spine — 2ec61ed, exact brand-direction strings; [CONFIRM] items are `data-todo`
+- [x] Shop, how to cook, cart, done, header and footer updated — 2ec61ed, fold-bordered chalkboard, kraft price tags, ridge above footer, wordmark; behaviour and markup hooks unchanged
+- [x] Image slots wired — 2ec61ed, srcset + fixed aspect-ratio + width/height; placeholders kept
+- [x] Motion (two effects, reduced-motion safe) — 2ec61ed, steam drift + scroll-driven fade-in; both off under reduced motion
+- [x] Verified and merged to `main` — 2ec61ed, see log; deploy status recorded in the log
 
 ## Step 2 — Cart and order flow (mock)
 
