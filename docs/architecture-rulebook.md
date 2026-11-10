@@ -11,7 +11,7 @@ Visitor browser ──► GitHub Pages (static files from dist/)
      ▼                    │
 Edge function place-order ──► Postgres ◄── Admin pages (Supabase Auth)
      │                          │
-     └─► (no email, D-033)      └─ database webhook ► Edge function trigger-rebuild ► workflow ► build.mjs ► Pages
+     └─► email to owner (D-037) └─ database webhook ► Edge function trigger-rebuild ► workflow ► build.mjs ► Pages
 ```
 
 - The public site is static. It reads products from HTML, and pickup rules, the notice banner and public settings from Supabase over plain `fetch` using the anon key.
@@ -72,7 +72,7 @@ Conventions: files and folders `kebab-case`; database tables and columns `snake_
 All tables have `created_at`. Use `uuid` ids unless noted. Money is `integer` pence.
 
 - `products` — id, slug (unique), name, kind (`pack` or `addon`), category (nullable text, for filter chips once the catalogue grows, decision D-028), unit_label (for example "40 pieces"), price_pence, available (bool), photo_path (nullable), sort_order, active (bool), updated_at.
-- `pickup_rules` — id, weekday (0 to 6, Sunday is 0), start_time, end_time, slot_minutes (the time step the customer can pick, default 15, D-034), active.
+- `pickup_rules` — id, weekday (0 to 6, Sunday is 0), start_time, end_time, slot_minutes (the time step the customer can pick, default 1, D-038), active.
 - `pickup_exceptions` — id, date, kind (`closed` or `extra`), start_time, end_time (null when closed all day), note.
 - `site_notice` — single row (id = 1): message, active, updated_at.
 - `settings` — key (text pk), value (jsonb). Keys: `order_prefix` ("SS"), `min_lead_hours`, `max_days_ahead`, `max_qty_per_item`.
@@ -95,17 +95,17 @@ Indexes: `orders (pickup_date, status)`, `orders (created_at desc)`, `products (
 ## 6. Edge functions (Deno, TypeScript)
 
 **`place-order`** — public endpoint, CORS limited to the site's origins.
-1. Validate the body: items (slug and qty only), optional name, phone, notes, pickup date and time. Reject unknown slugs, unavailable products, qty outside 1 to `max_qty_per_item`, over-long text, and a filled honeypot field.
+1. Validate the body: items (slug and qty only), required name and phone (UK format), optional notes, pickup date and time. Reject unknown slugs, unavailable products, qty outside 1 to `max_qty_per_item`, over-long text, and a filled honeypot field.
 2. Recompute every price and the total from the `products` table. Never trust prices from the browser.
 3. Check the pickup date and time against the rules, exceptions, `min_lead_hours` and `max_days_ahead` (only when a pickup date was supplied).
 4. Rate-limit by IP.
 5. Take the next number from `order_counters`, build the order number, insert the order, in one transaction.
-6. No email is sent (D-033). The order is saved and visible in the admin panel.
+6. Email the owner a plain summary (D-037). If the email fails, log it and still return success. The order is saved.
 7. Return `{ orderNumber, totalPence }`.
 
 **`trigger-rebuild`** — called by a database webhook on `products` changes. Calls the GitHub API to start the deploy workflow using a fine-grained token (actions permission on this repo only). The workflow's concurrency setting collapses a burst of edits into one build.
 
-Function secrets: `GITHUB_DISPATCH_TOKEN`, `ALLOWED_ORIGINS`.
+Function secrets: `OWNER_EMAIL`, `EMAIL_API_KEY`, `GITHUB_DISPATCH_TOKEN`, `ALLOWED_ORIGINS`.
 
 ## 7. Build pipeline (`scripts/build.mjs`)
 

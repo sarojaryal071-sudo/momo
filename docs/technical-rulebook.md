@@ -20,28 +20,27 @@ Status: v1, 2026-11-10. Rules and behaviour. Structure lives in `architecture-ru
 - Quantity per item: 1 to `max_qty_per_item` (default 10).
 - The server recomputes every price and the total. The total shown in the browser is a convenience, not a source of truth.
 - Field limits (enforced in the browser and again in the function): name 80 characters, phone 20, notes 500, at most 20 line items.
-- Order number: `<prefix>-<date>-<counter>`, date in UK time, for example `SS-1011-01` (DDMM, decision D-032). Assigned only by the backend. See decision D-007 for the pending date-format question.
+- Order number: `<prefix>-<date>-<counter>`, date in UK time, for example `SS-1011-01` (DDMM, decision D-032). Assigned only by the backend. 
 
-## 3. Order flow, step by step
+## 3. Order flow, step by step (decision D-036)
 
-1. Customer adds items on the shop page; the cart shows the count.
-2. Cart page lists items, quantities and the total, then the optional form: name, phone, pickup date, pickup time, notes. A visible hint says "Add your phone number so we can arrange pickup." Nothing is required. Pickup only and "pay cash on pickup" are stated next to the button.
-3. Clicking "Confirm order" disables the button and calls `submitOrder()`.
+1. Customer adds items; the cart shows the count and the sticky checkout bar.
+2. Cart page lists items, options, quantities and the total, then the form: **name (required), phone (required)**, pickup date, pickup time (hour and minute lists inside her window), notes (optional). The phone is checked for UK format and shown back ("We will message you on 07xxx xxxxxx"). Pickup only and "pay cash on pickup" are stated next to the button.
+3. Clicking "Place order" disables the button and calls `submitOrder()`.
 4. The gateway returns `{ orderNumber, totalPence }`, or fails.
-5. The site builds the WhatsApp message and moves the customer to `done.html?o=<orderNumber>`, which shows the order number, a summary, and a large "Open WhatsApp" button. It also tries to open WhatsApp automatically once.
+5. The site moves the customer to `done.html?o=<orderNumber>`: an animated "Order received" screen with the order number, the summary, the three next steps ("We will message you on WhatsApp to confirm", "Pick up at <date> <time>; we send the address then", "Pay cash on pickup") and the call and WhatsApp contact links for questions. It never says "confirmed" or "sent". There is **no automatic WhatsApp opening** and no required WhatsApp step.
 6. The cart is cleared only after a successful save.
 
 If the backend fails or takes longer than 8 seconds:
-- No order number exists. Say so plainly: "We couldn't save your order online. Please send the WhatsApp message so we receive it."
-- Build the WhatsApp message without a number and open it. The order is not lost, because the customer sends it by hand.
-- Keep the cart so they can retry.
+- No order number exists. Say so plainly: "We couldn't place your order online. Please send us the WhatsApp message instead, so we receive it."
+- Show the pre-filled WhatsApp message button (the order is not lost, because the customer sends it by hand). Keep the cart so they can retry.
 
-In `mock` mode (before the backend exists) the gateway returns a clearly fake number such as `SS-TEST-01` and nothing is emailed.
+In `mock` mode the gateway returns a clearly fake number such as `SS-TEST-01` and nothing is emailed.
 
-## 4. WhatsApp rules
+## 4. WhatsApp rules (the customer link is optional; the admin message is the main use)
 
 - Link: `https://wa.me/<number>?text=<encodeURIComponent(message)>`. The number is digits only in international format, for example `447413069241`. Confirmed by the owner as the same number as the public phone (D-030).
-- A website cannot send the message. Never write "sent" or "your order has been sent via WhatsApp." Write "Tap send in WhatsApp to confirm."
+- A website cannot send the message. Never write "sent" or "your order has been sent via WhatsApp." The customer-side link is only for questions and the failure backup.
 - Navigate in the same tab (`location.href`) after the gateway returns. Opening a new window after an async call is often blocked by browsers. The done page always has a visible button as the fallback.
 - Message layout (plain text, UK English):
   ```
@@ -70,7 +69,7 @@ In `mock` mode (before the backend exists) the gateway returns a clearly fake nu
 
 ## 6. Privacy and data
 
-- Collect only what the form asks for. Everything is optional.
+- Collect only what the form asks for: name and phone are required (D-036), everything else is optional.
 - Orders hold personal data (name, phone). A privacy notice is required before ordering goes public (decision D-018). The retention period is not set yet. Build the admin so old orders can be exported and deleted later; do not delete automatically.
 - No legal claims in the code or content. The owner confirms legal wording with the council.
 

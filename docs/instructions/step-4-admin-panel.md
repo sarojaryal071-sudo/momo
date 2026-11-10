@@ -17,11 +17,11 @@ A mobile-friendly admin panel at `/admin/` where the owner sees orders by pickup
 7. **Export**: a button on the orders page that downloads orders for a chosen date range as CSV (supports later record-keeping and data-retention decisions).
 8. **Design**: reuse `theme.css` and `base.css`; the admin is plain and clear, not decorative. Big touch targets, designed for a phone first. `noindex` meta and a restrictive Content-Security-Policy on every admin page. No links to `/admin/` from public pages.
 
-## Added by decisions D-033 to D-035
+## Added by decisions D-036 to D-038
 
-- **No email exists (D-033), so the orders page is her only alert besides WhatsApp.** Make new orders impossible to miss: a big count of orders with status `new` at the top, new rows highlighted until opened, the browser tab title showing "(N) Orders" while any are new, and an automatic refresh every `ORDERS_REFRESH_SECONDS` (named constant, 60). Optional later: a sound toggle. Say plainly on the page that an order only reaches WhatsApp if the customer taps send.
-- **Pickup page**: windows per weekday (start, end) and the time step in minutes (default 15, D-034). No capacity setting.
-- **Message customer** template (WhatsApp) includes a line she can edit to add the full pickup address once she confirms the order (D-035); the address is typed by her per message and never stored on the public site.
+- **Orders are placed on the site, so the orders page is her main tool** (an email also arrives, D-037). Make new orders impossible to miss: a big count of orders with status `new` at the top, new rows highlighted until opened, the browser tab title showing "(N) Orders" while any are new, and an automatic refresh every `ORDERS_REFRESH_SECONDS` (named constant, 60).
+- Each order shows name, phone (tap to call), pickup date and time, lines with options and a "Customised" label, notes and the total, with status buttons: new, confirmed, ready, collected, cancelled. A "Message customer" button opens her WhatsApp to the customer's phone with an editable template for each status; the **confirmation template includes a line where she types the full pickup address** (D-035), which is never stored on the public site.
+- **Pickup page**: windows per weekday (start, end) and the time step in minutes (default 1, D-038). No capacity setting.
 
 ## Added by decision D-031 (options, stock, custom lead time)
 

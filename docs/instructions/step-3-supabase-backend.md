@@ -4,33 +4,35 @@ Prerequisite: Step 2 done. Read `CLAUDE.md`, `docs/architecture-rulebook.md` sec
 
 ## Goal
 
-Real orders: the site saves each order in a database, and assigns the order number (`SS-DDMM-NN`, D-032). No email is sent (D-033): she sees orders in the admin panel and in the WhatsApp message the customer sends. The shop reads real products at build time and real pickup rules at runtime.
+Real orders: the site saves each order in a database, assigns the order number (`SS-DDMM-NN`, D-032) and emails the owner (D-037). The order is placed on the site; the customer does not have to send a WhatsApp message (D-036). The shop reads real products at build time and real pickup rules at runtime.
 
 ## Owner actions first (list them clearly in your first message to the owner, then wait)
 
 1. Create a Supabase project (free tier) and note the project URL and anon key.
 2. In Authentication settings, **disable public sign-ups**. Create one admin user (the owner's email and a strong password).
-3. Create a fine-grained GitHub token limited to this repository with permission to run workflows. It goes only into a Supabase function secret.
-4. Add repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values) in GitHub.
+3. Choose the email provider and create an API key (suggestion: Resend free tier). The owner's email address goes only into a Supabase function secret.
+4. Create a fine-grained GitHub token limited to this repository with permission to run workflows. It goes only into a Supabase function secret.
+5. Add repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values) in GitHub.
 
 Write `backend/README.md` as a step-by-step guide for these actions in plain language, with where each value goes.
 
 ## Do
 
 1. **Migrations** in `backend/supabase/migrations/`, numbered and forward-only: all tables and indexes from section 4 of the architecture rulebook (including the nullable `products.category` column, D-028; the shop's filter chips use `category` when present, otherwise `kind`), the `is_admin()` function, row-level security policies from section 5, the `product-photos` storage bucket and its policies, and a `place_order` SQL function that does the counter and insert in one transaction with row locking.
-2. **`seed.sql`**: the two momo packs (prices from decision D-002), the two sauce pots (inactive or unavailable, no price), default settings (`order_prefix` `SS`, `min_lead_hours` 24, `max_days_ahead` 14, `max_qty_per_item` 10), default pickup rules (Saturday and Sunday 10:00 to 18:00, time step 15 minutes, D-034), an empty notice row. Keep it free of any personal data.
-3. **`place-order` function** exactly as architecture section 6: validation, server-side price recalculation, pickup checks, honeypot, IP rate limit, number assignment, insert, return `{ orderNumber, totalPence }`. No email (D-033). CORS limited to the site's origins (from a secret).
+2. **`seed.sql`**: the two momo packs (prices from decision D-002), the two sauce pots (inactive or unavailable, no price), default settings (`order_prefix` `SS`, `min_lead_hours` 24, `max_days_ahead` 14, `max_qty_per_item` 10), default pickup rules (Saturday and Sunday 10:00 to 18:00, time step 1 minute, D-038), an empty notice row. Keep it free of any personal data.
+3. **`place-order` function** exactly as architecture section 6: validation, server-side price recalculation, pickup checks, honeypot, IP rate limit, number assignment, insert, email the owner through the provider (failure never loses the order), return `{ orderNumber, totalPence }`. CORS limited to the site's origins (from a secret).
 4. **`trigger-rebuild` function** and a database webhook on `products` insert, update and delete, starting the deploy workflow through the GitHub API. Add `workflow_dispatch` handling to the workflow if missing.
 5. **Frontend wiring**: implement the `supabase` gateway in `order-gateway.js` (plain `fetch` to the function), read pickup rules and exceptions and public settings in `pickup.js` over REST with the anon key, switch `site-config.js` to `backend: 'supabase'` with the public URL and anon key (these may be in the repo). Keep `mock` selectable for local development.
 6. **Build**: extend `build.mjs` per architecture section 7 steps 2 to 6: fetch active products, merge with `frontend/content/products/<slug>.json`, fill the marked regions, write `dist/data/products.json`, download and convert photos to WebP. Failed or empty fetch fails the build in CI. Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to the workflow environment.
 7. **Notice banner**: `notice.js` fetches `site_notice` and shows the strip on every public page when active; silent on failure; reserve space so the layout does not jump.
 8. **Tests**: a script (documented in `backend/README.md`) that proves: anonymous users cannot read or write `orders`, cannot read inactive products or non-public settings; a tampered price is ignored; two simultaneous orders get different numbers; a sold-out product is rejected; an order with every optional field empty succeeds.
 
-## Changes from decisions D-032 to D-035
+## Changes from decisions D-032 to D-039
 
-- Remove the `emailed` field from the gateway result, the mock gateway, the done page logic and the tests (no email, D-033). No email provider, key or owner email exists anywhere in this project.
-- `pickup.js` and the order checks use the time step from each rule's `slot_minutes` (15) so the customer can pick times like 09:15 inside her windows (D-034); a time outside every window, off the step, or earlier than the lead time is rejected by the function.
-- The Step 1f time picker is wired to real rules here; keep `mock` selectable.
+- The order is placed on the site (D-036): the function requires name and phone (UK format) and rejects an order without them; the cart and done pages follow `docs/technical-rulebook.md` section 3. Remove the automatic WhatsApp opening on the done page; keep the WhatsApp message builder for the failure backup and for the admin panel (Step 4).
+- Email alert to the owner (D-037) through the chosen provider; owner email and API key only in function secrets.
+- `pickup.js` and the checks use the time step from each rule's `slot_minutes` (default 1): any minute inside her windows is valid (D-038); a time outside every window, off the step or earlier than the lead time is rejected by the function.
+- Keep `mock` selectable.
 
 ## Added by decision D-031 (options, stock, custom lead time)
 
@@ -43,7 +45,7 @@ Read `docs/architecture-rulebook.md` section 11 first. In addition to the list a
 
 ## Do not
 
-Put the service-role key, GitHub token in the repo, the browser, or workflow variables. Build the admin panel (Step 4). Add payments or customer accounts.
+Put the service-role key, GitHub token, email key or owner email in the repo, the browser, or workflow variables. Build the admin panel (Step 4). Add payments or customer accounts.
 
 ## Verify (live run)
 

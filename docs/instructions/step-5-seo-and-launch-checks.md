@@ -25,7 +25,7 @@ Set `SITE_INDEXABLE` to `true`, submit anything to Search Console, buy a domain,
 
 ## Verify (live run)
 
-- A full test order from a phone, start to finish, with the WhatsApp message and the admin panel entry checked.
+- A full test order from a phone, start to finish, with the owner's email, the admin panel entry and her WhatsApp message to the customer checked.
 - Rich Results Test and Lighthouse reports pasted into the report (scores and any remaining issues).
 - `npm run build` with `SITE_INDEXABLE=true` in a scratch environment fails while any `TODO:` remains and passes when none do. Do not leave that variable set to true in the repo's variables.
 
