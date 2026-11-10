@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildLink, buildMessage, buildOrderLink, toWhatsAppNumber } from '../frontend/js/whatsapp.js';
+import { buildLink, buildMessage, buildOrderLink, toNationalFormat, toWhatsAppNumber } from '../frontend/js/whatsapp.js';
 
 const lines = [
   { qty: 1, name: 'Frozen chicken momo', unitLabel: '40 pieces', linePence: 1000 },
@@ -50,4 +50,12 @@ test('UK phone conversion', () => {
 test('options are listed under their line', () => {
   const msg = buildMessage({ orderNumber: 'SS-TEST-01', lines: [{ qty: 2, name: 'Frozen chicken momo', unitLabel: '40 pieces', linePence: 2100, optionText: 'No onion, Hot' }], totalPence: 2100 });
   assert.equal(msg, 'Hi! Order SS-TEST-01\n- 2 x Frozen chicken momo (40 pieces) £21\n  Customised: No onion, Hot\nTotal £21\nPay cash on pickup.');
+});
+
+test('the customer phone is listed and numbers are shown back in national format', () => {
+  const msg = buildMessage({ lines: [{ qty: 1, name: 'A', unitLabel: '', linePence: 1000 }], totalPence: 1000, name: 'Asha', phone: '07413 069241' });
+  assert.ok(msg.includes('Name: Asha\nPhone: 07413 069241\nPay cash'));
+  assert.equal(toNationalFormat('447413069241'), '07413 069241');
+  assert.equal(toNationalFormat(toWhatsAppNumber('+44 7413 069241')), '07413 069241');
+  assert.equal(toNationalFormat(null), '');
 });

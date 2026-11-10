@@ -224,6 +224,30 @@ document.addEventListener('change', (e) => { const dlg = e.target.closest('dialo
 // "close" does not bubble, so listen in the capture phase. Focus goes back to whatever opened the window.
 document.addEventListener('close', (e) => { if (e.target.matches('dialog[data-dialog]')) { opener?.focus(); opener = null; } }, true);
 
+// Swipe down on the handle or header closes the sheet (touch and pen only).
+let drag = null;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+document.addEventListener('pointerdown', (e) => {
+  if (e.pointerType === 'mouse') return;
+  const grip = e.target.closest('[data-dialog-head], [data-dialog-handle]');
+  if (!grip || e.target.closest('[data-dialog-close]')) return;
+  drag = { dlg: grip.closest('dialog'), y: e.clientY, dy: 0 };
+});
+document.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  drag.dy = Math.max(0, e.clientY - drag.y);
+  if (!reduceMotion.matches) drag.dlg.style.translate = `0 ${drag.dy}px`; // follows the finger; with reduced motion it only closes
+});
+const endDrag = () => {
+  if (!drag) return;
+  const { dlg, dy } = drag;
+  drag = null;
+  dlg.style.translate = '';
+  if (dy > siteConfig.swipeClosePx) dlg.close();
+};
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+
 document.querySelectorAll('[data-slug]').forEach(renderCardAction);
 
 // ---- Filter chips and search. Every card is in the HTML; this only hides and shows them. ----

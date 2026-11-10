@@ -36,7 +36,7 @@ test('maximum days ahead', () => {
 test('closed day and closed hours exceptions, extra day', () => {
   const closedDay = { date: '2026-11-14', kind: 'closed', start_time: null, end_time: null };
   const closedHours = { date: '2026-11-15', kind: 'closed', start_time: '11:00', end_time: '12:00' };
-  const extra = { date: '2026-11-18', kind: 'extra', start_time: '16:00', end_time: '18:00' };
+  const extra = { date: '2026-11-18', kind: 'extra', start_time: '16:00', end_time: '18:00', slot_minutes: 60 };
   const opts = getPickupOptions(config({ exceptions: [closedDay, closedHours, extra] }), monday);
   assert.equal(opts.find((o) => o.date === '2026-11-14'), undefined);
   assert.deepEqual(opts.find((o) => o.date === '2026-11-15').times.map((t) => t.value), ['10:00', '12:00']);
@@ -66,4 +66,27 @@ test('a customised cart uses the longer minimum notice, a standard cart does not
   assert.equal(custom[0].date, '2026-11-15'); // 72 h: Saturday 10:00 is too soon, Sunday is the first day
   assert.equal(earliestPickup(cfg, thursday, 72).date, '2026-11-15');
   assert.equal(getPickupOptions(cfg, thursday, { customised: true, customLeadHours: 12 })[0].date, '2026-11-14'); // never shorter than the usual notice
+});
+
+// Hour and minute lists (D-038)
+import { pickupHours, pickupMinutes, windowText } from '../frontend/js/pickup.js';
+
+test('hour and minute lists stay inside the window and step by the rule', () => {
+  const cfg = { settings: { min_lead_hours: 0, max_days_ahead: 7 }, rules: [{ weekday: 6, start_time: '09:00', end_time: '10:30', slot_minutes: 15, active: true }], exceptions: [] };
+  const [day] = getPickupOptions(cfg, new Date('2026-11-09T12:00:00Z'));
+  assert.deepEqual(pickupHours(day), ['09', '10']);
+  assert.deepEqual(pickupMinutes(day, '09'), ['00', '15', '30', '45']);
+  assert.deepEqual(pickupMinutes(day, '10'), ['00', '15']); // 10:30 would end at 10:45, past the window
+  assert.equal(windowText(day), 'Available 09:00 to 10:30 on Saturday');
+});
+
+test('a one-minute step offers every minute and the notice period trims the first day', () => {
+  const cfg = { settings: { min_lead_hours: 24, max_days_ahead: 7 }, rules: [{ weekday: 6, start_time: '09:00', end_time: '12:00', slot_minutes: 1, active: true }], exceptions: [] };
+  const [day] = getPickupOptions(cfg, new Date('2026-11-13T09:30:00Z')); // Friday 09:30 + 24 h = Saturday 09:30
+  assert.equal(day.date, '2026-11-14');
+  assert.equal(day.times[0].value, '09:30');
+  assert.deepEqual(pickupHours(day), ['09', '10', '11']);
+  assert.equal(pickupMinutes(day, '09').length, 30);
+  assert.equal(pickupMinutes(day, '11').length, 60);
+  assert.equal(windowText(day), 'Available 09:30 to 12:00 on Saturday');
 });

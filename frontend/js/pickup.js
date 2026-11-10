@@ -1,5 +1,8 @@
 // Pickup dates and times from rules and exceptions (same shape as the future database tables).
-const DEFAULT_SLOT_MINUTES = 60;
+import { siteConfig } from './site-config.js';
+
+// Slot length when a rule or exception does not say: the named step constant (D-038).
+const DEFAULT_SLOT_MINUTES = siteConfig.pickupStepMinutes;
 const MS_PER_MINUTE = 60000;
 const MINUTES_PER_HOUR = 60;
 const MINUTES_PER_DAY = 1440;
@@ -66,7 +69,7 @@ export function getPickupOptions(config, now = new Date(), { customised = false,
     }
     const times = [...slots.entries()].sort((a, b) => a[0] - b[0])
       .filter(([t]) => dayMs / MS_PER_MINUTE + t >= earliestMin)
-      .map(([t, len]) => ({ value: toHhmm(t), label: `${toHhmm(t)} to ${toHhmm(t + len)}` }));
+      .map(([t, len]) => ({ value: toHhmm(t), label: `${toHhmm(t)} to ${toHhmm(t + len)}`, end: toHhmm(t + len) }));
     if (times.length) options.push({ date, label: dateLabel(date), times });
   }
   return options;
@@ -74,3 +77,8 @@ export function getPickupOptions(config, now = new Date(), { customised = false,
 
 // The first date a customised order can be collected, or null when none is offered.
 export const earliestPickup = (config, now, customLeadHours) => getPickupOptions(config, now, { customised: true, customLeadHours })[0] || null;
+
+// Hour and minute lists for one day's window (D-038). Only values inside the window and past the notice period are offered.
+export const pickupHours = (day) => [...new Set(day.times.map((t) => t.value.slice(0, 2)))];
+export const pickupMinutes = (day, hour) => day.times.filter((t) => t.value.slice(0, 2) === hour).map((t) => t.value.slice(3));
+export const windowText = (day) => `Available ${day.times[0].value} to ${day.times[day.times.length - 1].end} on ${day.label.split(' ')[0]}`;

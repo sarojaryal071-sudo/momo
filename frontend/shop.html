@@ -31,7 +31,7 @@
         <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7 H20 M4 12 H20 M4 17 H20"/></svg><span class="visually-hidden">Menu</span></button>
       </div>
-      <nav id="site-menu" class="site-menu" aria-label="Main" data-menu>
+      <nav id="site-menu" class="site-menu" aria-label="Main" tabindex="-1" data-menu>
         <ul class="nav-list">
           <li><a href="index.html">Home</a></li>
           <li><a href="shop.html" aria-current="page">Shop</a></li>
@@ -84,39 +84,46 @@
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-chicken-momo-title" data-dialog>
   <div class="dialog-panel">
-    <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
-    <div class="card-media dialog-media card-media-multiply"><img src="assets/img/pack-chicken.webp" srcset="assets/img/pack-chicken-400.webp 400w, assets/img/pack-chicken.webp 800w" sizes="(min-width: 48em) 24rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
-    <h2 id="dlg-chicken-momo-title">Frozen chicken momo</h2>
-    <p class="card-meta">40 pieces</p>
-    <p class="card-price">£10</p>
-    <section class="dialog-section">
-      <h3>Ingredients and allergens</h3>
-      <p data-todo>TODO: ingredients and allergen information from the owner</p>
-    </section>
-    <div class="dialog-form" data-options>
-    <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
+    <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
+    <div class="dialog-head" data-dialog-head>
+      <div class="card-media dialog-media card-media-multiply"><img src="assets/img/pack-chicken.webp" srcset="assets/img/pack-chicken-400.webp 400w, assets/img/pack-chicken.webp 800w" sizes="6rem" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
+      <div class="dialog-title">
+        <h2 id="dlg-chicken-momo-title">Frozen chicken momo</h2>
+        <p class="card-meta">40 pieces</p>
+        <p class="card-price">£10</p>
+      </div>
+      <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+    </div>
+    <div class="dialog-body" data-options>
+      <section class="dialog-section">
+        <h3>Ingredients and allergens</h3>
+        <p data-todo>TODO: ingredients and allergen information from the owner</p>
+      </section>
+      <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
       <legend>Leave out <span class="sample-label">sample</span></legend>
       <label class="opt"><input type="checkbox" name="opt-chicken-momo-leave-out" value="no-onion" data-delta="0" data-default="false"> <span>No onion</span></label>
       <label class="opt"><input type="checkbox" name="opt-chicken-momo-leave-out" value="no-coriander" data-delta="0" data-default="false"> <span>No coriander</span></label>
     </fieldset>
-    <fieldset class="opt-group" data-group="spice" data-kind="single">
+      <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
     </fieldset>
-    <p class="custom-note" data-custom-note hidden></p>
-    <p class="stock-line" data-stock-line hidden></p>
-    <div class="dialog-buy">
-      <div class="stepper" role="group" aria-label="Quantity of Frozen chicken momo">
-        <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen chicken momo">&minus;</button>
-        <output class="stepper-count" data-qty-value>1</output>
-        <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen chicken momo">+</button>
-      </div>
-      <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £10</span></button>
+      <!-- TODO: owner and council to approve the allergy wording below -->
+      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
-    <!-- TODO: owner and council to approve the allergy wording below -->
-    <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
+    <div class="dialog-foot">
+      <p class="custom-note" data-custom-note hidden></p>
+      <p class="stock-line" data-stock-line hidden></p>
+      <div class="dialog-buy">
+        <div class="stepper" role="group" aria-label="Quantity of Frozen chicken momo">
+          <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen chicken momo">&minus;</button>
+          <output class="stepper-count" data-qty-value>1</output>
+          <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen chicken momo">+</button>
+        </div>
+        <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £10</span></button>
+      </div>
     </div>
   </div>
 </dialog>
@@ -134,39 +141,46 @@
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-veg-momo-title" data-dialog>
   <div class="dialog-panel">
-    <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
-    <div class="card-media dialog-media card-media-multiply"><img src="assets/img/pack-veg.webp" srcset="assets/img/pack-veg-400.webp 400w, assets/img/pack-veg.webp 800w" sizes="(min-width: 48em) 24rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
-    <h2 id="dlg-veg-momo-title">Frozen veg momo</h2>
-    <p class="card-meta">40 pieces</p>
-    <p class="card-price">£10</p>
-    <section class="dialog-section">
-      <h3>Ingredients and allergens</h3>
-      <p data-todo>TODO: ingredients and allergen information from the owner</p>
-    </section>
-    <div class="dialog-form" data-options>
-    <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
+    <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
+    <div class="dialog-head" data-dialog-head>
+      <div class="card-media dialog-media card-media-multiply"><img src="assets/img/pack-veg.webp" srcset="assets/img/pack-veg-400.webp 400w, assets/img/pack-veg.webp 800w" sizes="6rem" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
+      <div class="dialog-title">
+        <h2 id="dlg-veg-momo-title">Frozen veg momo</h2>
+        <p class="card-meta">40 pieces</p>
+        <p class="card-price">£10</p>
+      </div>
+      <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+    </div>
+    <div class="dialog-body" data-options>
+      <section class="dialog-section">
+        <h3>Ingredients and allergens</h3>
+        <p data-todo>TODO: ingredients and allergen information from the owner</p>
+      </section>
+      <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
       <legend>Leave out <span class="sample-label">sample</span></legend>
       <label class="opt"><input type="checkbox" name="opt-veg-momo-leave-out" value="no-onion" data-delta="0" data-default="false"> <span>No onion</span></label>
       <label class="opt"><input type="checkbox" name="opt-veg-momo-leave-out" value="no-coriander" data-delta="0" data-default="false"> <span>No coriander</span></label>
     </fieldset>
-    <fieldset class="opt-group" data-group="spice" data-kind="single">
+      <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
     </fieldset>
-    <p class="custom-note" data-custom-note hidden></p>
-    <p class="stock-line" data-stock-line hidden></p>
-    <div class="dialog-buy">
-      <div class="stepper" role="group" aria-label="Quantity of Frozen veg momo">
-        <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen veg momo">&minus;</button>
-        <output class="stepper-count" data-qty-value>1</output>
-        <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen veg momo">+</button>
-      </div>
-      <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £10</span></button>
+      <!-- TODO: owner and council to approve the allergy wording below -->
+      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
-    <!-- TODO: owner and council to approve the allergy wording below -->
-    <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
+    <div class="dialog-foot">
+      <p class="custom-note" data-custom-note hidden></p>
+      <p class="stock-line" data-stock-line hidden></p>
+      <div class="dialog-buy">
+        <div class="stepper" role="group" aria-label="Quantity of Frozen veg momo">
+          <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen veg momo">&minus;</button>
+          <output class="stepper-count" data-qty-value>1</output>
+          <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen veg momo">+</button>
+        </div>
+        <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £10</span></button>
+      </div>
     </div>
   </div>
 </dialog>
@@ -184,34 +198,41 @@
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-chutney-pot-title" data-dialog>
   <div class="dialog-panel">
-    <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
-    <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
-    <h2 id="dlg-chutney-pot-title">Chutney pot</h2>
-    <p class="card-meta">1 pot</p>
-    <p class="card-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
-    <section class="dialog-section">
-      <h3>Ingredients and allergens</h3>
-      <p data-todo>TODO: ingredients and allergen information from the owner</p>
-    </section>
-    <div class="dialog-form" data-options>
-    <fieldset class="opt-group" data-group="spice" data-kind="single">
+    <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
+    <div class="dialog-head" data-dialog-head>
+      <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+      <div class="dialog-title">
+        <h2 id="dlg-chutney-pot-title">Chutney pot</h2>
+        <p class="card-meta">1 pot</p>
+        <p class="card-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
+      </div>
+      <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+    </div>
+    <div class="dialog-body" data-options>
+      <section class="dialog-section">
+        <h3>Ingredients and allergens</h3>
+        <p data-todo>TODO: ingredients and allergen information from the owner</p>
+      </section>
+      <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
     </fieldset>
-    <p class="custom-note" data-custom-note hidden></p>
-    <p class="stock-line" data-stock-line hidden></p>
-    <div class="dialog-buy">
-      <div class="stepper" role="group" aria-label="Quantity of Chutney pot">
-        <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Chutney pot">&minus;</button>
-        <output class="stepper-count" data-qty-value>1</output>
-        <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Chutney pot">+</button>
-      </div>
-      <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £1.11</span></button>
+      <!-- TODO: owner and council to approve the allergy wording below -->
+      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
-    <!-- TODO: owner and council to approve the allergy wording below -->
-    <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
+    <div class="dialog-foot">
+      <p class="custom-note" data-custom-note hidden></p>
+      <p class="stock-line" data-stock-line hidden></p>
+      <div class="dialog-buy">
+        <div class="stepper" role="group" aria-label="Quantity of Chutney pot">
+          <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Chutney pot">&minus;</button>
+          <output class="stepper-count" data-qty-value>1</output>
+          <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Chutney pot">+</button>
+        </div>
+        <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £1.11</span></button>
+      </div>
     </div>
   </div>
 </dialog>
@@ -229,34 +250,41 @@
   </div>
   <dialog class="product-dialog" aria-labelledby="dlg-hot-sauce-pot-title" data-dialog>
   <div class="dialog-panel">
-    <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
-    <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
-    <h2 id="dlg-hot-sauce-pot-title">Hot sauce pot</h2>
-    <p class="card-meta">1 pot</p>
-    <p class="card-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
-    <section class="dialog-section">
-      <h3>Ingredients and allergens</h3>
-      <p data-todo>TODO: ingredients and allergen information from the owner</p>
-    </section>
-    <div class="dialog-form" data-options>
-    <fieldset class="opt-group" data-group="spice" data-kind="single">
+    <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
+    <div class="dialog-head" data-dialog-head>
+      <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+      <div class="dialog-title">
+        <h2 id="dlg-hot-sauce-pot-title">Hot sauce pot</h2>
+        <p class="card-meta">1 pot</p>
+        <p class="card-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
+      </div>
+      <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+    </div>
+    <div class="dialog-body" data-options>
+      <section class="dialog-section">
+        <h3>Ingredients and allergens</h3>
+        <p data-todo>TODO: ingredients and allergen information from the owner</p>
+      </section>
+      <fieldset class="opt-group" data-group="spice" data-kind="single">
       <legend>Spice level <span class="sample-label">sample</span></legend>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
     </fieldset>
-    <p class="custom-note" data-custom-note hidden></p>
-    <p class="stock-line" data-stock-line hidden></p>
-    <div class="dialog-buy">
-      <div class="stepper" role="group" aria-label="Quantity of Hot sauce pot">
-        <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Hot sauce pot">&minus;</button>
-        <output class="stepper-count" data-qty-value>1</output>
-        <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Hot sauce pot">+</button>
-      </div>
-      <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £2.22</span></button>
+      <!-- TODO: owner and council to approve the allergy wording below -->
+      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
-    <!-- TODO: owner and council to approve the allergy wording below -->
-    <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
+    <div class="dialog-foot">
+      <p class="custom-note" data-custom-note hidden></p>
+      <p class="stock-line" data-stock-line hidden></p>
+      <div class="dialog-buy">
+        <div class="stepper" role="group" aria-label="Quantity of Hot sauce pot">
+          <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Hot sauce pot">&minus;</button>
+          <output class="stepper-count" data-qty-value>1</output>
+          <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Hot sauce pot">+</button>
+        </div>
+        <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · £2.22</span></button>
+      </div>
     </div>
   </div>
 </dialog>

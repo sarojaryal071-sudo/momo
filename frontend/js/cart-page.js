@@ -1,11 +1,11 @@
-// Cart page: lines, totals, optional details, confirm. Customer text is only ever written with textContent.
+// Cart page: lines, totals, details (name and phone required), pickup date and time, place order. Customer text is only ever written with textContent.
 import './menu.js';
 import { buildLines, cartTotal, formatPrice, getCart, lineKey, updateHeaderCount } from './cart.js';
 import { loadPickup, loadProducts } from './data.js';
 import { submitOrder } from './order-gateway.js';
-import { dateLabel, getPickupOptions, noticeText } from './pickup.js';
+import { dateLabel, getPickupOptions, noticeText, pickupHours, pickupMinutes, windowText } from './pickup.js';
 import { siteConfig } from './site-config.js';
-import { buildOrderLink } from './whatsapp.js';
+import { buildOrderLink, toNationalFormat, toWhatsAppNumber } from './whatsapp.js';
 
 const { limits } = siteConfig;
 const $ = (sel) => document.querySelector(sel);
@@ -16,7 +16,10 @@ const form = $('[data-order-form]');
 const errorBox = $('[data-order-error]');
 const confirmBtn = $('[data-confirm]');
 const dateSel = $('#f-date');
-const timeSel = $('#f-time');
+const hourSel = $('#f-hour');
+const minuteSel = $('#f-minute');
+const nameInput = $('#f-name');
+const phoneInput = $('#f-phone');
 
 let products = [];
 let pickupOptions = [];
@@ -103,7 +106,7 @@ function refreshPickup(lines) {
   dateSel.replaceChildren(new Option('No date chosen', ''));
   pickupOptions.forEach((o) => dateSel.append(new Option(o.label, o.date)));
   dateSel.value = pickupOptions.some((o) => o.date === keep) ? keep : '';
-  fillTimes();
+  fillHours();
   const note = $('[data-lead-note]');
   note.hidden = !customised;
   if (customised) {
@@ -112,19 +115,39 @@ function refreshPickup(lines) {
   }
 }
 
-function fillTimes() {
-  const day = pickupOptions.find((o) => o.date === dateSel.value);
-  timeSel.replaceChildren(new Option(day ? 'No time chosen' : 'Choose a date first', ''));
-  timeSel.disabled = !day;
-  if (day) day.times.forEach((t) => timeSel.append(new Option(t.label, t.value)));
+const selectedDay = () => pickupOptions.find((o) => o.date === dateSel.value);
+
+// Hour and minute lists for the chosen day, inside her window and past the notice period (D-038).
+function fillHours() {
+  const day = selectedDay();
+  hourSel.replaceChildren(new Option('Hour', ''));
+  minuteSel.replaceChildren(new Option('Minute', ''));
+  hourSel.disabled = !day;
+  minuteSel.disabled = true;
+  const note = $('[data-window-note]');
+  note.hidden = !day;
+  if (day) {
+    pickupHours(day).forEach((h) => hourSel.append(new Option(h, h)));
+    note.textContent = windowText(day);
+  }
+}
+
+function fillMinutes() {
+  const day = selectedDay();
+  minuteSel.replaceChildren(new Option('Minute', ''));
+  minuteSel.disabled = !day || !hourSel.value;
+  if (!minuteSel.disabled) {
+    pickupMinutes(day, hourSel.value).forEach((m) => minuteSel.append(new Option(m, m)));
+    minuteSel.value = minuteSel.options[1].value; // a time is always complete once an hour is chosen
+  }
 }
 
 function readOrder(lines) {
   const data = new FormData(form);
   const clean = (key, max) => String(data.get(key) || '').trim().slice(0, max);
   const pickupDate = String(data.get('pickupDate') || '');
-  const pickupTime = String(data.get('pickupTime') || '');
-  const time = pickupTime ? (timeSel.selectedOptions[0]?.textContent || pickupTime).split(' to ')[0] : '';
+  const pickupTime = hourSel.value && minuteSel.value ? `${hourSel.value}:${minuteSel.value}` : '';
+  const time = pickupTime;
   return {
     items: lines.map((l) => ({ slug: l.slug, qty: l.qty, options: l.options })),
     name: clean('name', limits.nameMax),
@@ -136,9 +159,35 @@ function readOrder(lines) {
   };
 }
 
+// Name and phone are required. The phone must be a UK number and is shown back so typos are caught (D-036).
+function showError(field, input, message) {
+  const box = $(`[data-field-error="${field}"]`);
+  box.textContent = message;
+  box.hidden = !message;
+  if (message) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
+}
+
+function echoPhone() {
+  const digits = toWhatsAppNumber(phoneInput.value);
+  $('[data-phone-echo]').textContent = digits ? `We will message you on ${toNationalFormat(digits)}` : '';
+  return digits;
+}
+
+function validateDetails() {
+  const nameOk = nameInput.value.trim().length > 0;
+  showError('name', nameInput, nameOk ? '' : 'Enter your name.');
+  const phoneOk = Boolean(echoPhone());
+  showError('phone', phoneInput, phoneOk ? '' : 'Enter a UK phone number, for example 07123 456789.');
+  if (!nameOk) { nameInput.focus(); return false; }
+  if (!phoneOk) { phoneInput.focus(); return false; }
+  return true;
+}
+
 async function confirm(e) {
   e.preventDefault();
   errorBox.textContent = '';
+  $('[data-fail-link]').hidden = true;
+  if (!validateDetails()) return;
   const lines = buildLines(getCart().items(), products).filter((l) => !l.unavailable);
   if (!lines.length) { render(); errorBox.textContent = 'There is nothing available in your cart.'; return; }
   const order = readOrder(lines);
@@ -147,17 +196,18 @@ async function confirm(e) {
   confirmBtn.disabled = true;
   try {
     const result = await submitOrder({ ...order, totalPenceHint: totalPence });
-    const { message, link } = buildOrderLink({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name, notes: order.notes });
-    try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, link, message })); } catch { /* the done page copes without it */ }
+    try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name })); } catch { /* the done page copes without it */ }
     getCart().clear();
     location.href = `done.html?o=${encodeURIComponent(result.orderNumber)}`;
   } catch {
-    const { link } = buildOrderLink({ lines: summary, totalPence, pickup: order.pickupText, name: order.name, notes: order.notes });
-    errorBox.textContent = "We couldn't save your order online. Please send the WhatsApp message so we receive it.";
-    $('[data-fail-whatsapp]').href = link;
+    // The order was not saved. The customer can send it by WhatsApp instead; the cart is kept.
+    const { link } = buildOrderLink({ lines: summary, totalPence, pickup: order.pickupText, name: order.name, phone: order.phone, notes: order.notes });
+    errorBox.textContent = 'We could not place your order online. Please send us the WhatsApp message instead so we receive it.';
+    const fail = $('[data-fail-whatsapp]');
+    fail.href = link;
     $('[data-fail-link]').hidden = false;
     confirmBtn.disabled = false;
-    location.href = link;
+    fail.focus();
   }
 }
 
@@ -172,7 +222,10 @@ async function init() {
   } catch {
     errorBox.textContent = 'We could not load the shop data. Please reload, or call us to order.';
   }
-  dateSel.addEventListener('change', fillTimes);
+  dateSel.addEventListener('change', fillHours);
+  hourSel.addEventListener('change', fillMinutes);
+  phoneInput.addEventListener('input', () => { echoPhone(); if (phoneInput.getAttribute('aria-invalid') && toWhatsAppNumber(phoneInput.value)) showError('phone', phoneInput, ''); });
+  nameInput.addEventListener('input', () => { if (nameInput.value.trim()) showError('name', nameInput, ''); });
   form.addEventListener('submit', confirm);
   render();
 }

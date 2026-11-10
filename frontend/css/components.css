@@ -14,7 +14,8 @@
   font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
   background: var(--emerald); color: var(--white);
   border: var(--hairline) solid var(--emerald); border-radius: var(--radius);
-  transition: background var(--transition);
+  box-shadow: var(--shadow-raised);
+  transition: background var(--dur-fast), box-shadow var(--dur-fast), translate var(--dur-fast) var(--ease-out);
 }
 .btn:hover { background: var(--emerald-dark); }
 .btn-secondary { background: var(--white); color: var(--emerald); }
@@ -23,7 +24,10 @@
 .btn-big { min-block-size: calc(var(--tap) * 1.3); font-size: var(--step-1); padding-inline: var(--space-l); }
 
 /* Header: one slim line on phones (wordmark, cart, menu button); the full inline header from the tablet width up */
-.site-header { position: relative; z-index: var(--z-menu); background: var(--white); border-block-end: var(--hairline) solid var(--line); }
+.site-header { position: sticky; inset-block-start: 0; z-index: var(--z-menu); border-block-end: var(--hairline) solid var(--glass-border); }
+/* The glass sits on a pseudo-element, so the menu panel (a child) can blur the page behind it too. */
+.site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--glass-solid); }
+@supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) { .site-header::before { background: var(--glass-bg-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); } }
 .header-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-m); min-block-size: calc(var(--tap) + var(--space-xs)); }
 .brand { display: inline-flex; align-items: center; gap: var(--space-2xs); font-family: var(--font-head); font-size: var(--step-1); line-height: var(--line-height-head); letter-spacing: var(--tracking-display); color: var(--emerald); text-decoration: none; }
 .brand-mark { inline-size: var(--brand-mark); block-size: var(--brand-mark); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -44,12 +48,18 @@
 .site-menu a[aria-current="page"] { font-weight: 700; color: var(--emerald); text-decoration-color: var(--green); text-decoration-thickness: var(--ring-width); }
 .site-header .brand[aria-current="page"], .site-header .cart-link[aria-current="page"] { text-decoration: none; }
 /* Phone menu panel (only when scripts run; without them the links stay in the row above) */
-.js .site-menu { display: none; position: absolute; inset-inline: 0; inset-block-start: 100%; padding: var(--space-xs) var(--gutter) var(--space-m); background: var(--white); border-block-end: var(--hairline) solid var(--line); box-shadow: var(--shadow-card); }
+.js .site-menu { display: none; position: absolute; inset-inline: 0; inset-block-start: 100%; padding: var(--space-xs) var(--gutter) var(--space-m); background: var(--glass-solid); border-block-end: var(--hairline) solid var(--glass-border); box-shadow: var(--glass-shadow); }
+@supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) { .js .site-menu { background: var(--glass-bg-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); } }
 .js .site-menu.is-open { display: block; }
+.site-menu:focus { outline: none; }
+@media (prefers-reduced-motion: no-preference) { .js .site-menu.is-open { animation: menu-in var(--dur-base) var(--ease-out); } }
+@keyframes menu-in { from { opacity: 0; translate: 0 calc(var(--space-xs) * -1); } }
 .js .nav-list, .js .menu-contact { display: block; }
 .js .site-menu li { border-block-end: var(--hairline) solid var(--line); }
 .js .site-menu a { display: flex; inline-size: 100%; min-block-size: var(--menu-row); font-size: var(--step-1); }
 .js .menu-contact { margin-block-start: var(--space-s); }
+.js .menu-contact .contact-item { min-block-size: var(--menu-row); }
+.js .site-menu li { display: flex; align-items: center; }
 .contact-item { display: inline-flex; align-items: center; gap: var(--space-2xs); }
 @media (min-width: 48em) {
   .header-row { flex-wrap: nowrap; }
@@ -148,7 +158,7 @@ html:not(.js) .shop-tools { display: none; }
 /* Compact quantity stepper: card (after adding), details window and cart */
 .stepper { display: inline-flex; align-items: stretch; }
 .stepper .qty-btn, .stepper .qty-input { min-block-size: var(--tap); min-inline-size: var(--tap); font: inherit; text-align: center; background: var(--white); color: var(--emerald); border: var(--hairline) solid var(--emerald); border-radius: 0; }
-.stepper .qty-btn { cursor: pointer; font-weight: 700; }
+.stepper .qty-btn { cursor: pointer; font-weight: 700; box-shadow: var(--shadow-raised); }
 .stepper .qty-btn:hover:not(:disabled) { background: var(--green-tint); }
 .stepper .qty-btn:disabled { color: var(--line); border-color: var(--line); cursor: not-allowed; }
 .stepper .qty-btn:first-child { border-start-start-radius: var(--radius); border-end-start-radius: var(--radius); }
@@ -156,34 +166,69 @@ html:not(.js) .shop-tools { display: none; }
 .stepper-count, .stepper .qty-input { display: grid; place-items: center; inline-size: calc(var(--tap) * 0.9); border-block: var(--hairline) solid var(--emerald); font-weight: 700; color: var(--charcoal); }
 .stepper .qty-input { border-inline: 0; border-radius: 0; padding: 0; }
 
-/* Details window: a bottom sheet on phones, a centred panel from the tablet width */
-.product-dialog { inline-size: 100%; max-inline-size: none; max-block-size: 92dvh; margin: auto 0 0; padding: 0; border: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--white); color: var(--charcoal); box-shadow: var(--shadow-card); overflow-y: auto; }
-.product-dialog::backdrop { background: color-mix(in srgb, var(--charcoal) 55%, transparent); }
+/* Details window (D-039): a bottom sheet on phones, a centred dialog from the tablet width.
+   Three zones: fixed header (close, thumbnail, name, price), scrolling middle, fixed footer (notes, stepper, add). */
+.product-dialog { inline-size: 100%; max-inline-size: none; block-size: var(--sheet-height); max-block-size: var(--sheet-height); margin: auto 0 0; padding: 0; border: 0; border-radius: var(--radius-lg) var(--radius-lg) 0 0; background: var(--glass-solid); color: var(--charcoal); box-shadow: var(--glass-shadow); overflow: hidden; overscroll-behavior: contain; }
+.product-dialog[open] { display: block; }
+.product-dialog::backdrop { background: var(--glass-backdrop); }
+@supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) {
+  .product-dialog { background: var(--glass-bg); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  .product-dialog::backdrop { -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+}
 html:has(dialog[open]) { overflow: hidden; }
-.dialog-panel { position: relative; display: grid; gap: var(--space-xs); padding: var(--space-m); }
-.dialog-panel > * { margin: 0; }
-.dialog-close { position: absolute; inset-block-start: var(--space-xs); inset-inline-end: var(--space-xs); z-index: 1; display: grid; place-items: center; min-inline-size: var(--tap); min-block-size: var(--tap); color: var(--emerald); background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); cursor: pointer; }
-.dialog-media { cursor: default; inline-size: min(100%, 14rem); aspect-ratio: 1; min-block-size: 0; justify-self: center; border-radius: var(--radius-lg); }
+.dialog-panel { display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; block-size: 100%; }
+.dialog-handle { justify-self: center; inline-size: var(--handle-w); block-size: var(--handle-h); margin-block: var(--space-xs) 0; border-radius: var(--radius-pill); background: var(--line); touch-action: none; }
+.dialog-head { position: relative; display: flex; align-items: center; gap: var(--space-s); padding: var(--space-xs) calc(var(--tap) + var(--space-s)) var(--space-xs) var(--space-m); border-block-end: var(--hairline) solid var(--glass-border); touch-action: none; }
+.dialog-head h2 { margin: 0; font-size: var(--step-2); }
+.dialog-head .card-price { margin: 0; font-size: var(--step-1); }
+.dialog-title { min-inline-size: 0; }
+.dialog-media { flex: none; inline-size: var(--dialog-thumb); aspect-ratio: 1; min-block-size: 0; cursor: default; border-radius: var(--radius); }
+.dialog-close { position: absolute; inset-block-start: var(--space-xs); inset-inline-end: var(--space-xs); display: grid; place-items: center; min-inline-size: var(--tap); min-block-size: var(--tap); color: var(--emerald); background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); box-shadow: var(--shadow-raised); cursor: pointer; }
+.dialog-body { overflow-y: auto; overscroll-behavior: contain; display: grid; gap: var(--space-s); align-content: start; padding: var(--space-s) var(--space-m); }
+.dialog-body > * { margin: 0; }
+.dialog-body .card-meta { font-size: var(--step-0); }
 .dialog-section h3 { margin-block-end: var(--space-3xs); font-size: var(--step-0); }
-.dialog-form { display: grid; gap: var(--space-s); }
-.dialog-form > * { margin: 0; }
-.opt-group { margin: 0; padding: 0; border: 0; display: grid; gap: var(--space-2xs); }
+.dialog-foot { display: grid; gap: var(--space-xs); padding: var(--space-xs) var(--space-m) calc(var(--space-xs) + env(safe-area-inset-bottom)); border-block-start: var(--hairline) solid var(--glass-border); background: var(--glass-solid); }
+.dialog-foot > * { margin: 0; }
+.dialog-foot:empty { display: none; }
+.opt-group { margin: 0; padding: 0; border: 0; display: grid; gap: var(--space-xs); }
 .opt-group legend { padding: 0; margin-block-end: var(--space-2xs); font-weight: 700; color: var(--emerald); }
-.opt { display: flex; align-items: center; gap: var(--space-xs); min-block-size: var(--tap); padding-inline: var(--space-xs); border: var(--hairline) solid var(--line); border-radius: var(--radius); cursor: pointer; }
-.opt:has(input:checked) { border-color: var(--emerald); background: var(--green-tint); }
-.opt input { inline-size: 1.25rem; block-size: 1.25rem; accent-color: var(--emerald); }
-.opt-delta { margin-inline-start: auto; font-weight: 700; }
 .custom-note { padding: var(--space-xs) var(--space-s); background: var(--peach-tint); border-radius: var(--radius); font-weight: 700; color: var(--emerald); }
 .stock-line { font-weight: 700; color: var(--emerald); }
-.dialog-buy { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); }
-.dialog-buy .btn { flex: 1 1 12rem; }
+.dialog-buy { display: flex; flex-wrap: nowrap; align-items: center; gap: var(--space-xs); }
+.dialog-buy .btn { flex: 1 1 auto; min-inline-size: 0; }
+[data-dialog-total] { white-space: pre; }
 .allergy-line { font-size: var(--step--1); }
-@media (min-width: 48em) {
-  .product-dialog { margin: auto; max-inline-size: var(--dialog-max); max-block-size: 90dvh; border-radius: var(--radius-lg); }
+
+/* Tactile option tiles: raised, with a clear selected state and a press-down feel */
+.opt { display: flex; align-items: center; gap: var(--space-xs); min-block-size: var(--tap); padding-inline: var(--space-s); background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-raised); cursor: pointer; transition: box-shadow var(--dur-fast), background var(--dur-fast), border-color var(--dur-fast), translate var(--dur-fast) var(--ease-out); }
+.opt:has(input:checked) { border-color: var(--emerald); background: var(--green-tint); }
+.opt:has(input:focus-visible) { outline: var(--ring-width) solid var(--ring-color); outline-offset: var(--ring-offset); }
+.opt input { appearance: none; -webkit-appearance: none; flex: none; display: grid; place-content: center; inline-size: 1.5rem; block-size: 1.5rem; margin: 0; background: var(--white); border: var(--hairline) solid var(--emerald); border-radius: var(--radius); }
+.opt input[type="radio"] { border-radius: 50%; }
+.opt input::before { content: ""; inline-size: 0.875rem; block-size: 0.875rem; background: var(--emerald); scale: 0; transition: scale var(--dur-base) var(--ease-spring); }
+.opt input[type="radio"]::before { border-radius: 50%; }
+.opt input[type="checkbox"]::before { -webkit-mask: url("../assets/svg/tick.svg") center / contain no-repeat; mask: url("../assets/svg/tick.svg") center / contain no-repeat; inline-size: 1.125rem; block-size: 1.125rem; }
+.opt input:checked::before { scale: 1; }
+.opt-delta { margin-inline-start: auto; font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) {
+  .opt:active, .btn:active:not(:disabled), .stepper .qty-btn:active:not(:disabled), .chip:active { translate: 0 var(--press); box-shadow: var(--shadow-pressed); }
+  .product-dialog[open] { animation: sheet-in var(--dur-base) var(--ease-spring); }
+  .product-dialog[open]::backdrop { animation: fade-in var(--dur-base) var(--ease-out); }
 }
+@keyframes sheet-in { from { translate: 0 100%; } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes dialog-in { from { opacity: 0; scale: 0.96; } }
+@media (min-width: 48em) {
+  .product-dialog { margin: auto; block-size: auto; max-block-size: 90dvh; max-inline-size: var(--dialog-max); border-radius: var(--radius-lg); }
+  .dialog-handle { display: none; }
+  .dialog-panel { grid-template-rows: auto minmax(0, 1fr) auto; max-block-size: 90dvh; }
+}
+@media (min-width: 48em) and (prefers-reduced-motion: no-preference) { .product-dialog[open] { animation: dialog-in var(--dur-base) var(--ease-out); } }
 
 /* Sticky checkout bar: appears only when the cart has items (script), never on the cart or done pages */
-.checkout-bar { position: fixed; inset-inline: 0; inset-block-end: 0; z-index: var(--z-bar); display: flex; align-items: center; justify-content: space-between; gap: var(--space-s); padding: var(--space-xs) var(--gutter) calc(var(--space-xs) + env(safe-area-inset-bottom)); background: var(--white); border-block-start: var(--hairline) solid var(--line); box-shadow: var(--shadow-card); }
+.checkout-bar { position: fixed; inset-inline: 0; inset-block-end: 0; z-index: var(--z-bar); display: flex; align-items: center; justify-content: space-between; gap: var(--space-s); padding: var(--space-xs) var(--gutter) calc(var(--space-xs) + env(safe-area-inset-bottom)); background: var(--glass-solid); border-block-start: var(--hairline) solid var(--glass-border); box-shadow: var(--glass-shadow); }
+@supports ((backdrop-filter: blur(0)) or (-webkit-backdrop-filter: blur(0))) { .checkout-bar { background: var(--glass-bg-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); } }
 .checkout-summary { margin: 0; font-weight: 700; color: var(--emerald); }
 .has-checkout-bar .site-footer { padding-block-end: calc(var(--space-m) + var(--checkout-bar-space)); }
 
@@ -205,3 +250,22 @@ html:has(dialog[open]) { overflow: hidden; }
 .cook-steps { max-inline-size: var(--measure); padding-inline-start: var(--space-m); }
 .cook-steps li { margin-block-end: var(--space-s); }
 
+
+/* Cart form: pickup time as hour and minute lists */
+.pickup-time { margin: 0 0 var(--space-s); padding: 0; border: 0; }
+.pickup-time legend { padding: 0; margin-block-end: var(--space-2xs); font-weight: 700; }
+.time-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-s); }
+
+/* Order received: a drawn check, then the content fades in. Everything shows at once without motion. */
+.done-head { display: flex; align-items: center; gap: var(--space-m); margin-block-end: var(--space-m); }
+.done-head h1 { margin: 0; }
+.done-check { flex: none; inline-size: var(--check-size); block-size: var(--check-size); fill: none; stroke: var(--emerald); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.done-highlight { padding: var(--space-s) var(--space-m); background: var(--peach-tint); border-inline-start: var(--space-2xs) solid var(--emerald); border-radius: var(--radius); font-weight: 700; color: var(--emerald); }
+.next-steps { max-inline-size: var(--measure); margin: 0 0 var(--space-m); padding-inline-start: var(--space-m); }
+.next-steps li { margin-block-end: var(--space-xs); padding-inline-start: var(--space-3xs); }
+@keyframes draw { from { stroke-dasharray: 1; stroke-dashoffset: 1; } to { stroke-dasharray: 1; stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: no-preference) {
+  .done-check circle { animation: draw var(--dur-slow) var(--ease-out) both; }
+  .done-check path { animation: draw var(--dur-base) var(--ease-out) calc(var(--dur-slow) * 0.8) both; }
+  .done-content { animation: reveal var(--dur-slow) var(--ease-out) calc(var(--dur-slow) * 1.1) both; }
+}

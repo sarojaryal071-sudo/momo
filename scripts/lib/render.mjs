@@ -66,6 +66,7 @@ function optionGroupHtml(p, g) {
 }
 
 // The details window: one native dialog per product, with its text in the page source.
+// Three zones: header (thumbnail, name, price, close), scrolling middle, footer (notes, stepper, add).
 function dialogHtml(p) {
   const priced = p.price_pence != null;
   const stock = Number.isInteger(p.stock_quantity) ? p.stock_quantity : null;
@@ -75,32 +76,39 @@ function dialogHtml(p) {
   const stockLine = `<p class="stock-line" data-stock-line${stockText ? '' : ' hidden'}>${stockText ? (p.stock_placeholder ? `<span data-placeholder>${stockText}${SAMPLE_TAG}</span>` : stockText) : ''}</p>`;
   const buy = priced && p.available && !soldOut
     ? `<div class="dialog-buy">
-      <div class="stepper" role="group" aria-label="Quantity of ${esc(p.name)}">
-        <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of ${esc(p.name)}">&minus;</button>
-        <output class="stepper-count" data-qty-value>1</output>
-        <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of ${esc(p.name)}">+</button>
-      </div>
-      <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · ${formatPrice(p.price_pence)}</span></button>
-    </div>`
+        <div class="stepper" role="group" aria-label="Quantity of ${esc(p.name)}">
+          <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of ${esc(p.name)}">&minus;</button>
+          <output class="stepper-count" data-qty-value>1</output>
+          <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of ${esc(p.name)}">+</button>
+        </div>
+        <button type="button" class="btn" data-dialog-add>Add to cart<span data-dialog-total> · ${formatPrice(p.price_pence)}</span></button>
+      </div>`
     : (soldOut ? '' : '<p class="stock-line">Not available yet</p>');
   return `<dialog class="product-dialog" aria-labelledby="dlg-${esc(p.slug)}-title" data-dialog>
   <div class="dialog-panel">
-    <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
-    ${mediaHtml(p, '(min-width: 48em) 24rem, 90vw', ' dialog-media')}
-    <h2 id="dlg-${esc(p.slug)}-title">${esc(p.name)}</h2>
-    <p class="card-meta">${esc(p.unit_label)}</p>
-    ${priceBlock(p)}
-    <section class="dialog-section">
-      <h3>Ingredients and allergens</h3>
-      <p data-todo>TODO: ingredients and allergen information from the owner</p>
-    </section>
-    <div class="dialog-form" data-options>
-    ${groupsOf(p).map((g) => optionGroupHtml(p, g)).join('\n    ')}
-    <p class="custom-note" data-custom-note hidden></p>
-    ${stockLine}
-    ${buy}
-    <!-- TODO: owner and council to approve the allergy wording below -->
-    <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
+    <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
+    <div class="dialog-head" data-dialog-head>
+      ${mediaHtml(p, '6rem', ' dialog-media')}
+      <div class="dialog-title">
+        <h2 id="dlg-${esc(p.slug)}-title">${esc(p.name)}</h2>
+        <p class="card-meta">${esc(p.unit_label)}</p>
+        ${priceBlock(p)}
+      </div>
+      <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+    </div>
+    <div class="dialog-body" data-options>
+      <section class="dialog-section">
+        <h3>Ingredients and allergens</h3>
+        <p data-todo>TODO: ingredients and allergen information from the owner</p>
+      </section>
+      ${groupsOf(p).map((g) => optionGroupHtml(p, g)).join('\n      ')}
+      <!-- TODO: owner and council to approve the allergy wording below -->
+      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
+    </div>
+    <div class="dialog-foot">
+      <p class="custom-note" data-custom-note hidden></p>
+      ${stockLine}
+      ${buy}
     </div>
   </div>
 </dialog>`;

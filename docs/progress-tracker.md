@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1f done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
+- Current step: **Step 1g done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -90,14 +90,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1g — UI polish and the new order flow (D-036, D-038, D-039)
 
-- [ ] Glass and motion tokens
-- [ ] Modal sheet: fixed header and footer, compact photo, scrolling middle, animation
-- [ ] Tactile option buttons and press states
-- [ ] Menu glass panel and focus fix
-- [ ] Hour and minute pickup lists, `PICKUP_STEP_MINUTES`
-- [ ] Name and phone required, phone echoed back, "Place order"
-- [ ] "Order received" screen, failure path, no automatic WhatsApp
-- [ ] Verified, merged to `main`, deploy confirmed
+- [x] Glass and motion tokens — HASH, theme.css: glass, raised/pressed shadow, motion and sheet tokens; glass only on header, menu, dialog and backdrop, checkout bar; solid fallback behind @supports; no gradients
+- [x] Modal sheet: fixed header and footer, compact photo, scrolling middle, animation — HASH, 85dvh bottom sheet on phones, fixed header (thumbnail, name, price, close), only the middle scrolls, fixed footer with notes, stepper and Add to cart; swipe, backdrop, Escape and close button close it; centred 34rem dialog from 48em
+- [x] Tactile option buttons and press states — HASH, raised tiles with spring tick or dot, press-down on tiles, buttons, steppers and chips; movement only under prefers-reduced-motion: no-preference
+- [x] Menu glass panel and focus fix — HASH, glass panel with slide and fade; focus goes to the panel on touch (no ring) and to the first link on keyboard (ring); even 53 px rows
+- [x] Hour and minute pickup lists, `PICKUP_STEP_MINUTES` — HASH, two selects after the date, window text, minutes follow the hour, PICKUP_STEP_MINUTES = 1 and seed slot_minutes 1, customised notice still applied
+- [x] Name and phone required, phone echoed back, "Place order" — HASH, inline errors, aria-invalid, UK phone check, "We will message you on 07413 069241", button reads Place order
+- [x] "Order received" screen, failure path, no automatic WhatsApp — HASH, drawn check, Order received, not-confirmed highlight, summary, three steps, contact; no automatic WhatsApp and no Open WhatsApp order button; failure shows the WhatsApp message button and keeps the cart
+- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -204,6 +204,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 1g: `npm test` 33 pass (tests changed: pickup extra-exception test now sets slot_minutes 60 because the default step is 1; 3 added in pickup and whatsapp), `npm run build` passes. At 360 px: sheet is 85% of the screen (629 of 740 px), head 123 px, foot 61 px, only the body scrolls, page behind does not move, swipe down and backdrop tap close it and focus returns, option tile selects with the spring tick; menu opened by touch leaves focus on the panel with no outline, by keyboard focuses the first link with a ring, six rows all 53 px; reduced motion: no dialog animation. Wide: dialog 544 px wide (34rem) and centred. Cart: Place order, empty submit gives both errors and focuses name, bad phone error, echo "We will message you on 07413 069241", hour and minute lists disabled until a date, window text, 60 minutes listed for 10:xx, a customised line shows the 2 days' notice sentence. Done: Order received, not-confirmed highlight, summary with pickup and name, three steps, 0 WhatsApp requests, no Open WhatsApp button. Failure (broken backend): error text, Send the WhatsApp message button with name and phone in the text, no auto open, cart kept, Place order enabled again. No horizontal overflow on five pages at 360 and 1280 px. Glass contrast: strong glass (94% white) over white, emerald, charcoal, turmeric and peach gives emerald text 8.83 to 9.88 and charcoal text 14.34 to 16.06; dialog glass (82%) over the dimmed page gives emerald 6.86 to 8.44 and charcoal 11.15 to 13.72; solid fallback emerald 9.88, charcoal 16.06.
 - 2026-11-10, step 1f: `npm test` 30 pass (7 new; no existing assertion changed), `npm run build` passes. With a temporary test set (removed): at 360 px cards are 108 px, six visible in one screen; momo Add opens the dialog first; dialog focus in, Escape and backdrop close and return focus; options change the total live; customised note appears ("Customised: needs 2 days' notice. Earliest pickup: ..."); plain item Add becomes a stepper, caps at stock, back to Add at 0; sold-out card has no button; low stock shows "Only 4 left" and caps qty, customised choice lifts the cap and hides the stock line; cart keeps separate lines, shows Customised label, caps over-stock and flags sold-out lines; date list on a fake Friday: standard cart starts Saturday 14, customised cart starts Sunday 15 with the sentence; WhatsApp text lists "Customised: Hot". JS off: card name, size, price and the name link are present. Keyboard-only: Add, options, add to cart, checkout bar to cart. No horizontal overflow on five pages at 360 and 1280 px.
 - 2026-11-10, step 1e: `npm test` 23 pass, `npm run build` passes. At 360 px all five pages: header 53 px (one line), no horizontal overflow, cart icon visible; menu opens/closes by button, Escape, link tap and outside tap, focus moves in and returns, tab order skip > brand > cart > menu. Shop: compact rows (about 190 px), Added state for 1.6 s, bar "1 item" then "2 items · £11.11" linking to cart.html; bar visible on home and how-to-cook, absent on cart and done. Instagram: placeholder with data-todo (2 places per page); with a temporary URL (reverted) both became real links with rel=noopener. `grep -ri tomato frontend` finds nothing. Phone number is in: cart.html, done.html, how-to-cook.html, index.html, shop.html, frontend/js/site-config.js, scripts/build.mjs, tests/whatsapp.test.mjs. Sauce images present after merge: photo-sauce.webp only. Kept the button label "Confirm order" on the cart page (the step says keep it as it is today).
 - 2026-11-10, step 1d: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow; CLS 0.0000; JS off shows all home content and all 12 test cards, chips and search hidden; reduced motion stops steam and shows all sections; focus rings emerald on white, peach on emerald. Shop with the 2 real products: chips yes (2 kinds), no search; temporary 12-item set (deleted): chips and search appear, chip and search filtering work, a no-match shows the message; 0 products shows "New items are coming soon."; 1 product shows no chips. `?kind=addon` preselects Sauces. Home transfer after scrolling the whole page: 230.7 KB raw / 197 KB gzip over 22 requests (images 173 KB, font 27 KB); above the fold only about 105 KB. Fixed a Step 2 bug: shop.js did not update the header count on load (now imports main.js).

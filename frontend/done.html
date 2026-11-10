@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="js/js-flag.js"></script>
-  <title>Almost done | Steam &amp; Spice</title>
-  <meta name="description" content="Your order number and the WhatsApp button to confirm it.">
+  <title>Order received | Steam &amp; Spice</title>
+  <meta name="description" content="Your order has been received. We will message you on WhatsApp to confirm it.">
   <meta name="robots" content="noindex">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/young-serif-latin-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -23,7 +23,7 @@
         <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7 H20 M4 12 H20 M4 17 H20"/></svg><span class="visually-hidden">Menu</span></button>
       </div>
-      <nav id="site-menu" class="site-menu" aria-label="Main" data-menu>
+      <nav id="site-menu" class="site-menu" aria-label="Main" tabindex="-1" data-menu>
         <ul class="nav-list">
           <li><a href="index.html">Home</a></li>
           <li><a href="shop.html">Shop</a></li>
@@ -38,20 +38,32 @@
     </div>
   </header>
   <main id="main" class="flow">
-    <section class="section">
+    <section class="section done">
       <div class="wrap">
-        <h1>Almost done</h1>
-        <p class="lead" data-done-number></p>
-        <div data-done-summary hidden>
-          <ul class="cart-lines" data-done-lines></ul>
-          <p class="cart-total">Total <strong data-done-total></strong></p>
-          <p data-done-pickup></p>
+        <div class="done-head">
+          <svg class="done-check" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28" pathLength="1"/><path d="M19 33 L28 42 L45 23" pathLength="1"/></svg>
+          <h1>Order received</h1>
         </div>
-        <p data-done-missing hidden>We cannot show your summary on this device. Please check your WhatsApp chat or call <a href="tel:+447413069241">+44 7413 069241</a>.</p>
-        <p><a class="btn btn-big" href="#" data-done-whatsapp hidden>Open WhatsApp</a></p>
-        <p class="notice-line">Tap send in WhatsApp to confirm. Pickup only, pay cash on pickup.</p>
-        <p><a href="shop.html">Back to the shop</a></p>
-        <p class="contact-line">Questions? Call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></p>
+        <div class="done-content">
+          <p class="lead" data-done-number></p>
+          <p class="done-highlight">Your order is not confirmed until we message you.</p>
+          <div class="done-summary" data-done-summary hidden>
+            <h2 class="rule">Your order</h2>
+            <ul class="cart-lines" data-done-lines></ul>
+            <p class="cart-total">Total <strong data-done-total></strong></p>
+            <p data-done-name></p>
+            <p data-done-pickup></p>
+          </div>
+          <p data-done-missing hidden>We cannot show your summary on this device. Please call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a>.</p>
+          <h2 class="rule">What happens next</h2>
+          <ol class="next-steps">
+            <li>We will message you on WhatsApp to confirm your order.</li>
+            <li>Pick up at <span data-done-when>the time we agree</span>. We will send the full address then.</li>
+            <li>Pay cash when you pick up.</li>
+          </ol>
+          <p class="contact-line">Questions? Call <a href="tel:+447413069241">+44 7413 069241</a> or <a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></p>
+          <p><a href="shop.html">Back to the shop</a></p>
+        </div>
       </div>
     </section>
   </main>

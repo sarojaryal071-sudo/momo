@@ -6,7 +6,7 @@ const UK_PREFIX = '44';
 const UK_NUMBER_RE = /^44\d{9,10}$/;
 
 // lines: [{ qty, name, unitLabel, linePence, optionText? }]. Empty optional parts are left out; options are listed under their line.
-export function buildMessage({ orderNumber, lines, totalPence, pickup, name, notes }) {
+export function buildMessage({ orderNumber, lines, totalPence, pickup, name, phone, notes }) {
   const out = [orderNumber ? `Hi! Order ${orderNumber}` : "Hi! I'd like to place an order"];
   for (const l of lines) {
     out.push(`- ${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} ${formatPrice(l.linePence)}`);
@@ -15,6 +15,7 @@ export function buildMessage({ orderNumber, lines, totalPence, pickup, name, not
   out.push(`Total ${formatPrice(totalPence)}`);
   if (pickup) out.push(`Pickup: ${pickup}`);
   if (name) out.push(`Name: ${name}`);
+  if (phone) out.push(`Phone: ${phone}`);
   if (notes) out.push(`Notes: ${notes}`);
   out.push('Pay cash on pickup.');
   return out.join('\n');
@@ -40,4 +41,11 @@ export function toWhatsAppNumber(phone) {
   if (digits.startsWith('0044')) digits = digits.slice(2);
   else if (digits.startsWith('0')) digits = UK_PREFIX + digits.slice(1);
   return UK_NUMBER_RE.test(digits) ? digits : null;
+}
+
+// WhatsApp digits back to the number as people write it: 447413069241 becomes "07413 069241".
+export function toNationalFormat(digits) {
+  if (!digits || !digits.startsWith(UK_PREFIX)) return '';
+  const rest = digits.slice(UK_PREFIX.length);
+  return `0${rest.slice(0, 4)} ${rest.slice(4)}`;
 }

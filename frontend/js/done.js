@@ -1,10 +1,8 @@
-// Done page: order number and summary from sessionStorage, plus one automatic WhatsApp open.
+// Done page: order number and summary from sessionStorage. Nothing opens automatically (D-036).
 import './menu.js';
 import { formatPrice, updateHeaderCount } from './cart.js';
-import { siteConfig } from './site-config.js';
 
 updateHeaderCount();
-const AUTO_KEY = 'ss-auto-opened';
 const $ = (sel) => document.querySelector(sel);
 const number = new URLSearchParams(location.search).get('o') || '';
 let order = null;
@@ -17,18 +15,14 @@ if (order) {
   for (const l of order.lines) {
     const li = document.createElement('li');
     li.className = 'cart-line';
-    li.textContent = `${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} — ${formatPrice(l.linePence)}${l.optionText ? ` · Customised: ${l.optionText}` : ''}`;
+    li.textContent = `${l.qty} x ${l.name}${l.unitLabel ? ` (${l.unitLabel})` : ''} \u2014 ${formatPrice(l.linePence)}${l.optionText ? ` \u00b7 Customised: ${l.optionText}` : ''}`;
     list.append(li);
   }
   $('[data-done-total]').textContent = formatPrice(order.totalPence);
+  $('[data-done-name]').textContent = order.name ? `Name: ${order.name}` : '';
   $('[data-done-pickup]').textContent = order.pickup ? `Pickup: ${order.pickup}` : '';
+  if (order.pickup) $('[data-done-when]').textContent = order.pickup;
   $('[data-done-summary]').hidden = false;
-  const btn = $('[data-done-whatsapp]');
-  btn.href = order.link;
-  btn.hidden = false;
-  let opened = false;
-  try { opened = sessionStorage.getItem(AUTO_KEY) === number; sessionStorage.setItem(AUTO_KEY, number); } catch { /* try once anyway */ }
-  if (!opened) setTimeout(() => { location.href = order.link; }, siteConfig.autoOpenDelayMs);
 } else {
   $('[data-done-missing]').hidden = false;
 }

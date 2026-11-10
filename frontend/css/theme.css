@@ -94,10 +94,38 @@
   --ring-color-on-dark: var(--peach);
   --shadow-card: 0 0.5rem 1.5rem color-mix(in srgb, var(--charcoal) 12%, transparent);
   --shadow-cutout: drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--charcoal) 20%, transparent));
+  --shadow-raised: 0 0.125rem 0.25rem color-mix(in srgb, var(--charcoal) 22%, transparent);
+  --shadow-pressed: inset 0 0.125rem 0.25rem color-mix(in srgb, var(--charcoal) 25%, transparent);
+  --press: 0.125rem;
   --line-height-body: 1.6;
   --line-height-head: 1.15;
   --line-height-display: 1.02;
   --tracking-display: -0.01em;
+
+  /* Glass (D-039): only the modal and its backdrop, the sticky header, the menu panel, the checkout bar and notice strips.
+     Never gradients. Without backdrop-filter support the solid fallback is used. */
+  --glass-solid: var(--white);
+  --glass-bg: color-mix(in srgb, var(--white) 82%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--white) 94%, transparent);
+  --glass-border: color-mix(in srgb, var(--charcoal) 14%, transparent);
+  --glass-edge: color-mix(in srgb, var(--white) 60%, transparent);
+  --glass-blur: 0.75rem;
+  --glass-shadow: 0 0.5rem 2rem color-mix(in srgb, var(--charcoal) 16%, transparent), inset 0 0 0 var(--hairline) var(--glass-edge);
+  --glass-backdrop: color-mix(in srgb, var(--charcoal) 45%, transparent);
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 700ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Details window */
+  --sheet-height: 85dvh;
+  --handle-w: 2.5rem;
+  --handle-h: 0.25rem;
+  --check-size: clamp(3.5rem, 2.5rem + 5vw, 5.5rem);
+  --dialog-thumb: clamp(4.5rem, 20vw, 6rem);
 
   /* Motifs, motion and sizes */
   --fold-height: clamp(1rem, 0.8rem + 1vw, 1.5rem);
@@ -124,4 +152,6 @@
    at the tablet width (--bp-tablet, 48em). CSS variables cannot be used inside media queries, so the value is
    repeated here and nowhere else in the CSS but the rule itself. Used for: the header (phone menu below it,
    inline nav from it) and the product cards (compact rows below it, vertical grid cards from it).
-   - (min-width: 48em) */
+   - (min-width: 48em)
+   Not a width: (prefers-reduced-motion: no-preference) wraps movement (press-down, slide-in), so nothing moves for
+   people who ask for less motion; base.css stops animations and transitions for (prefers-reduced-motion: reduce). */
