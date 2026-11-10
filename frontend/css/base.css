@@ -4,12 +4,12 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-block-size: 100svh;
   display: flex;
   flex-direction: column;
   background: var(--cream);
   color: var(--charcoal);
-  font: 1rem/1.6 var(--font-body);
+  font: var(--step-0)/var(--line-height-body) var(--font-body);
 }
 
 /* Faint paper grain */
@@ -27,22 +27,22 @@ main { flex: 1; }
 
 h1, h2, h3 {
   font-family: var(--font-head);
-  line-height: 1.15;
-  margin: 0 0 0.5em;
+  line-height: var(--line-height-head);
+  margin: 0 0 var(--space-xs);
   font-weight: 700;
 }
-h1 { font-size: clamp(2.4rem, 9vw, 4.5rem); }
-h2 { font-size: clamp(1.6rem, 5vw, 2.4rem); }
-h3 { font-size: 1.25rem; }
+h1 { font-size: var(--step-5); }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-1); }
 
-p { margin: 0 0 1em; max-width: 60ch; }
+p { margin: 0 0 var(--space-s); max-width: var(--measure); }
 a { color: var(--chutney); }
-img { max-width: 100%; height: auto; }
+img { max-inline-size: 100%; height: auto; }
 
-.wrap { width: min(100% - 2.5rem, var(--max)); margin-inline: auto; }
-.section { padding-block: clamp(2rem, 6vw, 4rem); }
+.wrap { width: min(100% - 2 * var(--gutter), var(--wrap)); margin-inline: auto; }
+.section { padding-block: var(--space-xl); }
 
-:focus-visible { outline: 3px solid var(--turmeric); outline-offset: 3px; }
+:focus-visible { outline: var(--ring-width) solid var(--turmeric); outline-offset: var(--ring-offset); }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
