@@ -79,7 +79,7 @@ function renderCardAction(card) {
     const btn = el('button', 'btn btn-add');
     btn.type = 'button';
     btn.dataset.addToCart = '';
-    btn.append('Add', Object.assign(el('span', 'visually-hidden'), { textContent: `: ${info.name}` }));
+    btn.append('Add to cart', Object.assign(el('span', 'visually-hidden'), { textContent: `: ${info.name}` }));
     const hadFocus = action.contains(document.activeElement);
     current.replaceWith(btn);
     if (hadFocus) btn.focus();

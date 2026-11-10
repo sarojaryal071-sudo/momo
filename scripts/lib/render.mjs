@@ -114,7 +114,7 @@ function card(p) {
   const attrs = `id="product-${esc(p.slug)}" data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''} data-kind="${esc(p.kind)}" data-name="${esc(p.name.toLowerCase())}" data-has-options="${hasOptions(p)}"${stock !== null ? ` data-stock="${stock}"` : ''}${stock !== null && p.stock_placeholder ? ' data-stock-sample' : ''}`;
   const action = buyable
     ? `<div class="card-action" data-card-action>
-      <button type="button" class="btn btn-add" data-add-to-cart>Add<span class="visually-hidden">: ${esc(p.name)}</span></button>
+      <button type="button" class="btn btn-add" data-add-to-cart>Add to cart<span class="visually-hidden">: ${esc(p.name)}</span></button>
       <p class="added-note" role="status" data-added-note></p>
     </div>`
     : `<div class="card-action"><p class="badge badge-unavailable">${soldOut ? 'Sold out' : 'Not available yet'}</p></div>`;
