@@ -58,6 +58,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Cut-out image slots with honest placeholders — 03a6944, cutout-hero 1200x1200, cutout-momo 800x800, cutout-chutney 800x800 (transparent placeholders with labels); kitchen slot kept on how-to-cook
 - [x] Verified, merged to `main`, deploy confirmed — 03a6944, see log
 
+## Step 1d — Hybrid premium rebuild (D-027, D-028)
+
+- [ ] Emerald & Copper tokens in; retired tokens removed
+- [ ] Header and footer rebuilt (footer columns, ridge line)
+- [ ] Hero panel with cut-out slot, trust row
+- [ ] Product cards on home and shop; `HOME_PRODUCT_LIMIT`, `SEARCH_MIN_PRODUCTS` constants; chips and search thresholds
+- [ ] Two tiles, Made together band, steps with illustration, statement, ordering row
+- [ ] Cart, done, how to cook aligned
+- [ ] Image slots and intentional placeholders
+- [ ] Verified, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
