@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1c done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
+- Current step: **Step 1d done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -60,14 +60,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1d — Hybrid premium rebuild (D-027, D-028)
 
-- [ ] Emerald & Copper tokens in; retired tokens removed
-- [ ] Header and footer rebuilt (footer columns, ridge line)
-- [ ] Hero panel with cut-out slot, trust row
-- [ ] Product cards on home and shop; `HOME_PRODUCT_LIMIT`, `SEARCH_MIN_PRODUCTS` constants; chips and search thresholds
-- [ ] Two tiles, Made together band, steps with illustration, statement, ordering row
-- [ ] Cart, done, how to cook aligned
-- [ ] Image slots and intentional placeholders
-- [ ] Verified, merged to `main`, deploy confirmed
+- [x] Emerald & Copper tokens in; retired tokens removed — HASH, theme.css rebuilt on the D-027 palette plus radius, shadow, card and motif tokens; coriander, clay, cream, cream-light, chalk and chutney-dark removed (grep finds none)
+- [x] Header and footer rebuilt (footer columns, ridge line) — HASH, white header with fold mark, nav, phone, cart badge; emerald four-column footer with sage ridge line above and (c) line
+- [x] Hero panel with cut-out slot, trust row — HASH, green-tint rounded panel, cut-out overlaps its base with drop shadow, steam wisps, sage ridge, four-item trust row with drawn icons
+- [x] Product cards on home and shop; `HOME_PRODUCT_LIMIT`, `SEARCH_MIN_PRODUCTS` constants; chips and search thresholds — HASH, cards from data with photo or drawn placeholder; constants in site-config.js (HOME_PRODUCT_LIMIT 8, SEARCH_MIN_PRODUCTS 8, KIND_LABELS); chips with 2+ kinds, search at 8+, empty state, ?kind= from footer links
+- [x] Two tiles, Made together band, steps with illustration, statement, ordering row — HASH, emerald Pickup tile + peach chutney tile, emerald Made together band with kitchen photo, copper-numeral flow with step cut-outs and drawn arrows, statement, peach-tint ordering row with kraft tag
+- [x] Cart, done, how to cook aligned — HASH, same header, footer and palette; fields white with emerald border; how-to-cook uses the kitchen photo
+- [x] Image slots and intentional placeholders — HASH, all manifest images wired (hero, momo packs with multiply, chutney, steps, kitchen, plate on shop); sauce pots use drawn sage placeholders; old placeholder-kitchen files deleted
+- [x] Verified, merged to `main`, deploy confirmed — HASH, see log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -143,15 +143,15 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `scripts/build.mjs` | Build v1: copy to `dist/`, noindex, sitemap, robots | 0 |
 | `.github/workflows/deploy.yml` | Pages deploy on push to `main` and manual | 0 |
 | `frontend/{index,shop,how-to-cook}.html` | The three public pages, hand-written, shared header/footer copied in | 1 |
-| `frontend/css/motifs.css` | Step 1b/1c: motif masks, hero band, bands, display type, steam, fold steps, kraft tags, reveal | 1b, 1c |
-| `frontend/assets/img/cutout-{hero,momo,chutney}.webp` (+ `-600`/`-400` sizes) | Transparent cut-out slots: 1200x1200, 800x800, 800x800; labelled placeholders until the owner supplies real cut-outs | 1c |
-| `frontend/assets/svg/grain-light.svg` | Light grain for the chalkboard and kraft tags only | 1c |
+| `frontend/css/motifs.css` | Motif masks, hero panel, trust row, tiles, Made together, fold flow, ordering row, steam, reveal | 1b-1d |
+| `frontend/assets/img/` | AI mood images per `docs/design/image-manifest.md` (cut-outs, two pack shots, two scenes) plus `placeholder-og.webp`; replace with real photos later | 1d |
+| `frontend/assets/svg/` | fold, ridge, steam, kraft-tag, arrow motifs; art-momo and art-bowl placeholder drawings | 1d |
 | `frontend/assets/fonts/` | Young Serif latin woff2 (27 KB) and its OFL licence | 1b |
 | `frontend/assets/svg/` | fold, ridge, steam, kraft-tag SVG motifs | 1b |
 | `frontend/css/components.css` | Buttons, header, footer, forms, notice, chalkboard, layouts; tokens only | 1 |
 | `frontend/data/products.seed.json`, `frontend/content/products/*.json` | Seed products and momo copy | 1 |
 | `frontend/assets/img/placeholder-*.webp`, `assets/icons/favicon.svg` | Flat-colour placeholder images and favicon | 1 |
-| `scripts/lib/render.mjs` | Renders the `build:products` regions (home: chalkboard rows with kraft price tags) and Product JSON-LD | 1, 1b |
+| `scripts/lib/render.mjs` | Renders the `build:products` regions (product cards, shop chips and search, empty state) and Product JSON-LD | 1, 1d |
 | `tests/regions.test.mjs` | Checks the source fallback regions match the seed | 1 |
 | `frontend/cart.html`, `frontend/done.html` | Cart with order form; confirmation with WhatsApp button; both `noindex` | 2 |
 | `frontend/js/site-config.js` | Backend choice, WhatsApp number, limits, timeouts (single config place) | 2 |
@@ -172,6 +172,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-10, step 1d: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow; CLS 0.0000; JS off shows all home content and all 12 test cards, chips and search hidden; reduced motion stops steam and shows all sections; focus rings emerald on white, peach on emerald. Shop with the 2 real products: chips yes (2 kinds), no search; temporary 12-item set (deleted): chips and search appear, chip and search filtering work, a no-match shows the message; 0 products shows "New items are coming soon."; 1 product shows no chips. `?kind=addon` preselects Sauces. Home transfer after scrolling the whole page: 230.7 KB raw / 197 KB gzip over 22 requests (images 173 KB, font 27 KB); above the fold only about 105 KB. Fixed a Step 2 bug: shop.js did not update the header count on load (now imports main.js).
 - 2026-11-10, step 1c: `npm test` 23 pass, `npm run build` passes. Home, shop, how-to-cook, cart, done at 320, 360 and 1280 px (home also at 768 and 1600): no horizontal overflow; headline on two lines at every width; hero image overlaps the charcoal band; CLS 0.0000; JS off shows all home content; reduced motion stops steam and shows all sections; cart badge updates (1 item). Home transfer about 94.7 KB raw / 70.4 KB gzip over 17 requests (cut-out placeholders 31 KB of that). Contrast: charcoal/white 16.06, chutney/white 5.98, white/chutney 5.98, charcoal/turmeric 7.12, cream/charcoal 13.57, white/clay 5.82, clay/white 5.82, charcoal/cream 13.57; chutney button against turmeric edge 2.65 (text inside passes). Focus ring checked on white (charcoal), turmeric (charcoal), charcoal board (cream).
 - 2026-11-10, step 1b: `npm test` 23 pass, `npm run build` passes. Five pages at 320, 360 and 1280 px: no horizontal overflow. Home CLS 0.0000; font loads; home transfer 65.9 KB raw / about 42.9 KB gzip over 17 requests (font 27.0 KB, SVGs 1.6 KB, CSS 20.9 KB raw). JS off: all home content present. Reduced motion: animations off, content visible. Focus ring visible on every band after switching it to charcoal (cream on dark). Contrast: cream/charcoal 13.57, charcoal/turmeric 7.12, cream-light/clay 5.31, chutney/cream 5.05, clay/cream 4.92, cream-light/chutney 5.45. Lighthouse not run (owner uses PageSpeed Insights).
 - 2026-11-10, step 1b deploy: pushed to `main` (3f473e7); Actions run 4 build and deploy jobs both succeeded (npm ci, build, upload, deploy-pages). The agent sandbox cannot reach github.io (proxy refuses the connection), so the live pages were not opened by the agent: the owner should open https://sarojaryal071-sudo.github.io/momo/ and check them.

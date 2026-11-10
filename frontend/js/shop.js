@@ -1,4 +1,5 @@
 // Shop page: quantity controls and add to cart. The page works as plain HTML without this script.
+import './main.js';
 import { getCart, updateHeaderCount } from './cart.js';
 import { siteConfig } from './site-config.js';
 
@@ -24,3 +25,34 @@ document.addEventListener('click', (e) => {
 document.addEventListener('change', (e) => {
   if (e.target.matches('[data-qty-input]')) e.target.value = clampQty(e.target.value);
 });
+
+// Filter chips and search. Every card is in the HTML; this only hides and shows them.
+const tools = document.querySelector('[data-shop-tools]');
+const cards = [...document.querySelectorAll('[data-product-grid] [data-slug]')];
+const noResults = document.querySelector('[data-no-results]');
+const searchInput = document.querySelector('[data-shop-search]');
+const chips = [...document.querySelectorAll('[data-filter]')];
+let activeKind = 'all';
+
+function applyFilters() {
+  const q = searchInput ? searchInput.value.trim().toLowerCase() : '';
+  let shown = 0;
+  for (const card of cards) {
+    const match = (activeKind === 'all' || card.dataset.kind === activeKind) && (!q || card.dataset.name.includes(q));
+    card.hidden = !match;
+    if (match) shown += 1;
+  }
+  if (noResults) noResults.hidden = shown > 0;
+}
+
+function setKind(kind) {
+  activeKind = chips.some((c) => c.dataset.filter === kind) ? kind : 'all';
+  chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.filter === activeKind)));
+  applyFilters();
+}
+
+if (tools) {
+  chips.forEach((c) => c.addEventListener('click', () => setKind(c.dataset.filter)));
+  if (searchInput) searchInput.addEventListener('input', applyFilters);
+  setKind(new URLSearchParams(location.search).get('kind') || 'all');
+}

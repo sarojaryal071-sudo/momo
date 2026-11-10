@@ -25,30 +25,33 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="wrap header-row">
-      <a class="brand" href="index.html">Steam &amp; Spice</a>
+      <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
       <nav aria-label="Main">
         <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
           <li><a href="shop.html">Shop</a></li>
           <li><a href="how-to-cook.html" aria-current="page">How to cook</a></li>
-          <li><a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a></li>
         </ul>
       </nav>
+      <div class="header-actions">
+        <a href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a>
+        <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
+      </div>
     </div>
   </header>
   <main id="main">
-    <section class="section">
+    <section class="page-head">
       <div class="wrap split">
         <div>
           <h1>How to cook frozen momo</h1>
           <p class="lead">Cook them straight from the freezer. Nothing fancy.</p>
         </div>
-        <img class="img img-kitchen" src="assets/img/placeholder-kitchen-corner.webp" srcset="assets/img/placeholder-kitchen-corner-800.webp 800w, assets/img/placeholder-kitchen-corner.webp 1200w" sizes="(min-width: 48em) 50vw, 100vw" width="1200" height="800" alt="Placeholder for a photo of a home kitchen corner with a steamer" loading="lazy">
+        <img class="photo-frame" src="assets/img/photo-kitchen-corner.webp" srcset="assets/img/photo-kitchen-corner-800.webp 800w, assets/img/photo-kitchen-corner.webp 1024w" sizes="(min-width: 48em) 40rem, 90vw" width="1024" height="687" alt="A home kitchen corner with a brick wall, wooden counter and a bamboo steamer" fetchpriority="high">
       </div>
     </section>
 
-    <section class="band band-light">
+    <section class="band band-peach-tint">
       <div class="wrap">
-        <div class="fold" aria-hidden="true"></div>
         <h2 class="rule">Steaming from frozen</h2>
         <ol class="cook-steps">
           <li>Take the momo you want to cook out of the freezer. Leave the rest frozen.</li>
@@ -61,10 +64,35 @@
       </div>
     </section>
   </main>
-  <footer class="site-footer">
-    <div class="wrap footer-row">
-      <a class="phone-link" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a>
-      <p>Pickup only. Pay cash on pickup.</p>
+  <footer class="site-footer on-emerald">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</p>
+          <p>Taste like Nepal.</p>
+        </div>
+        <div>
+          <p class="footer-title">Quick links</p>
+          <ul class="footer-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="how-to-cook.html">How to cook</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-title">Shop</p>
+          <ul class="footer-list">
+            <li><a href="shop.html?kind=pack">Momo</a></li>
+            <li><a href="shop.html?kind=addon">Sauces</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-title">Get in touch</p>
+          <p><a class="phone-link" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a></p>
+          <p>Pickup only. Pay cash on pickup.</p>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; Steam &amp; Spice</p></div>
     </div>
   </footer>
   <script type="module" src="js/main.js"></script>

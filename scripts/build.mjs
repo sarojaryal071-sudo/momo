@@ -55,8 +55,8 @@ if (useSeed) {
 }
 
 if (products.length) {
-  const slim = products.map(({ slug, name, unit_label, price_pence, available, placeholder }) =>
-    ({ slug, name, unit_label, price_pence, available, photo: null, ...(placeholder ? { placeholder: true } : {}) }));
+  const slim = products.map(({ slug, name, unit_label, price_pence, available, placeholder, photo }) =>
+    ({ slug, name, unit_label, price_pence, available, photo: photo ?? null, ...(placeholder ? { placeholder: true } : {}) }));
   await writeFile(join(dist, 'data/products.json'), JSON.stringify(slim, null, 2) + '\n');
 }
 

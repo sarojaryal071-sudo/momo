@@ -2,13 +2,11 @@
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 import { formatPrice } from '../../frontend/js/cart.js';
-import { siteConfig } from '../../frontend/js/site-config.js';
+import { HOME_PRODUCT_LIMIT, KIND_LABELS, SEARCH_MIN_PRODUCTS, siteConfig } from '../../frontend/js/site-config.js';
 
 export { formatPrice };
 const SAMPLE = '<span class="sample-label">sample</span>';
 const priceHtml = (p) => (p.placeholder ? `<span data-placeholder>${formatPrice(p.price_pence)} ${SAMPLE}</span>` : formatPrice(p.price_pence));
-// Unit label, then the price on a kraft tag. The dash keeps the product line readable as text.
-const metaHtml = (p) => `<span>${esc(p.unit_label)}</span><span class="visually-hidden"> — </span><span class="tag tag-price">${priceHtml(p)}</span>`;
 
 function qtyControl(p) {
   const n = esc(p.name);
@@ -43,57 +41,82 @@ function productJsonLd(products, siteUrl) {
   return items.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n');
 }
 
-function packItem(p) {
-  return `<li class="menu-item" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}">
-  <h3>${esc(p.name)}</h3>
-  <p class="menu-meta">${metaHtml(p)}</p>
-  <p class="menu-desc">${esc(p.description || p.summary || '')}</p>
-  ${qtyControl(p)}
-  ${addButton(p, '')}
-</li>`;
+const PACK_ALT = 'A bag of frozen momo tied with twine and a blank paper tag';
+const MEDIA_SIZES = '(min-width: 40em) 22rem, 90vw';
+const kindLabel = (kind) => KIND_LABELS[kind] || kind.charAt(0).toUpperCase() + kind.slice(1);
+
+// Image tile: the product photo, or a quiet drawn placeholder until a photo exists.
+function mediaHtml(p) {
+  if (p.photo) {
+    const base = `assets/img/${esc(p.photo)}`;
+    const multiply = p.photo.startsWith('pack-'); // opaque shots on white: blended into the tinted tile
+    return `<div class="card-media${multiply ? ' card-media-multiply' : ''}"><img src="${base}.webp" srcset="${base}-400.webp 400w, ${base}.webp 800w" sizes="${MEDIA_SIZES}" width="800" height="800" alt="${p.photo.startsWith('pack-') ? PACK_ALT : esc(p.name)}" loading="lazy"></div>`;
+  }
+  const art = p.kind === 'addon' ? 'bowl' : 'momo';
+  return `<div class="card-media card-art card-art-${art}" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>`;
 }
 
-function addonItem(p) {
+function priceBlock(p) {
+  if (p.price_pence == null) return `<p class="card-price">Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span></p>`;
+  return `<p class="card-price">${priceHtml(p)}</p>`;
+}
+
+function card(p) {
   const priced = p.price_pence != null;
   const buyable = p.available && priced;
-  const attrs = `data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''}`;
-  const meta = priced
-    ? metaHtml(p)
-    : `${esc(p.unit_label)} — Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span>`;
+  const attrs = `data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''} data-kind="${esc(p.kind)}" data-name="${esc(p.name.toLowerCase())}"`;
   const action = buyable
-    ? `${qtyControl(p)}\n  ${addButton(p, ' btn-secondary')}`
+    ? `${qtyControl(p)}\n  ${addButton(p, '')}`
     : `<button type="button" class="btn btn-secondary" disabled>Not available yet<span class="visually-hidden">: ${esc(p.name)}</span></button>`;
-  return `<li class="addon-item" ${attrs}>
-  <h3>${esc(p.name)}</h3>
-  <p class="menu-meta">${meta}</p>
-  ${action}
+  return `<li class="product-card" ${attrs}>
+  ${mediaHtml(p)}
+  <div class="card-body">
+    <h3>${esc(p.name)}</h3>
+    <p class="card-meta">${esc(p.unit_label)}${p.available ? '' : ' <span class="badge badge-unavailable">Unavailable</span>'}</p>
+    ${priceBlock(p)}
+    ${action}
+  </div>
 </li>`;
 }
 
+function toolsHtml(products) {
+  const kinds = [...new Set(products.map((p) => p.kind))];
+  const chips = kinds.length >= 2;
+  const search = products.length >= SEARCH_MIN_PRODUCTS;
+  if (!chips && !search) return '';
+  const chipHtml = chips
+    ? `<div class="chips" role="group" aria-label="Filter by type">
+<button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+${kinds.map((k) => `<button type="button" class="chip" data-filter="${esc(k)}" aria-pressed="false">${esc(kindLabel(k))}</button>`).join('\n')}
+</div>` : '';
+  const searchHtml = search
+    ? `<div class="search-box"><label class="visually-hidden" for="shop-search">Search products</label><input id="shop-search" type="search" placeholder="Search products" autocomplete="off" data-shop-search></div>` : '';
+  return `<div class="shop-tools" data-shop-tools>
+${chipHtml}
+${searchHtml}
+</div>
+`;
+}
+
+const EMPTY = '<p class="empty-note">New items are coming soon.</p>';
+
 export function renderRegion(page, products, siteUrl = '') {
-  const packs = products.filter((p) => p.kind === 'pack');
-  const addons = products.filter((p) => p.kind === 'addon');
   if (page === 'index') {
-    return `<div class="menu-board">
-<ul class="pack-board">
-${packs.map((p) => `<li class="pack-row" data-slug="${esc(p.slug)}" data-price-pence="${p.price_pence}"><span class="pack-name">${esc(p.name)}</span> <span class="pack-meta">${metaHtml(p)}</span></li>`).join('\n')}
+    const shown = products.filter((p) => p.available).slice(0, HOME_PRODUCT_LIMIT);
+    if (!shown.length) return EMPTY;
+    return `<div class="product-wrap">
+<ul class="product-grid">
+${shown.map(card).join('\n')}
 </ul>
-<p class="board-action"><a class="btn" href="shop.html">See the full menu</a></p>
-<p class="tag board-tag">Pickup only</p>
 </div>`;
   }
-  return `<section class="menu-board" aria-labelledby="menu-title">
-<h2 id="menu-title">The momo</h2>
-<ul class="menu-list">
-${packs.map(packItem).join('\n')}
+  if (!products.length) return EMPTY;
+  return `<div class="product-wrap">
+${toolsHtml(products)}<ul class="product-grid" data-product-grid>
+${products.map(card).join('\n')}
 </ul>
-</section>
-<section class="addons" aria-labelledby="addons-title">
-<h2 id="addons-title">Sauce pots</h2>
-<ul class="addon-list">
-${addons.map(addonItem).join('\n')}
-</ul>
-</section>
+<p class="empty-note" data-no-results hidden>No products match. Try another word or filter.</p>
+</div>
 ${productJsonLd(products, siteUrl)}`;
 }
 

@@ -25,18 +25,22 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="wrap header-row">
-      <a class="brand" href="index.html">Steam &amp; Spice</a>
+      <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
       <nav aria-label="Main">
         <ul class="nav-list">
+          <li><a href="index.html">Home</a></li>
           <li><a href="shop.html" aria-current="page">Shop</a></li>
           <li><a href="how-to-cook.html">How to cook</a></li>
-          <li><a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a></li>
         </ul>
       </nav>
+      <div class="header-actions">
+        <a href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a>
+        <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
+      </div>
     </div>
   </header>
   <main id="main">
-    <section class="section">
+    <section class="page-head">
       <div class="wrap split">
         <div>
           <h1>Shop frozen momo</h1>
@@ -44,77 +48,121 @@
           <p class="tag">Pickup only</p>
           <p data-todo>TODO: allergen information to be added by owner</p>
         </div>
-        <img class="cutout cutout-small" src="assets/img/cutout-chutney.webp" srcset="assets/img/cutout-chutney-400.webp 400w, assets/img/cutout-chutney.webp 800w" sizes="(min-width: 48em) 18rem, 50vw" width="800" height="800" alt="Placeholder for a cut-out photo of a bowl of chutney" loading="lazy">
+        <img class="photo-frame" src="assets/img/photo-plate.webp" srcset="assets/img/photo-plate-800.webp 800w, assets/img/photo-plate.webp 1024w" sizes="(min-width: 48em) 40rem, 90vw" width="1024" height="687" alt="A plate of steamed momo with a small bowl of tomato chutney" fetchpriority="high">
       </div>
     </section>
 
-    <div class="wrap section">
-      <!-- build:products -->
-<section class="menu-board" aria-labelledby="menu-title">
-<h2 id="menu-title">The momo</h2>
-<ul class="menu-list">
-<li class="menu-item" data-slug="chicken-momo" data-price-pence="1000">
-  <h3>Frozen chicken momo</h3>
-  <p class="menu-meta"><span>40 pieces</span><span class="visually-hidden"> — </span><span class="tag tag-price">£10</span></p>
-  <p class="menu-desc">A pack of 40 homemade chicken momo. Keep them frozen, then cook them straight from the freezer.</p>
-  <div class="qty" role="group" aria-label="Quantity of Frozen chicken momo">
+    <section class="band-shop">
+      <div class="wrap">
+        <!-- build:products -->
+<div class="product-wrap">
+<div class="shop-tools" data-shop-tools>
+<div class="chips" role="group" aria-label="Filter by type">
+<button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+<button type="button" class="chip" data-filter="pack" aria-pressed="false">Momo</button>
+<button type="button" class="chip" data-filter="addon" aria-pressed="false">Sauces</button>
+</div>
+
+</div>
+<ul class="product-grid" data-product-grid>
+<li class="product-card" data-slug="chicken-momo" data-price-pence="1000" data-kind="pack" data-name="frozen chicken momo">
+  <div class="card-media card-media-multiply"><img src="assets/img/pack-chicken.webp" srcset="assets/img/pack-chicken-400.webp 400w, assets/img/pack-chicken.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
+  <div class="card-body">
+    <h3>Frozen chicken momo</h3>
+    <p class="card-meta">40 pieces</p>
+    <p class="card-price">£10</p>
+    <div class="qty" role="group" aria-label="Quantity of Frozen chicken momo">
   <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen chicken momo">&minus;</button>
   <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Frozen chicken momo" data-qty-input>
   <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen chicken momo">+</button>
 </div>
   <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Frozen chicken momo</span></button>
 <p class="added-note" role="status" data-added-note></p>
+  </div>
 </li>
-<li class="menu-item" data-slug="veg-momo" data-price-pence="1000">
-  <h3>Frozen veg momo</h3>
-  <p class="menu-meta"><span>40 pieces</span><span class="visually-hidden"> — </span><span class="tag tag-price">£10</span></p>
-  <p class="menu-desc">A pack of 40 homemade veg momo. Keep them frozen, then cook them straight from the freezer.</p>
-  <div class="qty" role="group" aria-label="Quantity of Frozen veg momo">
+<li class="product-card" data-slug="veg-momo" data-price-pence="1000" data-kind="pack" data-name="frozen veg momo">
+  <div class="card-media card-media-multiply"><img src="assets/img/pack-veg.webp" srcset="assets/img/pack-veg-400.webp 400w, assets/img/pack-veg.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
+  <div class="card-body">
+    <h3>Frozen veg momo</h3>
+    <p class="card-meta">40 pieces</p>
+    <p class="card-price">£10</p>
+    <div class="qty" role="group" aria-label="Quantity of Frozen veg momo">
   <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen veg momo">&minus;</button>
   <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Frozen veg momo" data-qty-input>
   <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen veg momo">+</button>
 </div>
   <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Frozen veg momo</span></button>
 <p class="added-note" role="status" data-added-note></p>
+  </div>
 </li>
-</ul>
-</section>
-<section class="addons" aria-labelledby="addons-title">
-<h2 id="addons-title">Sauce pots</h2>
-<ul class="addon-list">
-<li class="addon-item" data-slug="chutney-pot" data-price-pence="111">
-  <h3>Chutney pot</h3>
-  <p class="menu-meta"><span>1 pot</span><span class="visually-hidden"> — </span><span class="tag tag-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></span></p>
-  <div class="qty" role="group" aria-label="Quantity of Chutney pot">
+<li class="product-card" data-slug="chutney-pot" data-price-pence="111" data-kind="addon" data-name="chutney pot">
+  <div class="card-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+  <div class="card-body">
+    <h3>Chutney pot</h3>
+    <p class="card-meta">1 pot</p>
+    <p class="card-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
+    <div class="qty" role="group" aria-label="Quantity of Chutney pot">
   <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Chutney pot">&minus;</button>
   <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Chutney pot" data-qty-input>
   <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Chutney pot">+</button>
 </div>
-  <button type="button" class="btn btn-secondary" data-add-to-cart>Add to cart<span class="visually-hidden">: Chutney pot</span></button>
+  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Chutney pot</span></button>
 <p class="added-note" role="status" data-added-note></p>
+  </div>
 </li>
-<li class="addon-item" data-slug="hot-sauce-pot" data-price-pence="222">
-  <h3>Hot sauce pot</h3>
-  <p class="menu-meta"><span>1 pot</span><span class="visually-hidden"> — </span><span class="tag tag-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></span></p>
-  <div class="qty" role="group" aria-label="Quantity of Hot sauce pot">
+<li class="product-card" data-slug="hot-sauce-pot" data-price-pence="222" data-kind="addon" data-name="hot sauce pot">
+  <div class="card-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+  <div class="card-body">
+    <h3>Hot sauce pot</h3>
+    <p class="card-meta">1 pot</p>
+    <p class="card-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
+    <div class="qty" role="group" aria-label="Quantity of Hot sauce pot">
   <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Hot sauce pot">&minus;</button>
   <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Hot sauce pot" data-qty-input>
   <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Hot sauce pot">+</button>
 </div>
-  <button type="button" class="btn btn-secondary" data-add-to-cart>Add to cart<span class="visually-hidden">: Hot sauce pot</span></button>
+  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Hot sauce pot</span></button>
 <p class="added-note" role="status" data-added-note></p>
+  </div>
 </li>
 </ul>
-</section>
+<p class="empty-note" data-no-results hidden>No products match. Try another word or filter.</p>
+</div>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Frozen chicken momo","description":"A pack of 40 homemade chicken momo. Keep them frozen, then cook them straight from the freezer.","offers":{"@type":"Offer","priceCurrency":"GBP","price":"10.00","availability":"https://schema.org/InStock","url":"shop.html"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Frozen veg momo","description":"A pack of 40 homemade veg momo. Keep them frozen, then cook them straight from the freezer.","offers":{"@type":"Offer","priceCurrency":"GBP","price":"10.00","availability":"https://schema.org/InStock","url":"shop.html"}}</script>
 <!-- /build:products -->
-    </div>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer">
-    <div class="wrap footer-row">
-      <a class="phone-link" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a>
-      <p>Pickup only. Pay cash on pickup.</p>
+  <footer class="site-footer on-emerald">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</p>
+          <p>Taste like Nepal.</p>
+        </div>
+        <div>
+          <p class="footer-title">Quick links</p>
+          <ul class="footer-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="how-to-cook.html">How to cook</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-title">Shop</p>
+          <ul class="footer-list">
+            <li><a href="shop.html?kind=pack">Momo</a></li>
+            <li><a href="shop.html?kind=addon">Sauces</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-title">Get in touch</p>
+          <p><a class="phone-link" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a></p>
+          <p>Pickup only. Pay cash on pickup.</p>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; Steam &amp; Spice</p></div>
     </div>
   </footer>
   <script type="module" src="js/shop.js"></script>

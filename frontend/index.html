@@ -25,100 +25,181 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="wrap header-row">
-      <a class="brand" href="index.html" aria-current="page">Steam &amp; Spice</a>
+      <a class="brand" href="index.html" aria-current="page"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
       <nav aria-label="Main">
         <ul class="nav-list">
+          <li><a href="index.html" aria-current="page">Home</a></li>
           <li><a href="shop.html">Shop</a></li>
           <li><a href="how-to-cook.html">How to cook</a></li>
-          <li><a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a></li>
         </ul>
       </nav>
+      <div class="header-actions">
+        <a href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a>
+        <a class="cart-link" href="cart.html" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
+      </div>
     </div>
   </header>
   <main id="main">
     <section class="hero">
       <div class="wrap">
-        <div class="hero-grid">
-          <h1 class="display hero-title">Taste like Nepal.</h1>
-          <div class="hero-copy">
-            <p class="lead">Homemade frozen momo, ready to steam at home. Pickup in the UK.</p>
-            <p><a class="btn btn-big" href="shop.html">See the momo</a></p>
+        <div class="hero-panel">
+          <div class="hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">HOMEMADE · FROZEN · PICKUP</p>
+              <h1 class="display">Taste like Nepal.</h1>
+              <p class="lead">Homemade frozen momo, ready to steam at home. Pickup in the UK.</p>
+              <p class="hero-actions"><a class="btn btn-big" href="shop.html">See the momo</a><a class="btn btn-secondary btn-big" href="how-to-cook.html">How to cook</a></p>
+            </div>
+            <div class="hero-media">
+              <img src="assets/img/cutout-hero.webp" srcset="assets/img/cutout-hero-600.webp 600w, assets/img/cutout-hero.webp 1200w" sizes="(min-width: 44em) 36rem, 90vw" width="1200" height="1200" alt="A bamboo steamer filled with freshly steamed momo" fetchpriority="high">
+              <span class="steam" aria-hidden="true"><i></i><i></i><i></i></span>
+            </div>
           </div>
-          <div class="hero-media">
-            <img class="cutout " src="assets/img/cutout-hero.webp" srcset="assets/img/cutout-hero-600.webp 600w, assets/img/cutout-hero.webp 1200w" sizes="(min-width: 40em) 34rem, 45vw" width="1200" height="1200" alt="Placeholder for a cut-out photo of a bamboo steamer of momo" fetchpriority="high">
-            <span class="steam" aria-hidden="true"><i></i><i></i><i></i></span>
-          </div>
+          <div class="ridge" aria-hidden="true"></div>
         </div>
-      </div>
-      <div class="ridge" aria-hidden="true"></div>
-    </section>
-
-    <section class="band band-dark made">
-      <div class="wrap">
-        <div class="made-text">
-          <h2 class="display-2">Made together.</h2>
-          <p class="lead">In Himalayan homes, momo is often made by family and friends, folding side by side.</p>
-          <p class="lead">We make ours at home, then freeze them, so you can have that table wherever you are.</p>
-        </div>
+        <ul class="trust-row">
+          <li><svg class="trust-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 L12 4 L21 11 M5 10 V20 H19 V10 M10 20 V14 H14 V20"/></svg><div><strong>Homemade</strong><span>Made at home, then frozen</span></div></li>
+          <li><svg class="trust-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 V21 M4.2 7.5 L19.8 16.5 M4.2 16.5 L19.8 7.5 M9.5 4.8 L12 7 L14.5 4.8 M9.5 19.2 L12 17 L14.5 19.2"/></svg><div><strong>Frozen</strong><span>Ready to steam at home</span></div></li>
+          <li><svg class="trust-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8 H19 L18 20 H6 Z M9 8 V6.5 a3 3 0 0 1 6 0 V8"/></svg><div><strong>Pickup only</strong><span>Order online, collect in person</span></div></li>
+          <li><svg class="trust-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9.5 h.01 M17.5 14.5 h.01"/></svg><div><strong>Pay cash</strong><span>Pay when you pick up</span></div></li>
+        </ul>
       </div>
     </section>
 
     <section class="band reveal">
-      <div class="wrap split">
-        <div class="fold-block">
-          <h2 class="display-2">Fold. Fill. Steam.</h2>
-          <ol class="fold-steps">
-            <li><p>A thin wrapper.</p></li>
-            <li><p>A spiced filling.</p></li>
-            <li><p>Steamed until soft.</p></li>
-          </ol>
-          <p data-todo>TODO: confirm whether we can say "folded by hand"</p>
-          <p data-todo>TODO: confirm any filling description beyond chicken and veg</p>
-        </div>
-        <img class="cutout cutout-small" src="assets/img/cutout-momo.webp" srcset="assets/img/cutout-momo-400.webp 400w, assets/img/cutout-momo.webp 800w" sizes="(min-width: 48em) 18rem, 50vw" width="800" height="800" alt="Placeholder for a cut-out photo of a single folded momo" loading="lazy">
-      </div>
-    </section>
-
-    <section class="band band-turmeric reveal">
-      <div class="wrap split">
-        <div class="chutney-text">
-          <h2 class="display-2">The chutney.</h2>
-          <p class="lead">Momo is traditionally served with a spicy tomato dip.</p>
-          <p class="lead">Add our spicy tomato chutney to your order.</p>
-          <p data-todo>TODO: her own words describing the chutney flavour</p>
-          <p><a class="btn btn-secondary" href="shop.html">See the momo</a></p>
-        </div>
-        <img class="cutout cutout-small" src="assets/img/cutout-chutney.webp" srcset="assets/img/cutout-chutney-400.webp 400w, assets/img/cutout-chutney.webp 800w" sizes="(min-width: 48em) 18rem, 50vw" width="800" height="800" alt="Placeholder for a cut-out photo of a bowl of chutney" loading="lazy">
-      </div>
-    </section>
-
-    <section class="band band-quiet reveal">
       <div class="wrap">
-        <h2 class="kicker">Wherever home is now</h2>
-        <p class="statement">For anyone far from home, a bag of momo in the freezer is a little closer.</p>
-      </div>
-    </section>
-
-    <section class="band-pad reveal">
-      <div class="wrap">
-        <div class="centered">
-          <h2 class="rule">The packs</h2>
-          <p class="lead">New to momo? Think of a dumpling, steamed until soft, with a sauce that wakes everything up.</p>
+        <div class="section-head">
+          <h2 class="rule">Our momo</h2>
+          <a href="shop.html">View all</a>
         </div>
         <!-- build:products -->
-<div class="menu-board">
-<ul class="pack-board">
-<li class="pack-row" data-slug="chicken-momo" data-price-pence="1000"><span class="pack-name">Frozen chicken momo</span> <span class="pack-meta"><span>40 pieces</span><span class="visually-hidden"> — </span><span class="tag tag-price">£10</span></span></li>
-<li class="pack-row" data-slug="veg-momo" data-price-pence="1000"><span class="pack-name">Frozen veg momo</span> <span class="pack-meta"><span>40 pieces</span><span class="visually-hidden"> — </span><span class="tag tag-price">£10</span></span></li>
+<div class="product-wrap">
+<ul class="product-grid">
+<li class="product-card" data-slug="chicken-momo" data-price-pence="1000" data-kind="pack" data-name="frozen chicken momo">
+  <div class="card-media card-media-multiply"><img src="assets/img/pack-chicken.webp" srcset="assets/img/pack-chicken-400.webp 400w, assets/img/pack-chicken.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
+  <div class="card-body">
+    <h3>Frozen chicken momo</h3>
+    <p class="card-meta">40 pieces</p>
+    <p class="card-price">£10</p>
+    <div class="qty" role="group" aria-label="Quantity of Frozen chicken momo">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen chicken momo">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Frozen chicken momo" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen chicken momo">+</button>
+</div>
+  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Frozen chicken momo</span></button>
+<p class="added-note" role="status" data-added-note></p>
+  </div>
+</li>
+<li class="product-card" data-slug="veg-momo" data-price-pence="1000" data-kind="pack" data-name="frozen veg momo">
+  <div class="card-media card-media-multiply"><img src="assets/img/pack-veg.webp" srcset="assets/img/pack-veg-400.webp 400w, assets/img/pack-veg.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
+  <div class="card-body">
+    <h3>Frozen veg momo</h3>
+    <p class="card-meta">40 pieces</p>
+    <p class="card-price">£10</p>
+    <div class="qty" role="group" aria-label="Quantity of Frozen veg momo">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Frozen veg momo">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Frozen veg momo" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Frozen veg momo">+</button>
+</div>
+  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Frozen veg momo</span></button>
+<p class="added-note" role="status" data-added-note></p>
+  </div>
+</li>
+<li class="product-card" data-slug="chutney-pot" data-price-pence="111" data-kind="addon" data-name="chutney pot">
+  <div class="card-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+  <div class="card-body">
+    <h3>Chutney pot</h3>
+    <p class="card-meta">1 pot</p>
+    <p class="card-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
+    <div class="qty" role="group" aria-label="Quantity of Chutney pot">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Chutney pot">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Chutney pot" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Chutney pot">+</button>
+</div>
+  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Chutney pot</span></button>
+<p class="added-note" role="status" data-added-note></p>
+  </div>
+</li>
+<li class="product-card" data-slug="hot-sauce-pot" data-price-pence="222" data-kind="addon" data-name="hot sauce pot">
+  <div class="card-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+  <div class="card-body">
+    <h3>Hot sauce pot</h3>
+    <p class="card-meta">1 pot</p>
+    <p class="card-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
+    <div class="qty" role="group" aria-label="Quantity of Hot sauce pot">
+  <button type="button" class="qty-btn" data-qty-minus aria-label="Decrease quantity of Hot sauce pot">&minus;</button>
+  <input class="qty-input" type="number" inputmode="numeric" min="1" max="10" value="1" aria-label="Quantity of Hot sauce pot" data-qty-input>
+  <button type="button" class="qty-btn" data-qty-plus aria-label="Increase quantity of Hot sauce pot">+</button>
+</div>
+  <button type="button" class="btn" data-add-to-cart>Add to cart<span class="visually-hidden">: Hot sauce pot</span></button>
+<p class="added-note" role="status" data-added-note></p>
+  </div>
+</li>
 </ul>
-<p class="board-action"><a class="btn" href="shop.html">See the full menu</a></p>
-<p class="tag board-tag">Pickup only</p>
 </div>
 <!-- /build:products -->
       </div>
     </section>
 
-    <section class="band band-light centered reveal">
+    <section class="band-tiles reveal">
+      <div class="wrap tiles-wrap">
+        <div class="tiles">
+          <div class="tile tile-emerald on-emerald">
+            <h2>Pickup only</h2>
+            <p>Order online, collect in person, and pay cash when you pick up.</p>
+            <p data-todo>TODO: pickup area and how the location is shared, to be confirmed by owner</p>
+            <p><a class="btn btn-secondary" href="shop.html">See the momo</a></p>
+          </div>
+          <div class="tile tile-peach">
+            <div>
+              <h2>The chutney</h2>
+              <p>Momo is traditionally served with a spicy tomato dip.</p>
+              <p>Add our spicy tomato chutney to your order.</p>
+              <p data-todo>TODO: her own words describing the chutney flavour</p>
+              <p><a class="btn" href="shop.html">See the momo</a></p>
+            </div>
+            <img class="" src="assets/img/cutout-chutney.webp" srcset="assets/img/cutout-chutney-400.webp 400w, assets/img/cutout-chutney.webp 800w" sizes="(min-width: 48em) 16rem, 60vw" width="800" height="800" alt="A clay bowl of red tomato chutney with a wooden spoon" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-emerald on-emerald made reveal">
+      <div class="wrap">
+        <div class="fold" aria-hidden="true"></div>
+        <div class="split">
+          <div>
+            <h2 class="display-2">Made together.</h2>
+            <p class="lead">In Himalayan homes, momo is often made by family and friends, folding side by side.</p>
+            <p class="lead">We make ours at home, then freeze them, so you can have that table wherever you are.</p>
+          </div>
+          <img class="photo-frame" src="assets/img/photo-kitchen-corner.webp" srcset="assets/img/photo-kitchen-corner-800.webp 800w, assets/img/photo-kitchen-corner.webp 1024w" sizes="(min-width: 48em) 40rem, 90vw" width="1024" height="687" alt="A home kitchen corner with a brick wall, wooden counter and a bamboo steamer" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <section class="band reveal">
+      <div class="wrap">
+        <h2 class="display-2">Fold. Fill. Steam.</h2>
+        <ol class="fold-flow">
+          <li><img class="" src="assets/img/cutout-step-wrapper.webp" srcset="assets/img/cutout-step-wrapper-300.webp 300w, assets/img/cutout-step-wrapper.webp 600w" sizes="(min-width: 48em) 14rem, 40vw" width="600" height="600" alt="A thin round of dough" loading="lazy"><p>A thin wrapper.</p></li>
+          <li><img class="" src="assets/img/cutout-step-fold.webp" srcset="assets/img/cutout-step-fold-300.webp 300w, assets/img/cutout-step-fold.webp 600w" sizes="(min-width: 48em) 14rem, 40vw" width="600" height="600" alt="A momo being folded around a filling" loading="lazy"><p>A spiced filling.</p></li>
+          <li><img class="" src="assets/img/cutout-step-finished.webp" srcset="assets/img/cutout-step-finished-300.webp 300w, assets/img/cutout-step-finished.webp 600w" sizes="(min-width: 48em) 14rem, 40vw" width="600" height="600" alt="A finished, pleated momo" loading="lazy"><p>Steamed until soft.</p></li>
+        </ol>
+        <p data-todo>TODO: confirm whether we can say "folded by hand"</p>
+        <p data-todo>TODO: confirm any filling description beyond chicken and veg</p>
+      </div>
+    </section>
+
+    <section class="band-quiet reveal">
+      <div class="wrap">
+        <h2 class="kicker">Wherever home is now</h2>
+        <p class="statement">For anyone far from home, a bag of momo in the freezer is a little closer.</p>
+        <p class="centered curious">New to momo? Think of a dumpling, steamed until soft, with a sauce that wakes everything up.</p>
+      </div>
+    </section>
+
+    <section class="band band-peach-tint centered reveal">
       <div class="wrap">
         <h2 class="rule">How ordering works</h2>
         <ol class="steps">
@@ -126,21 +207,39 @@
           <li><h3>Confirm</h3><p>Send your order and we confirm the pickup details with you.</p></li>
           <li><h3>Pick up and pay cash</h3><p>Pickup only. There is no delivery.</p></li>
         </ol>
-      </div>
-    </section>
-
-    <section class="band">
-      <div class="wrap">
-        <h2 class="rule">Contact</h2>
-        <p>Call or message <a href="tel:+447413069241">+44 7413 069241</a>.</p>
-        <p data-todo>TODO: pickup area and how the location is shared, to be confirmed by owner</p>
+        <p class="tag">Pickup only</p>
       </div>
     </section>
   </main>
-  <footer class="site-footer">
-    <div class="wrap footer-row">
-      <a class="phone-link" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a>
-      <p>Pickup only. Pay cash on pickup.</p>
+  <footer class="site-footer on-emerald">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <p class="footer-brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</p>
+          <p>Taste like Nepal.</p>
+        </div>
+        <div>
+          <p class="footer-title">Quick links</p>
+          <ul class="footer-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="how-to-cook.html">How to cook</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-title">Shop</p>
+          <ul class="footer-list">
+            <li><a href="shop.html?kind=pack">Momo</a></li>
+            <li><a href="shop.html?kind=addon">Sauces</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="footer-title">Get in touch</p>
+          <p><a class="phone-link" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a></p>
+          <p>Pickup only. Pay cash on pickup.</p>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; Steam &amp; Spice</p></div>
     </div>
   </footer>
   <script type="module" src="js/main.js"></script>

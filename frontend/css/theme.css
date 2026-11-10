@@ -15,27 +15,30 @@
   line-gap-override: 0%;
 }
 
-/* Design tokens. Change colours and fonts here only. All values are placeholders until branding is final. */
+/* Design tokens: Emerald & Copper (D-027). Change colours and fonts here only. Pixel values live only in this file (D-022). */
 :root {
-  --turmeric: #E3A018;   /* main accent */
-  --coriander: #5E7D3A;  /* secondary accent: borders, banners, large decoration only (low contrast for small text) */
-  --chutney: #B8321F;    /* buttons, links, highlights */
-  --white: #FFFFFF;      /* page background (D-026) */
-  --cream: #F6EBD3;      /* light tint for one or two calm bands */
-  --cream-light: #FBF4E4;
-  --charcoal: #23211E;   /* text, dark sections */
-  --clay: #8A5A3B;       /* small details */
+  --white: #FFFFFF;       /* page background, cards */
+  --emerald: #004D3B;     /* primary: headings, buttons, footer and strong bands */
+  --green: #0F8A72;       /* hover, borders, icons, large decoration; never small text */
+  --sage: #7FB99B;        /* decoration: ridge line, dividers, icon strokes; never text */
+  --green-tint: #EAF3EE;  /* hero panel, calm bands, image tiles */
+  --copper: #B87333;      /* numerals and large accents only; never small text, never a button */
+  --peach: #E8B189;       /* warm tile, kraft tag fill */
+  --peach-tint: #FBEEE2;  /* soft warm band */
+  --charcoal: #23211E;    /* body text */
+  --chutney: #B8321F;     /* chutney accent, errors, unavailable */
+  --turmeric: #E3A018;    /* small highlights only */
 
-  --line: rgba(35, 33, 30, 0.25);
-  --chutney-dark: color-mix(in srgb, var(--chutney) 80%, var(--charcoal));
-  --chalk-line: color-mix(in srgb, var(--cream) 55%, transparent);
+  --emerald-dark: color-mix(in srgb, var(--emerald) 80%, var(--charcoal));
+  --line: color-mix(in srgb, var(--charcoal) 20%, transparent);
+  --line-on-dark: color-mix(in srgb, var(--white) 25%, transparent);
   --tilt: -2deg;
   --transition: 150ms;
 
   --font-head: "Young Serif", "Young Serif Fallback", Georgia, serif;
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --max: 62rem;
+  --max: 70rem;
 
   /* Fluid type scale: phone size to desktop size, in rem. Body is --step-0. */
   --step--1: clamp(0.8rem, 0.77rem + 0.15vw, 0.9rem);
@@ -45,6 +48,7 @@
   --step-3: clamp(1.75rem, 1.4rem + 1.75vw, 2.5rem);
   --step-4: clamp(2.1rem, 1.5rem + 3vw, 3.4rem);
   --step-5: clamp(2.5rem, 1.5rem + 5vw, 4.5rem);
+  --step-6: clamp(2.75rem, 1.4rem + 5vw, 5.5rem);
 
   /* Fluid spacing scale */
   --space-3xs: clamp(0.15rem, 0.12rem + 0.15vw, 0.25rem);
@@ -61,44 +65,54 @@
   --gutter: clamp(1.25rem, 0.8rem + 2.25vw, 2.5rem);
   --wrap: var(--max);
   --measure: 60ch;
+  --band-pad: clamp(3rem, 1.8rem + 5vw, 6rem);
+  --band-pad-quiet: clamp(4rem, 2.5rem + 8vw, 9rem);
+  --card-min: 14rem;
+  --card-max: 22rem;
+  --card-max-wide: 16rem;
+  --tile-wide: 1.6fr;
+  --media-max: 36rem;
+  --photo-max: 40rem;
 
-  /* Controls */
+  /* Controls, shape and depth */
   --tap: 2.75rem;
-  --radius: 0.25rem;
+  --radius: 0.375rem;
+  --radius-lg: 1.25rem;
+  --radius-pill: 62rem;
   --hairline: 1px;
   --ring-width: 3px;
   --ring-offset: 3px;
-  --ring-color: var(--charcoal);
-  --ring-color-on-dark: var(--cream);
+  --ring-color: var(--emerald);
+  --ring-color-on-dark: var(--peach);
+  --shadow-card: 0 0.5rem 1.5rem color-mix(in srgb, var(--charcoal) 12%, transparent);
+  --shadow-cutout: drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--charcoal) 20%, transparent));
   --line-height-body: 1.6;
   --line-height-head: 1.15;
+  --line-height-display: 1.02;
+  --tracking-display: -0.01em;
 
-  /* Visual upgrade (Step 1b) */
-  --step-6: clamp(3rem, 1.4rem + 6vw, 6rem);
-  --line-height-display: 0.98;
-  --tracking-display: -0.02em;
-  --band-pad: clamp(3.5rem, 2rem + 6vw, 7rem);
-  --band-pad-quiet: clamp(5rem, 3rem + 10vw, 11rem);
+  /* Motifs, motion and sizes */
   --fold-height: clamp(1rem, 0.8rem + 1vw, 1.5rem);
-  --ridge-height: clamp(3.5rem, 2rem + 7vw, 8rem);
-  --steam-height: clamp(4rem, 3rem + 6vw, 8rem);
-  --overlap: clamp(1.5rem, 0.8rem + 4vw, 4.5rem);
-  --hero-image: clamp(10rem, 2rem + 38vw, 40rem);
+  --ridge-height: clamp(2.5rem, 1.5rem + 5vw, 5.5rem);
+  --steam-height: clamp(3.5rem, 2.5rem + 5vw, 7rem);
+  --overlap: clamp(1.5rem, 0.8rem + 4vw, 4rem);
   --badge: 1.25rem;
-  --cutout-small: clamp(10rem, 6rem + 20vw, 18rem);
-  --grain-size: 10rem;
+  --icon: 1.6rem;
+  --icon-trust: 2.25rem;
+  --brand-mark: 2rem;
+  --step-art: clamp(7rem, 4rem + 14vw, 13rem);
   --tag-pad-block: var(--space-3xs);
   --tag-pad-inline: var(--space-s);
   --tag-hole: var(--space-m);
-  --mask-on: #000; /* mask colour only: the motif shapes are masks, never painted with this */
+  --mask-on: #000; /* mask colour only: motif shapes are masks, never painted with this */
   --reveal-distance: 1.5rem;
   --reveal-duration: 700ms;
   --drift-distance: 2rem;
   --drift-duration: 10s;
-  --ratio-kitchen: 3 / 2;
+  --ratio-photo: 3 / 2;
 }
 
-/* Media queries: none are defined yet. If one is ever truly needed, use at most two widths,
-   in em units, and list them here (CSS variables cannot be used inside media queries):
-   - (none)
-   Prefer intrinsic grids and container queries instead. */
+/* Media queries: none are defined. Layout changes use intrinsic grids and container queries.
+   If one is ever truly needed, use at most two widths, in em units, and list them here
+   (CSS variables cannot be used inside media queries):
+   - (none) */

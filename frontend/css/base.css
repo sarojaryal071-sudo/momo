@@ -16,6 +16,7 @@ main { flex: 1; }
 [hidden] { display: none !important; }
 
 h1, h2, h3 {
+  color: var(--emerald);
   font-family: var(--font-head);
   line-height: var(--line-height-head);
   margin: 0 0 var(--space-xs);
@@ -27,7 +28,7 @@ h2 { font-size: var(--step-3); }
 h3 { font-size: var(--step-1); }
 
 p { margin: 0 0 var(--space-s); max-width: var(--measure); }
-a { color: var(--chutney); }
+a { color: var(--emerald); text-underline-offset: var(--space-3xs); }
 img { max-inline-size: 100%; height: auto; }
 
 .wrap { width: min(100% - 2 * var(--gutter), var(--wrap)); margin-inline: auto; }
@@ -35,7 +36,7 @@ img { max-inline-size: 100%; height: auto; }
 
 :focus-visible { outline: var(--ring-width) solid var(--ring-color); outline-offset: var(--ring-offset); }
 
-.band-dark :focus-visible, .site-footer :focus-visible, .menu-board :focus-visible { outline-color: var(--ring-color-on-dark); }
+.on-emerald :focus-visible, .on-emerald:focus-visible, .site-footer :focus-visible { outline-color: var(--ring-color-on-dark); }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
