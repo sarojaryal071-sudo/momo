@@ -123,11 +123,11 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1k — Typography and a calmer look (D-043, D-044)
 
-- [x] Fonts self-hosted with fallbacks and preloads; Young Serif removed — HASH, Instrument Serif (21,032 B) and Hanken Grotesk variable (34,704 B) with measured fallbacks (81.6% and 99.7% size-adjust), preloaded on every page; Young Serif and its licence deleted
-- [x] Roles, bigger display scale, section labels — HASH, serif only for h1, h2, statements and numerals; sans for body, h3, product names, prices (tabular), forms and buttons; display tokens 3.5-8rem hero, 2.4-4.5rem h2; uppercase labels above each section
-- [x] Section rhythm and calmer cards and buttons — HASH, section gap clamp(4rem..8rem); hairline cards with shadow on hover only (hover: hover); flat emerald buttons; tags, copper rules and kraft tag file removed
-- [x] Ambient layer and extra glass removed (glass only on menu and sheet) — HASH, ambient layer and tokens gone; header, checkout bar, chips, Add and stepper solid; backdrop-filter only on the menu layer and pills, the sheet, its backdrop and its option pills; unused tokens deleted
-- [x] Checked in own screenshots, merged to `main`, deploy confirmed — HASH, see log
+- [x] Fonts self-hosted with fallbacks and preloads; Young Serif removed — a2d6d55, Instrument Serif (21,032 B) and Hanken Grotesk variable (34,704 B) with measured fallbacks (81.6% and 99.7% size-adjust), preloaded on every page; Young Serif and its licence deleted
+- [x] Roles, bigger display scale, section labels — a2d6d55, serif only for h1, h2, statements and numerals; sans for body, h3, product names, prices (tabular), forms and buttons; display tokens 3.5-8rem hero, 2.4-4.5rem h2; uppercase labels above each section
+- [x] Section rhythm and calmer cards and buttons — a2d6d55, section gap clamp(4rem..8rem); hairline cards with shadow on hover only (hover: hover); flat emerald buttons; tags, copper rules and kraft tag file removed
+- [x] Ambient layer and extra glass removed (glass only on menu and sheet) — a2d6d55, ambient layer and tokens gone; header, checkout bar, chips, Add and stepper solid; backdrop-filter only on the menu layer and pills, the sheet, its backdrop and its option pills; unused tokens deleted
+- [x] Checked in own screenshots, merged to `main`, deploy confirmed — a2d6d55, see log
 
 ## Step 2 — Cart and order flow (mock)
 
