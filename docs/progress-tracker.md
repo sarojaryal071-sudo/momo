@@ -121,6 +121,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Ambient background layer with tokens and kill switch — 5e30314, body::before fixed layer, three radial spots from palette tokens, `--ambient-opacity` 0.18 (set to 0 to turn off); hidden for print, prefers-reduced-transparency and prefers-contrast: more
 - [x] Checked in own screenshots, merged to `main`, deploy confirmed — 5e30314, see log
 
+## Step 1k — Typography and a calmer look (D-043, D-044)
+
+- [ ] Fonts self-hosted with fallbacks and preloads; Young Serif removed
+- [ ] Roles, bigger display scale, section labels
+- [ ] Section rhythm and calmer cards and buttons
+- [ ] Ambient layer and extra glass removed (glass only on menu and sheet)
+- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code
