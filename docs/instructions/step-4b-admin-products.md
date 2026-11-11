@@ -1,15 +1,19 @@
 # Step 4b — Admin: products, options, stock, ingredients and allergens (D-009, D-031, D-046)
 
-Prerequisite: Step 3 done and verified (database, functions and the owner's two admin logins exist). Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 6, 11 and 12, `docs/technical-rulebook.md` sections 4, 5 and 7, and `docs/ui-rulebook.md` sections 2b and 5. Do only this sub-step. Add its checklist to `docs/progress-tracker.md` first.
+Prerequisite: Step 1k is merged (it is) and, for 4b and 4c, the earlier admin sub-step is merged. **Step 3 is not required** (D-048). Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 6, 11 and 12, `docs/technical-rulebook.md` sections 4, 5 and 7, and `docs/ui-rulebook.md` sections 2b and 5. Do only this sub-step. Add its checklist to `docs/progress-tracker.md` first.
 
 ## Goal
 
 She manages the shop herself: prices, stock, photos, new items, the options customers can choose, and ingredients and allergens.
 
+## Demo backend
+
+Same as in `step-4a-admin-orders.md` (D-048): use `admin/js/api.js` and the `mock` implementation, keep the rules in the shared rules module, and add the operations this step needs.
+
 ## Shared rules for every admin page (D-021 style, D-047)
 
 - Plain HTML, CSS and JavaScript; reuse `theme.css` and `base.css` (Instrument Serif for the few large headings, Hanken Grotesk everywhere else, D-043). The admin is plain, clear and **phone first**: big touch targets, one-handed use, no decoration, no glass or ambient effects.
-- Auth with the vendored, version-pinned `supabase-js` in `admin/js/vendor/`. Every admin page checks the session and that the user is in `admins` (`is_admin()`), otherwise redirects to `login.html`. The database enforces the same; the page check is only for friendliness.
+- Auth goes through `admin/js/api.js` (demo login now; Step 3 swaps in Supabase Auth with the vendored, version-pinned `supabase-js` in `admin/js/vendor/`). Every admin page checks the session, otherwise redirects to `login.html`. With the real backend the database enforces the same (`is_admin()`); the page check is only for friendliness.
 - `noindex` meta and a restrictive Content-Security-Policy on every admin page. No links to `/admin/` from public pages. No analytics.
 - Money in integer pence; show as £10 or £10.50. UK English. Limits, intervals and names are named constants in one admin config file.
 - Never hard-delete orders. Customer text is always inserted as text, never as HTML.
@@ -27,7 +31,7 @@ She manages the shop herself: prices, stock, photos, new items, the options cust
 
 Hard-delete products (set inactive instead), let a price be negative, let an option price change reduce the price below zero, or trust the browser for stock rules (the database does).
 
-## Verify (live run)
+## Verify (live run in demo mode)
 
 - Edit a price, availability and stock; the public shop updates after the rebuild (prices and availability) or at once on the cart (stock). Add a new item with a photo; it appears on the shop with the right card.
 - Add an option group and options with a price change; they appear in the product window with the right total; a non-default choice shows the customised note.

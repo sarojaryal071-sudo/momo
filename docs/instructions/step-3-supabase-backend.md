@@ -2,6 +2,8 @@
 
 Prerequisite: Step 2 done. Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 7 and the technical rulebook sections 2, 3 and 5 first. Do only this step.
 
+> **Order change (D-048):** the admin screens (Steps 4a to 4c) are built first on a demo backend. This step therefore also **connects the admin to Supabase**: implement the `supabase` side of `admin/js/api.js` (replacing the stub), add Supabase Auth login with the two admin users and the vendored, version-pinned `supabase-js` in `admin/js/vendor/`, optional two-step login (TOTP), and run the same behaviour checks the mock rules tests describe against the real database. Switch `siteConfig.backend` to `supabase` only at the end, keep `mock` selectable for local work, and remove the demo banner and demo accounts from production.
+
 ## Goal
 
 Real orders: the site saves each order in a database, assigns the order number (`SS-DDMM-NN`, D-032) and emails the owner (D-037). The order is placed on the site; the customer does not have to send a WhatsApp message (D-036). The shop reads real products at build time and real pickup rules at runtime.

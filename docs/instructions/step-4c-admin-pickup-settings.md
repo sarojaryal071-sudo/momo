@@ -1,15 +1,19 @@
 # Step 4c — Admin: pickup, settings, notice, export, manual orders, home screen (D-034, D-038, D-045, D-047)
 
-Prerequisite: Step 3 done and verified (database, functions and the owner's two admin logins exist). Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 6, 11 and 12, `docs/technical-rulebook.md` sections 4, 5 and 7, and `docs/ui-rulebook.md` sections 2b and 5. Do only this sub-step. Add its checklist to `docs/progress-tracker.md` first.
+Prerequisite: Step 1k is merged (it is) and, for 4b and 4c, the earlier admin sub-step is merged. **Step 3 is not required** (D-048). Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 6, 11 and 12, `docs/technical-rulebook.md` sections 4, 5 and 7, and `docs/ui-rulebook.md` sections 2b and 5. Do only this sub-step. Add its checklist to `docs/progress-tracker.md` first.
 
 ## Goal
 
 The rest of what she controls, and the last convenience features. After this step the admin is complete.
 
+## Demo backend
+
+Same as in `step-4a-admin-orders.md` (D-048): use `admin/js/api.js` and the `mock` implementation, keep the rules in the shared rules module, and add the operations this step needs.
+
 ## Shared rules for every admin page (D-021 style, D-047)
 
 - Plain HTML, CSS and JavaScript; reuse `theme.css` and `base.css` (Instrument Serif for the few large headings, Hanken Grotesk everywhere else, D-043). The admin is plain, clear and **phone first**: big touch targets, one-handed use, no decoration, no glass or ambient effects.
-- Auth with the vendored, version-pinned `supabase-js` in `admin/js/vendor/`. Every admin page checks the session and that the user is in `admins` (`is_admin()`), otherwise redirects to `login.html`. The database enforces the same; the page check is only for friendliness.
+- Auth goes through `admin/js/api.js` (demo login now; Step 3 swaps in Supabase Auth with the vendored, version-pinned `supabase-js` in `admin/js/vendor/`). Every admin page checks the session, otherwise redirects to `login.html`. With the real backend the database enforces the same (`is_admin()`); the page check is only for friendliness.
 - `noindex` meta and a restrictive Content-Security-Policy on every admin page. No links to `/admin/` from public pages. No analytics.
 - Money in integer pence; show as £10 or £10.50. UK English. Limits, intervals and names are named constants in one admin config file.
 - Never hard-delete orders. Customer text is always inserted as text, never as HTML.
@@ -27,7 +31,7 @@ The rest of what she controls, and the last convenience features. After this ste
 
 Add roles beyond the two-admin allowlist, hard-delete orders, add push notifications, a service worker, analytics, or customer accounts.
 
-## Verify (live run)
+## Verify (live run in demo mode)
 
 - Edit pickup rules and add a closed date and an extra day; confirm the cart's date and time choices change and the admin preview matches.
 - Set the daily limit to 1, place an order for a date, and confirm that date disappears from the cart list and the function refuses a direct attempt. Clear the limit.

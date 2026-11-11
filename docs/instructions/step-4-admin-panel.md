@@ -6,4 +6,4 @@ The admin panel is built in **three sub-steps**, in this order. Each is merged a
 2. `step-4b-admin-products.md` — products, photos, stock, options, ingredients and allergens.
 3. `step-4c-admin-pickup-settings.md` — pickup windows, settings, notice, daily limit, export, manual orders, home screen.
 
-Prerequisite for all three: Step 3 is done and verified (see `step-3-supabase-backend.md`), including the two admin logins. Each sub-step file lists its own prerequisites, rules, verification and report. This file replaces the earlier single Step 4 and keeps nothing else.
+**Order change (D-048):** the admin is built first on the demo backend (`mock`), so Step 3 is not a prerequisite. Step 3 afterwards connects Supabase to both the public site and the admin. Each sub-step file lists its own prerequisites, rules, verification and report. This file replaces the earlier single Step 4 and keeps nothing else.
