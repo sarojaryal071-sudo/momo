@@ -51,12 +51,13 @@ Nothing visual is hard-coded. Everything scales smoothly with the screen and is 
 - Text scales with the user's browser setting: never set font sizes in `px`, and the page must remain usable at 200 percent zoom and at widths from 320 px up.
 - Colours, sizes, radii, shadows (if any), durations and z-indexes: tokens, not literals.
 
-## 3. Typography and texture
+## 3. Typography and texture (D-043, D-044)
 
-- Headings: one self-hosted open-licence serif (decision D-025) with the existing serif stack as fallback in `--font-head`. Body: system sans (`--font-body`). No other web-font downloads. Story, voice and motifs: `docs/brand-direction.md`.
-- No paper grain on the white page (decision D-026). Texture only on the chalkboard panel and the kraft tags.
-- Chalk-style underline or hand-drawn rule under key headings, done with CSS or a small inline SVG, not an image dependency.
-- Large, confident headings; short lines; generous spacing. Body copy max about 60 characters wide.
+- **Two families, both self-hosted** (SIL OFL, Latin subsets, `font-display: swap`, size-matched fallbacks, preloaded; licences next to the files): **Instrument Serif** (400, never faux-bold) for h1, h2, large statements and step numerals, never below about 1.6 rem; **Hanken Grotesk** (variable weight) for everything else: body (400, about 1.0625 rem fluid), navigation, buttons (600), labels, h3 and card titles, product names (600) and prices (600, tabular figures), forms. The receipt keeps its monospace face. Tokens: `--font-head`, `--font-body`, `--font-mono`. Young Serif is retired.
+- **Display sizes are large and tight** (fluid tokens): hero h1 `--display-1`, page h1 `--display-page`, h2 `--display-2`; line-height 0.95 to 1, letter-spacing about -0.01em; headings use `text-wrap: balance`, paragraphs `text-wrap: pretty`, measure about 60ch.
+- **Section labels:** a small uppercase Hanken 600 label (letter-spacing about 0.18em, not below 0.8 rem) above each section heading, emerald on white and tints, peach on emerald; never copper, mid-green or sage for small text. Only words already on the page or in `docs/brand-direction.md`.
+- No paper grain, no ambient background, no decorative extras that fight the type. Glass only on the full-screen menu and the product sheet (with its backdrop and option pills); the header, checkout bar, chips and card controls are solid.
+- Large, confident headings; short lines; generous spacing.
 
 ## 4. Layout
 

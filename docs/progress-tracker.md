@@ -3,7 +3,7 @@
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
 - Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1j done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
+- Current step: **Step 1k done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
 - Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -123,11 +123,11 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1k — Typography and a calmer look (D-043, D-044)
 
-- [ ] Fonts self-hosted with fallbacks and preloads; Young Serif removed
-- [ ] Roles, bigger display scale, section labels
-- [ ] Section rhythm and calmer cards and buttons
-- [ ] Ambient layer and extra glass removed (glass only on menu and sheet)
-- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+- [x] Fonts self-hosted with fallbacks and preloads; Young Serif removed — HASH, Instrument Serif (21,032 B) and Hanken Grotesk variable (34,704 B) with measured fallbacks (81.6% and 99.7% size-adjust), preloaded on every page; Young Serif and its licence deleted
+- [x] Roles, bigger display scale, section labels — HASH, serif only for h1, h2, statements and numerals; sans for body, h3, product names, prices (tabular), forms and buttons; display tokens 3.5-8rem hero, 2.4-4.5rem h2; uppercase labels above each section
+- [x] Section rhythm and calmer cards and buttons — HASH, section gap clamp(4rem..8rem); hairline cards with shadow on hover only (hover: hover); flat emerald buttons; tags, copper rules and kraft tag file removed
+- [x] Ambient layer and extra glass removed (glass only on menu and sheet) — HASH, ambient layer and tokens gone; header, checkout bar, chips, Add and stepper solid; backdrop-filter only on the menu layer and pills, the sheet, its backdrop and its option pills; unused tokens deleted
+- [x] Checked in own screenshots, merged to `main`, deploy confirmed — HASH, see log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -234,6 +234,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 ## Verification log (append one line per check: date, step, what was run, what was seen)
 
 - 2026-11-10, planning: docs pushed, no code yet.
+- 2026-11-11, step 1k: `npm test` 33 pass, `npm run build` passes (no test changed). Own screenshots of home, shop, cart, done and how to cook at 390 and 1440 px, plus the open menu and sheet at 390 px, opened and checked. Hero h1 fits at 360 px (269 of 318 px panel, no horizontal overflow, 60.8 px). Forms and buttons use Hanken Grotesk. With the font files delayed 1.8 s the h1, lead and hero heights are identical before and after load (390: 120 / 94 / 713 px, 1440: 243 / 74 / 501 px) and CLS is 0.0000. backdrop-filter appears only in the menu, the sheet and its option pills. Fonts 21,032 B + 34,704 B = 55,736 B. Home at 390 px: 311 KB raw before scrolling over 26 requests (326 KB after a full scroll, 27 requests); gzip estimate is meaningless for the WebP images. Labels: emerald on white 9.88, on green-tint 8.73, on peach-tint 8.67, on peach 5.22; peach on emerald 5.22.
 - 2026-11-10, step 1j: `npm test` 33 pass, `npm run build` passes (no test changed). Cart: steppers are 137 px wide and share one x per column at 1440 (518), 1024 (234) and 768 (400); at 390 the lines wrap as before; two columns at 1440 and 1024 (form card 352 px with the card shadow), single column at 768 and 390; h1 sits 58, 53, 45 and 34 px below the header; no horizontal overflow; form inputs now fill the card. Ambient: fixed layer, opacity 0.18, pointer-events none, z-index -1; with `--ambient-opacity: 0` computed opacity is 0; hidden in print and with prefers-contrast: more; CLS 0.0000 after a full scroll at 360 px. Contrast of charcoal on the strongest spot centre (emerald 18% over white): 11.70 (emerald text 7.20, chutney errors 4.35, only where an error sits on bare page in the top-left corner).
 - 2026-11-10, step 1i: `npm test` 33 pass, `npm run build` passes (no test changed). Own 390 px screenshots opened and checked. Menu: wordmark, cart and a 48 px glass X at the top; pills centred (gaps about 180 px above and 200 px below the group, none of it flat colour); blurred page shows faintly through the 90% emerald layer; pills have hairline light borders and soft shadows, no thick edges; white text 5.61 (pill), 5.06 (hover), 4.75 (current page), 7.52 on the layer over a white page. Sheet: touch open leaves focus on the panel and X outline none; light glass, 545 px tall for its content (not 85dvh), footer pinned at the bottom edge, no empty gap; option pills are on-light glass, selected pill is solid emerald with a tick; stepper is a glass pill with round buttons and dimmed minus. Keyboard: rings on menu pills (peach), X, option pills, stepper, Add and chips (emerald); Tab wraps inside the open menu. Reduced motion: menu opens instantly (transition 0s), sheet animation none, pill translate none. Without backdrop-filter (simulated): menu layer solid emerald, pills solid (white 5.44), sheet solid white, all readable. No horizontal overflow at 360, 390 and 1280 px; wide header unchanged.
 - 2026-11-10, step 1h: `npm test` 33 pass, `npm run build` passes (no test changed). 360 px: menu overlay covers 360x740, focus on the panel with no ring after a tap, first link focused with a ring after Enter, Escape and link tap close it and return state, page scroll locked while open, pills have a sage solid edge, current page pill is peach; wide header still inline with plain links. Options: five compact pills in rows (63 to 137 px wide, 44 px high), tap selects with tick, tap again removes, note and total update. Receipt: edges, number, time, name, pickup, option line, total, Download gives steam-and-spice-SS-TEST-01.txt, print emulation hides header, footer, buttons and next steps and leaves the receipt (PDF 34 KB), Print button calls window.print. No horizontal overflow on five pages at 360 and 1280 px; reduced motion opens the menu instantly.

@@ -18,17 +18,15 @@
 .site-footer::before { content: ""; position: absolute; inset-inline: 0; inset-block-end: 100%; block-size: var(--ridge-height); color: var(--sage); }
 
 /* Display type */
-.display { font-size: var(--step-6); line-height: var(--line-height-display); letter-spacing: var(--tracking-display); margin-block-end: var(--space-s); }
-.display-2 { font-size: var(--step-5); line-height: var(--line-height-display); letter-spacing: var(--tracking-display); }
+.display { font-size: var(--display-1); line-height: var(--line-height-display); letter-spacing: var(--tracking-display); margin-block-end: var(--space-s); }
+.display-2 { font-size: var(--display-2); line-height: var(--line-height-h2); letter-spacing: var(--tracking-display); }
 h2 { letter-spacing: var(--tracking-display); }
 .lead { font-size: var(--step-1); }
-.eyebrow { margin: 0 0 var(--space-xs); font-size: var(--step--1); font-weight: 700; letter-spacing: 0.14em; color: var(--emerald); }
-.statement { font-family: var(--font-head); font-size: var(--step-4); line-height: 1.1; letter-spacing: var(--tracking-display); color: var(--emerald); max-inline-size: 24ch; margin: 0 auto; text-align: center; }
-.kicker { margin-block-end: var(--space-m); text-align: center; font-size: var(--step-1); }
+.eyebrow { margin: 0 0 var(--space-xs); font-size: var(--step--1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--emerald); }
+.band-emerald .eyebrow, .tile-emerald .eyebrow { color: var(--peach); }
+.statement { font-size: var(--display-2); line-height: var(--line-height-h2); letter-spacing: var(--tracking-display); color: var(--emerald); max-inline-size: 22ch; margin: 0 auto; text-align: center; }
 .centered { text-align: center; }
 .centered p, p.centered { margin-inline: auto; text-align: center; }
-.rule::after { content: ""; display: block; inline-size: var(--space-2xl); block-size: var(--ring-width); margin-block-start: var(--space-2xs); background: var(--copper); border-radius: var(--radius); }
-.centered .rule::after { margin-inline: auto; }
 
 /* Vertical rhythm: one gap between major sections, so no two coloured blocks touch. Coloured bands pad their own content. */
 .flow > section + section { margin-block-start: var(--section-gap); }
@@ -113,11 +111,11 @@ h2 { letter-spacing: var(--tracking-display); }
 }
 
 /* How ordering works: calm row on the warm tint */
-.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--space-l); margin: 0 0 var(--space-m); padding: 0; list-style: none; counter-reset: step; justify-items: center; text-align: center; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--space-l); margin: 0 0 var(--space-m); padding: 0; list-style: none; counter-reset: step; }
 .steps li { counter-increment: step; }
-.steps li::before { content: counter(step); display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap); margin: 0 auto var(--space-xs); background: var(--emerald); color: var(--white); font: 400 var(--step-2) var(--font-head); border-radius: var(--radius); }
+.steps li::before { content: counter(step); display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap); margin: 0 0 var(--space-xs); background: var(--emerald); color: var(--white); font: 400 var(--step-2) var(--font-head); border-radius: var(--radius); }
 .steps h3 { margin-block-end: var(--space-3xs); }
-.steps p { margin-inline: auto; }
+
 
 /* Shop and how to cook headers */
 .page-head { padding-block: var(--space-xl) var(--space-l); }
