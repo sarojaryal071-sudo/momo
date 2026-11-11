@@ -9,7 +9,7 @@ Real orders: the site saves each order in a database, assigns the order number (
 ## Owner actions first (list them clearly in your first message to the owner, then wait)
 
 1. Create a Supabase project (free tier) and note the project URL and anon key.
-2. In Authentication settings, **disable public sign-ups**. Create one admin user (the owner's email and a strong password).
+2. In Authentication settings, **disable public sign-ups**. Create two admin users: the owner (her email) and the developer, each with a strong password; both are added to `admins` by a documented SQL statement.
 3. Choose the email provider and create an API key (suggestion: Resend free tier). The owner's email address goes only into a Supabase function secret.
 4. Create a fine-grained GitHub token limited to this repository with permission to run workflows. It goes only into a Supabase function secret.
 5. Add repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values) in GitHub.
@@ -42,6 +42,15 @@ Read `docs/architecture-rulebook.md` section 11 first. In addition to the list a
 - Seed: the sauces and momo get a few sample option groups only if the owner has listed them; otherwise seed none. Stock seeded with a sample quantity marked as sample.
 - Frontend: replace the mock option, stock and lead-time sources from Step 1f with the real ones (runtime `fetch` with the anon key; keep the mock selectable).
 - Tests: a tampered option price is ignored; an option from another product is rejected; two simultaneous orders for the last item let only one succeed and the stock never goes below 0; a customised order inside the custom notice period is rejected and a standard order is not; a customised order does not lower stock.
+
+## Added by decisions D-045 to D-047 (admin additions)
+
+Read `docs/architecture-rulebook.md` section 12 first. In addition to the list above:
+- Migrations for the new columns (`products.ingredients_text`, `products.allergens`, `products.allergen_note`, `orders.source`) and the new settings keys (public: `ordering_open`, `ordering_closed_message`; private: `max_orders_per_day`, `wa_template_*`, `pickup_address_text`, with row-level security so anonymous users can read only the public keys).
+- SQL functions `set_order_status`, `create_manual_order` and `full_pickup_dates` as described; revoke direct `update` of `orders.status` from the admin role so the function is the only path. `place_order` and the `place-order` edge function also check `ordering_open` and the full-date rule.
+- Seed: `ordering_open` true; `wa_template_*` with plain starter wording (marked sample, for example "Hi {name}, your order {order_number} is confirmed for {pickup}.") and an empty `pickup_address_text`.
+- Frontend (runtime, anon key): the cart reads `ordering_open` and its message (disable "Place order" and show the message when closed) and `full_pickup_dates` (hide full dates in the date list). The build fills ingredients, allergens and the note into the product window and JSON-LD; with no data it keeps the `TODO:` marker.
+- Tests: two simultaneous orders respect `max_orders_per_day`; a full date and a paused shop are refused by the function; `set_order_status` returns and re-takes stock exactly once, even if called twice; anonymous users cannot read private settings or call the admin functions.
 
 ## Do not
 

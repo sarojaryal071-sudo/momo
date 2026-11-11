@@ -161,3 +161,14 @@ Extends sections 4 to 6.
 - Stock and options are read by the browser at runtime (public `select`, active rows only) so a stale static page never shows the wrong stock. Option groups and options may also be rendered into the HTML at build time as the no-JavaScript fallback, but runtime data wins.
 
 **Security.** Option tables and `product_stock`: anyone may `select` (options only where `active`); only admins write. Stock is lowered only by `place_order` (security definer), never by the browser.
+
+## 12. Admin additions (D-045 to D-047)
+
+Extends sections 4 to 6.
+
+- `products` gains `ingredients_text` (nullable text), `allergens` (text array of the 14 UK allergen keys: celery, gluten, crustaceans, eggs, fish, lupin, milk, molluscs, mustard, tree_nuts, peanuts, sesame, soya, sulphites) and `allergen_note` (nullable text). The build writes them into the product window and the Product JSON-LD; the products webhook covers them.
+- `orders` gains `source` (`website` or `manual`).
+- `settings` gains public keys `ordering_open` (boolean, default true) and `ordering_closed_message`; and **private** (admin-only) keys `max_orders_per_day` (integer or null), `wa_template_confirmed`, `wa_template_ready`, `wa_template_cancelled`, `pickup_address_text`. Templates may contain `{name}`, `{order_number}`, `{pickup}`, `{items}`, `{address}`.
+- SQL functions (security definer, admin only unless stated): `set_order_status(order_id, status)` is the **only** way an admin changes a status; moving to `cancelled` returns the stock of standard lines, moving out of `cancelled` takes it again (and fails if there is not enough), all in one transaction, and the same change is never applied twice. `create_manual_order(...)` reuses the `place_order` logic with `source = 'manual'`, no honeypot, rate limit or lead-time check. `full_pickup_dates(from_date, to_date)` is public and returns only dates (no personal data) where the number of non-cancelled orders has reached `max_orders_per_day`.
+- `place-order` also refuses when `ordering_open` is false or the pickup date is full.
+- Two rows in `admins`; the admin panel and database check `is_admin()` on every request.
