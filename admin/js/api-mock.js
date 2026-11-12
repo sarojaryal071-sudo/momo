@@ -47,6 +47,7 @@ export const mockApi = {
   getPickup: () => store.getPickup(),
   saveRule: (r) => store.saveRule(r),
   deleteRule: (id) => store.deleteRule(id),
+  saveWeek: (rows) => store.saveWeek(rows),
   setSlotMinutes: (m) => store.setSlotMinutes(m),
   saveException: (e) => store.saveException(e),
   deleteException: (id) => store.deleteException(id),

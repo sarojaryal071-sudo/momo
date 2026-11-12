@@ -4,7 +4,7 @@
 import { getPickupOptions, noticeText, ukParts } from './pickup.js';
 import { siteConfig } from './site-config.js';
 import { toWhatsAppNumber } from './whatsapp.js';
-import { SETTING_FIELDS, slugify, validateAllergenName, validateChecked, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from './admin-rules.js';
+import { SETTING_FIELDS, slugify, validateAllergenName, validateChecked, validateException, validateWindows, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from './admin-rules.js';
 
 export const STORE_KEY = 'ss-store-v2';
 export const STATUSES = ['new', 'confirmed', 'ready', 'collected', 'cancelled'];
@@ -388,6 +388,18 @@ export function saveRule(state, rule) {
   const existing = rule.id && withIds(state.pickup.rules).find((r) => r.id === rule.id);
   if (existing) Object.assign(existing, row); else state.pickup.rules.push({ id: `r-${RANDOM_ID()}`, ...row });
 }
+// The whole week at once, all or nothing (the database does the same in one transaction): nothing changes if any row is refused.
+export function saveWeek(state, rows) {
+  const byDay = new Map();
+  for (const r of rows) {
+    const error = validateRule(r) || validateSlot(r.slot_minutes ?? 1);
+    if (error) fail(error);
+    if (!byDay.has(r.weekday)) byDay.set(r.weekday, []);
+    byDay.get(r.weekday).push({ start: r.start_time, end: r.end_time });
+  }
+  for (const list of byDay.values()) { const e = validateWindows(list); if (e) fail(e); }
+  state.pickup.rules = rows.map((r) => ({ id: `r-${RANDOM_ID()}`, weekday: r.weekday, start_time: r.start_time, end_time: r.end_time, slot_minutes: r.slot_minutes ?? 1, active: true }));
+}
 export function deleteRule(state, id) { state.pickup.rules = state.pickup.rules.filter((r) => r.id !== id); }
 export function setSlotMinutes(state, minutes) {
   const error = validateSlot(minutes);
@@ -480,6 +492,7 @@ export function createMock({ storage = null, loadSeed, now = () => new Date() } 
     getPickup: () => change((s) => adminPickup(s)),
     saveRule: (r) => change((s) => saveRule(s, r)),
     deleteRule: (id) => change((s) => deleteRule(s, id)),
+    saveWeek: (rows) => change((s) => saveWeek(s, rows)),
     setSlotMinutes: (m) => change((s) => setSlotMinutes(s, m)),
     saveException: (e) => change((s) => saveException(s, e)),
     deleteException: (id) => change((s) => deleteException(s, id)),

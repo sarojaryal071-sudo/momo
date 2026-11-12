@@ -81,3 +81,34 @@ test('the CSV has options, the customised flag, source and status, and cannot ru
   assert.match(header, /^Order number,Status,Source,/);
   assert.match(row, /^SS-1311-01,new,manual,2026-11-13,2026-11-14,10:30,'=cmd\|x,07700 900123,"2 x Frozen chicken momo \[Hot, No onion\] \(customised\); 1 x Chutney pot",yes,"a, ""b""\nc",20\.50/);
 });
+
+test('weekly hours: rows group into shared windows and per-day exceptions, and flatten back', async () => {
+  const { groupWeek, flattenWeek, validateWeek, weekSummary } = await import('../frontend/js/admin-rules.js');
+  const rows = [
+    { weekday: 6, start_time: '10:00:00', end_time: '13:00:00', slot_minutes: 1, active: true }, { weekday: 6, start_time: '16:00:00', end_time: '19:00:00', slot_minutes: 1, active: true },
+    { weekday: 0, start_time: '10:00:00', end_time: '13:00:00', slot_minutes: 1, active: true }, { weekday: 0, start_time: '16:00:00', end_time: '19:00:00', slot_minutes: 1, active: true },
+    { weekday: 5, start_time: '17:00', end_time: '20:00', slot_minutes: 1, active: true }, { weekday: 3, start_time: '09:00', end_time: '10:00', active: false },
+  ];
+  const week = groupWeek(rows);
+  assert.deepEqual([...week.open].sort(), [0, 5, 6]);
+  assert.deepEqual(week.shared, [{ start: '10:00', end: '13:00' }, { start: '16:00', end: '19:00' }]);
+  assert.deepEqual(week.custom, { 5: [{ start: '17:00', end: '20:00' }] });
+  const flat = flattenWeek(week);
+  assert.equal(flat.length, 5);
+  assert.deepEqual(flat.filter((r) => r.weekday === 5).map((r) => [r.start_time, r.end_time]), [['17:00', '20:00']]);
+  assert.equal(validateWeek(week), null);
+  assert.equal(weekSummary(week), 'Open Sat and Sun, 10:00 to 13:00 and 16:00 to 19:00; Fri, 17:00 to 20:00.');
+  assert.equal(weekSummary({ open: new Set([1, 2, 3, 4, 5]), shared: [{ start: '10:00', end: '18:00' }], custom: {}, slot: 1 }), 'Open Mon to Fri, 10:00 to 18:00.');
+  assert.equal(weekSummary({ open: new Set(), shared: [], custom: {}, slot: 1 }), 'Closed all week.');
+  assert.equal(groupWeek([]).open.size, 0);
+});
+test('weekly hours: validation of windows', async () => {
+  const { validateWindows, validateWeek } = await import('../frontend/js/admin-rules.js');
+  assert.match(validateWindows([]), /at least one/);
+  assert.match(validateWindows([{ start: '', end: '18:00' }]), /both times/);
+  assert.match(validateWindows([{ start: '18:00', end: '10:00' }]), /before "To"/);
+  assert.match(validateWindows([{ start: '10:00', end: '14:00' }, { start: '13:00', end: '18:00' }]), /overlaps/);
+  assert.equal(validateWindows([{ start: '10:00', end: '13:00' }, { start: '13:00', end: '18:00' }]), null);
+  assert.match(validateWeek({ open: new Set([6]), shared: [{ start: '10:00', end: '14:00' }, { start: '12:00', end: '15:00' }], custom: {}, slot: 1 }), /overlaps/);
+  assert.match(validateWeek({ open: new Set([6]), shared: [], custom: { 6: [{ start: '12:00', end: '11:00' }] }, slot: 1 }), /Saturday's hours/);
+});

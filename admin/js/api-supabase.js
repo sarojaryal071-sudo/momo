@@ -248,6 +248,12 @@ export const supabaseApi = {
     const row = { weekday: rule.weekday, start_time: rule.start_time, end_time: rule.end_time, slot_minutes: rule.slot_minutes ?? 1, active: rule.active !== false };
     unwrap(rule.id ? await sb.from('pickup_rules').update(row).eq('id', rule.id) : await sb.from('pickup_rules').insert(row));
   },
+  // The whole week in one transaction (database function replace_pickup_rules): a failure leaves the old hours untouched.
+  async saveWeek(rows) {
+    const sb = await loadClient();
+    for (const r of rows) { const error = validateRule(r) || validateSlot(r.slot_minutes ?? 1); if (error) refuse(error); }
+    unwrap(await sb.rpc('replace_pickup_rules', { p_rules: rows.map((r) => ({ weekday: r.weekday, start_time: r.start_time, end_time: r.end_time, slot_minutes: r.slot_minutes ?? 1 })) }));
+  },
   async deleteRule(id) { const sb = await loadClient(); unwrap(await sb.from('pickup_rules').delete().eq('id', id)); },
   async setSlotMinutes(minutes) {
     const sb = await loadClient();

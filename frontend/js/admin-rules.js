@@ -170,3 +170,79 @@ export function ordersToCsv(orders) {
   ]);
   return `﻿${[CSV_HEADER, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')}\r\n`;
 }
+
+// ---- weekly pickup hours (D-063): day chips plus shared opening windows ----
+// A week model: { open: Set of weekdays (Sunday = 0), shared: [{ start, end }], custom: { [weekday]: [{ start, end }] }, slot: minutes }.
+export const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Monday first
+export const DAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DEFAULT_WINDOW = { start: '10:00', end: '18:00' };
+const t5 = (t) => String(t || '').slice(0, 5);
+const sortWindows = (list) => [...list].sort((a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end));
+const keyOf = (list) => sortWindows(list).map((w) => `${w.start}-${w.end}`).join('|');
+
+// Rows from the database (pickup_rules) into the week model. The shared windows are the most common set among open days;
+// days with a different set keep their own windows.
+export function groupWeek(rules) {
+  const byDay = new Map();
+  for (const r of rules.filter((x) => x.active !== false)) {
+    if (!byDay.has(r.weekday)) byDay.set(r.weekday, []);
+    byDay.get(r.weekday).push({ start: t5(r.start_time), end: t5(r.end_time) });
+  }
+  const slot = rules[0]?.slot_minutes ?? 1;
+  if (!byDay.size) return { open: new Set(), shared: [{ ...DEFAULT_WINDOW }], custom: {}, slot };
+  const counts = new Map();
+  for (const list of byDay.values()) counts.set(keyOf(list), (counts.get(keyOf(list)) || 0) + 1);
+  const common = [...counts].sort((a, b) => b[1] - a[1])[0][0];
+  let shared = null; const custom = {};
+  for (const [day, list] of byDay) { if (keyOf(list) === common) shared ??= sortWindows(list); else custom[day] = sortWindows(list); }
+  return { open: new Set(byDay.keys()), shared, custom, slot };
+}
+
+// The week model back into one row per open day and window.
+export function flattenWeek(week) {
+  const rows = [];
+  for (const day of WEEK_ORDER) {
+    if (!week.open.has(day)) continue;
+    for (const w of sortWindows(week.custom[day] ?? week.shared)) rows.push({ weekday: day, start_time: w.start, end_time: w.end, slot_minutes: week.slot ?? 1, active: true });
+  }
+  return rows;
+}
+
+// A window list: every window needs both times, From before To, and no two may overlap. Returns a message or null.
+export function validateWindows(list, who = 'The opening windows') {
+  if (!list.length) return `${who}: add at least one window.`;
+  for (const w of list) {
+    if (!HHMM.test(w.start || '') || !HHMM.test(w.end || '')) return `${who}: fill in both times for every window.`;
+    if (minutesOf(w.end) <= minutesOf(w.start)) return `${who}: "From" must be before "To" (${w.start} to ${w.end}).`;
+  }
+  const sorted = sortWindows(list);
+  for (let i = 1; i < sorted.length; i++) if (minutesOf(sorted[i].start) < minutesOf(sorted[i - 1].end)) return `${who}: ${sorted[i - 1].start} to ${sorted[i - 1].end} overlaps ${sorted[i].start} to ${sorted[i].end}.`;
+  return null;
+}
+// null when fine. An empty week is not an error (it asks for confirmation on screen): check week.open.size for that.
+export function validateWeek(week) {
+  if (!week.open.size) return null;
+  const usesShared = WEEK_ORDER.some((d) => week.open.has(d) && !week.custom[d]);
+  if (usesShared) { const e = validateWindows(week.shared); if (e) return e; }
+  for (const d of WEEK_ORDER) if (week.open.has(d) && week.custom[d]) { const e = validateWindows(week.custom[d], `${WEEKDAYS[d]}'s hours`); if (e) return e; }
+  return null;
+}
+
+const windowsText = (list) => sortWindows(list).map((w) => `${w.start} to ${w.end}`).join(' and ');
+// "Open Mon to Fri 10:00 to 18:00", "Open Sat and Sun, 10:00 to 18:00", "Closed all week".
+export function weekSummary(week) {
+  const days = WEEK_ORDER.filter((d) => week.open.has(d));
+  if (!days.length) return 'Closed all week.';
+  const runs = []; let run = [];
+  const flush = () => { if (run.length >= 3) runs.push(`${DAY_SHORT[run[0]]} to ${DAY_SHORT[run[run.length - 1]]}`); else run.forEach((d) => runs.push(DAY_SHORT[d])); run = []; };
+  for (const d of days) { const prev = run[run.length - 1]; if (prev !== undefined && WEEK_ORDER.indexOf(d) === WEEK_ORDER.indexOf(prev) + 1) run.push(d); else { flush(); run = [d]; } }
+  flush();
+  const list = (xs) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+  const sharedDays = days.filter((d) => !week.custom[d]);
+  const parts = [];
+  if (sharedDays.length) { const sr = []; let r2 = []; const fl = () => { if (r2.length >= 3) sr.push(`${DAY_SHORT[r2[0]]} to ${DAY_SHORT[r2[r2.length - 1]]}`); else r2.forEach((d) => sr.push(DAY_SHORT[d])); r2 = []; };
+    for (const d of sharedDays) { const prev = r2[r2.length - 1]; if (prev !== undefined && WEEK_ORDER.indexOf(d) === WEEK_ORDER.indexOf(prev) + 1) r2.push(d); else { fl(); r2 = [d]; } } fl();
+    parts.push(`${list(sr)}, ${windowsText(week.shared)}`); }
+  for (const d of days) if (week.custom[d]) parts.push(`${DAY_SHORT[d]}, ${windowsText(week.custom[d])}`);
+  return `Open ${parts.join('; ')}.`;
+}

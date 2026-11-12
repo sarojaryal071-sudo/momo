@@ -395,8 +395,8 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 /* Cause of the floating Save bar: the scrolling area already has bottom padding that clears the tab bar, and sticky offsets are measured
    inside that padding, so adding the tab bar height again lifted the bar by about its own height. While editing, the padding is exactly
    the tab bar height and the sticky offset is 0, so the bar sits directly on the tab bar, scrolled or at the end of the form. */
-.admin-body.is-editing:not(.login-body) > .admin-main { padding-block-end: var(--bottom-h, var(--tabbar-h)); }
-@media (min-width: 48em) { .allergens { grid-template-columns: repeat(3, minmax(0, 1fr)); } .action-sticky { inset-block-end: var(--space-xs); } .admin-body.is-editing:not(.login-body) > .admin-main { padding-block-end: var(--space-m); } }
+.admin-body.is-editing:not(.login-body) > .admin-main, .admin-body.has-actionbar:not(.login-body) > .admin-main { padding-block-end: var(--bottom-h, var(--tabbar-h)); }
+@media (min-width: 48em) { .allergens { grid-template-columns: repeat(3, minmax(0, 1fr)); } .action-sticky { inset-block-end: var(--space-xs); } .admin-body.is-editing:not(.login-body) > .admin-main, .admin-body.has-actionbar:not(.login-body) > .admin-main { padding-block-end: var(--space-m); } }
 .reminder { margin: 0 0 var(--space-s); padding-inline-start: var(--space-xs); border-inline-start: var(--space-3xs) solid var(--emerald); font-weight: 600; font-size: var(--text-small); }
 .check-required { font-weight: 700; }
 .tag-add { display: flex; gap: var(--space-xs); margin-block-end: var(--space-xs); }
@@ -409,3 +409,19 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .allergen-row { display: grid; gap: var(--space-xs); padding-block: var(--space-xs); border-block-end: var(--hairline) solid var(--line); }
 .allergen-row input { min-inline-size: 0; min-block-size: var(--tap); padding-inline: var(--space-xs); font-size: var(--text-input); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); background: var(--white); }
 .allergen-add { border-block-end: 0; }
+
+/* Step 4h: weekly hours */
+.day-chips { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-block-end: var(--space-s); }
+.day-chip { min-inline-size: calc(var(--tap) * 1.15); justify-content: center; }
+.day-chip[aria-pressed="true"]::before { content: "\2713"; margin-inline-end: var(--space-3xs); }
+.window-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: var(--space-xs); align-items: end; padding-block: var(--space-xs); border-block-end: var(--hairline) solid var(--line); }
+.window-row label { display: grid; gap: var(--space-3xs); font-size: var(--text-small); font-weight: 600; }
+.window-row input { inline-size: 100%; min-inline-size: 0; min-block-size: var(--tap); padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); -webkit-appearance: none; appearance: none; }
+.window-row .window-dash { padding-block-end: var(--space-xs); font-weight: 700; }
+.window-row .btn { grid-column: 1 / -1; justify-self: start; }
+.windows .btn-row { margin-block-start: var(--space-xs); }
+.custom-days { margin-block: var(--space-s); }
+.custom-days summary { display: flex; align-items: center; min-block-size: var(--tap); font-weight: 600; color: var(--emerald); cursor: pointer; }
+.custom-line { margin: 0 0 var(--space-xs); }
+.custom-add select { min-block-size: var(--tap); flex: 1 1 auto; min-inline-size: 0; padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); }
+.week-summary { margin: var(--space-s) 0 0; padding: var(--space-xs) var(--space-s); background: var(--badge-new); color: var(--emerald); border-radius: var(--r-input); font-weight: 700; }

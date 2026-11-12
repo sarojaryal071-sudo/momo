@@ -139,6 +139,20 @@ insert into allergens (name, sort_order) values ('Marker allergen', 50);
 select t.chk((select unpublished from site_status), 'adding an allergen marks unpublished changes');
 delete from allergens where name = 'Marker allergen';
 
+-- ===== weekly pickup hours: replace_pickup_rules (D-063) =====
+select t.chk(t.try('anon', null, $$select public.replace_pickup_rules('[]'::jsonb)$$) = 'denied', 'anon cannot replace the pickup rules');
+select t.chk(t.try('authenticated', :'b', $$select public.replace_pickup_rules('[]'::jsonb)$$) = 'denied', 'a non-admin cannot replace the pickup rules');
+select count(*) as rules_before from pickup_rules \gset
+select t.chk(t.try('authenticated', :'a', $$select public.replace_pickup_rules('[{"weekday":6,"start_time":"10:00","end_time":"13:00"},{"weekday":6,"start_time":"12:00","end_time":"15:00"}]'::jsonb)$$) like 'error:22023%', 'overlapping windows are refused');
+select t.chk((select count(*) from pickup_rules) = :rules_before, 'a refused save leaves the old hours exactly as they were');
+select t.chk(t.try('authenticated', :'a', $$select public.replace_pickup_rules('[{"weekday":6,"start_time":"15:00","end_time":"10:00"}]'::jsonb)$$) like 'error:23514%', 'a window that ends before it starts is refused and nothing changes');
+select t.chk((select count(*) from pickup_rules) = :rules_before, 'still the old hours');
+select t.chk(t.try('authenticated', :'a', $$select public.replace_pickup_rules('[{"weekday":1,"start_time":"09:00","end_time":"12:00"},{"weekday":1,"start_time":"13:00","end_time":"17:00"},{"weekday":2,"start_time":"09:00","end_time":"12:00"}]'::jsonb)$$) = 'ok', 'an admin replaces the week');
+select t.chk((select count(*) from pickup_rules) = 3 and (select count(*) from pickup_rules where weekday = 1) = 2, 'the new rows are written, one per day and window');
+select public.replace_pickup_rules('[{"weekday":6,"start_time":"10:00","end_time":"18:00"},{"weekday":0,"start_time":"10:00","end_time":"18:00"}]'::jsonb) where false;
+delete from pickup_rules;
+insert into pickup_rules (weekday, start_time, end_time, slot_minutes, active) values (6, '10:00', '18:00', 1, true), (0, '10:00', '18:00', 1, true);
+
 -- ===== placing orders =====
 select t.chk(t.seq($$select t.place(t.order_json('chicken-momo', 1))$$, $$select (select order_number from orders order by created_at desc limit 1) = 'SS-1311-01'$$), 'an order with every optional field empty succeeds, number SS-DDMM-NN');
 select t.chk((select total_pence from orders where order_number = 'SS-1311-01') = 1000 and (select pickup_date from orders where order_number = 'SS-1311-01') is null, 'no pickup date is allowed and the price comes from the table');

@@ -1,9 +1,9 @@
-// Pickup (Step 4c): weekly pattern, time step, exceptions, and a preview of what customers will see (D-038, D-047).
+// Pickup (Steps 4c and 4h): weekly hours as day chips plus shared windows (D-063), time step, date exceptions, and a preview (D-038, D-047).
 import { api } from './shell.js';
 import { PREVIEW_DAYS } from './admin-config.js';
 import { addDays, shortDate } from './dates.js';
-import { actionBar, el, feedback, field, makeSwitch, saving } from './dom.js';
-import { WEEKDAYS } from '../../js/admin-rules.js';
+import { actionBar, confirmDialog, el, feedback, field, saving, toast } from './dom.js';
+import { DAY_SHORT, WEEKDAYS, WEEK_ORDER, flattenWeek, groupWeek, validateWeek, weekSummary } from '../../js/admin-rules.js';
 import { getPickupOptions } from '../../js/pickup.js';
 import { ukToday } from '../../js/mock-backend.js';
 
@@ -21,22 +21,6 @@ function actionRow(label, work, { secondary = false, small = false } = {}) {
   return row;
 }
 const reload = async () => { state = await api.getPickup(); draw(); await drawPreview(); };
-
-// ---------- weekly pattern ----------
-function ruleRow(rule) {
-  const day = field('Day', 'select', { value: String(rule.weekday ?? 6) }, WEEKDAYS.map((d, i) => [String(i), d]));
-  const start = field('From', 'time', { value: rule.start_time || '10:00' });
-  const end = field('To', 'time', { value: rule.end_time || '18:00' });
-  const on = makeSwitch('In use', rule.active !== false);
-  const row = el('div', { className: 'group-card' }, el('div', { className: 'form-grid' }, day.wrap, start.wrap, end.wrap), on.row);
-  const save = { label: rule.id ? 'Save' : 'Add this day', work: async () => {
-    await api.saveRule({ id: rule.id, weekday: Number(day.control.value), start_time: start.control.value, end_time: end.control.value, slot_minutes: rule.slot_minutes ?? state.rules[0]?.slot_minutes ?? 1, active: on.get() });
-    await reload();
-  } };
-  const remove = { label: 'Delete', secondary: true, work: async () => { if (!window.confirm('Delete this opening time?')) return; await api.deleteRule(rule.id); await reload(); } };
-  row.append(actionBar(rule.id ? [save, remove] : [save])); // Save and Delete side by side
-  return row;
-}
 
 // ---------- exceptions ----------
 const describeException = (e) => `${shortDate(e.date, true)}: ${e.kind === 'extra' ? `extra opening ${e.start_time} to ${e.end_time}` : e.start_time ? `closed ${e.start_time} to ${e.end_time}` : 'closed all day'}${e.note ? ` (${e.note})` : ''}`;
@@ -57,12 +41,92 @@ function exceptionForm() {
   return box;
 }
 
+// ---------- weekly hours (D-063) ----------
+let week = groupWeek([]);
+let savedSnapshot = '';
+let dirty = false;
+const snapshot = () => JSON.stringify(flattenWeek(week));
+const markDirty = () => { dirty = snapshot() !== savedSnapshot; window.onbeforeunload = dirty ? () => '' : null; if (summaryLine) summaryLine.textContent = weekSummary(week); };
+let summaryLine = null;
+const errorBox = el('p', { className: 'field-error', role: 'alert' });
+
+// One list of windows: each row From - To with a remove button, plus "Add another window".
+function windowsEditor(list, who) {
+  const box = el('div', { className: 'windows' });
+  const rows = el('div');
+  const drawRows = () => {
+    rows.replaceChildren(...list.map((w, i) => {
+      const start = el('input', { type: 'time', value: w.start, 'aria-label': `${who} window ${i + 1} from`, oninput: () => { w.start = start.value; markDirty(); } });
+      const end = el('input', { type: 'time', value: w.end, 'aria-label': `${who} window ${i + 1} to`, oninput: () => { w.end = end.value; markDirty(); } });
+      return el('div', { className: 'window-row' }, el('label', {}, 'From', start), el('span', { className: 'window-dash', 'aria-hidden': 'true' }, '–'), el('label', {}, 'To', end),
+        el('button', { type: 'button', className: 'btn btn-secondary btn-small', 'aria-label': `Remove ${who} window ${i + 1}`, onclick: () => { list.splice(i, 1); drawRows(); markDirty(); } }, 'Remove'));
+    }));
+  };
+  drawRows();
+  const add = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => {
+    const last = list[list.length - 1];
+    const [h, m] = (last?.end || '16:00').split(':').map(Number);
+    list.push({ start: last?.end || '16:00', end: `${String(Math.min(h + 3, 23)).padStart(2, '0')}:${String(h + 3 > 23 ? 59 : m).padStart(2, '0')}` });
+    drawRows(); markDirty();
+  } }, 'Add another window');
+  box.append(rows, el('div', { className: 'btn-row' }, add));
+  return box;
+}
+
+function drawWeek(container) {
+  container.replaceChildren();
+  // day chips: tap to open or close a day
+  const chips = el('div', { className: 'day-chips', role: 'group', 'aria-label': 'Open days' });
+  for (const d of WEEK_ORDER) {
+    const open = week.open.has(d);
+    const chip = el('button', { type: 'button', className: 'chip day-chip', 'aria-pressed': String(open), 'aria-label': `${WEEKDAYS[d]}, ${open ? 'open' : 'closed'}` }, DAY_SHORT[d]);
+    chip.addEventListener('click', () => { if (week.open.has(d)) { week.open.delete(d); delete week.custom[d]; } else week.open.add(d); markDirty(); drawWeek(container); });
+    chips.append(chip);
+  }
+  container.append(el('p', { className: 'muted' }, 'Tap a day to open or close it.'), chips);
+  container.append(el('h3', {}, 'Opening windows'), el('p', { className: 'muted' }, 'These hours apply to every open day, unless a day has different hours below.'), windowsEditor(week.shared, 'Shared'));
+  // different hours for one day (kept out of the way until used)
+  const customDays = WEEK_ORDER.filter((d) => week.open.has(d) && week.custom[d]);
+  const candidates = WEEK_ORDER.filter((d) => week.open.has(d) && !week.custom[d]);
+  const details = el('details', { className: 'custom-days', open: customDays.length > 0 }, el('summary', {}, 'Different hours for a day'));
+  customDays.forEach((d) => {
+    const editor = el('div', { hidden: true }, windowsEditor(week.custom[d], WEEKDAYS[d]));
+    const line = el('p', { className: 'custom-line' }, el('strong', {}, `${DAY_SHORT[d]}: `), week.custom[d].map((w) => `${w.start} – ${w.end}`).join(', '));
+    const edit = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { editor.hidden = !editor.hidden; edit.textContent = editor.hidden ? 'Edit' : 'Done'; line.lastChild.textContent = week.custom[d].map((w) => `${w.start} – ${w.end}`).join(', '); } }, 'Edit');
+    const remove = el('button', { type: 'button', className: 'btn btn-secondary btn-small', 'aria-label': `Use the shared hours on ${WEEKDAYS[d]}`, onclick: () => { delete week.custom[d]; markDirty(); drawWeek(container); } }, 'Remove');
+    details.append(el('div', { className: 'group-card' }, line, el('div', { className: 'btn-row' }, edit, remove), editor));
+  });
+  if (candidates.length) {
+    const pick = el('select', { 'aria-label': 'Day with different hours' }, ...candidates.map((d) => el('option', { value: String(d) }, WEEKDAYS[d])));
+    const addDay = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { week.custom[Number(pick.value)] = week.shared.map((w) => ({ ...w })); markDirty(); drawWeek(container); } }, 'Give this day its own hours');
+    details.append(el('div', { className: 'btn-row custom-add' }, pick, addDay));
+  } else if (!customDays.length) details.append(el('p', { className: 'muted' }, 'Open a day first.'));
+  container.append(details);
+  summaryLine = el('p', { className: 'week-summary', 'aria-live': 'polite' }, weekSummary(week));
+  container.append(summaryLine, errorBox);
+}
+
+async function saveWeekNow(saveBtn, cancelBtn) {
+  errorBox.textContent = '';
+  const problem = validateWeek(week);
+  if (problem) { errorBox.textContent = problem; errorBox.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+  if (!week.open.size && !(await confirmDialog({ title: 'Close all week?', message: 'Customers will not be able to choose a pickup day until you open a day again.', confirmLabel: 'Close all week', danger: true }))) return;
+  saveBtn.disabled = true; cancelBtn.disabled = true; saveBtn.setAttribute('aria-busy', 'true'); saveBtn.textContent = 'Saving…';
+  try {
+    await api.saveWeek(flattenWeek(week));
+    toast('Weekly hours saved.', { seconds: 4 });
+    await reload();
+  } catch (e) { errorBox.textContent = e.message; toast(e.message, { seconds: 8 }); }
+  finally { saveBtn.disabled = false; cancelBtn.disabled = false; saveBtn.removeAttribute('aria-busy'); saveBtn.textContent = 'Save'; }
+}
+
 function draw() {
   root.replaceChildren();
-  const rules = el('div');
-  state.rules.forEach((r) => rules.append(ruleRow(r)));
-  rules.append(el('details', { className: 'add-rule' }, el('summary', {}, 'Add another day'), ruleRow({})));
-  root.append(panel('Weekly pattern', el('p', { className: 'muted' }, 'The days and hours customers can collect. A day with no row is closed.'), rules));
+  week = groupWeek(state.rules);
+  savedSnapshot = snapshot(); dirty = false; window.onbeforeunload = null;
+  const weekBox = el('div');
+  drawWeek(weekBox);
+  root.append(panel('Weekly hours', weekBox));
 
   const step = field('Time step (minutes)', 'number', { value: state.rules[0]?.slot_minutes ?? 1, min: 1, max: 240, inputMode: 'numeric', hint: '1 means customers can pick any minute inside your hours. 15 means 10:00, 10:15, 10:30 and so on.' });
   root.append(panel('Time step', step.wrap, actionRow('Save time step', async () => { await api.setSlotMinutes(Number(step.control.value)); await reload(); })));
@@ -73,6 +137,17 @@ function draw() {
     list.append(el('div', { className: 'order-foot' }, el('span', { className: 'order-total' }, describeException(e)), actionRow('Delete', async () => { await api.deleteException(e.id); await reload(); }, { secondary: true, small: true })));
   }
   root.append(panel('Special dates', el('p', { className: 'muted' }, 'Close a day, close part of a day, or open an extra day.'), list, exceptionForm()));
+
+  // one Save for the whole week, docked on the tab bar like the product editor
+  const saveBtn = el('button', { type: 'button', className: 'btn' }, 'Save');
+  const cancelBtn = el('button', { type: 'button', className: 'btn btn-secondary' }, 'Cancel');
+  saveBtn.addEventListener('click', () => saveWeekNow(saveBtn, cancelBtn));
+  cancelBtn.addEventListener('click', async () => {
+    if (dirty && !(await confirmDialog({ title: 'Discard your changes?', message: 'The weekly hours you changed are not saved.', confirmLabel: 'Discard', cancelLabel: 'Keep editing', danger: true }))) return;
+    draw();
+  });
+  root.append(el('div', { className: 'action-sticky' }, saveBtn, cancelBtn));
+  document.body.classList.add('has-actionbar');
 }
 
 // ---------- preview: what customers will see ----------
