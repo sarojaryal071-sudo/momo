@@ -1,6 +1,8 @@
-# Step 4a2 — Admin UI polish (decision D-049)
+# Step 4a2 — Admin UI polish (decisions D-049, D-050)
 
-Prerequisite: Step 4a is merged (it is). Merge `origin/main` first. Read `CLAUDE.md`, `docs/decisions-log.md` D-043, D-045, D-048, D-049 and `docs/ui-rulebook.md` sections 2b and 5. Do only this step; do not start 4b, 4c or Step 3. Add the checklist at the bottom to `docs/progress-tracker.md` first. No new features and no changes to rules, data or the demo backend: layout, components and styling only. Same fonts and tokens as the public site (Instrument Serif for page titles only, Hanken Grotesk for everything else); no glass, no gradients, no background spots.
+> **Do Step 1l first** (it sets the new tokens). In this step use the **admin type tokens and spacing in `docs/design/type-and-spacing-spec.md` sections 3 to 5**; where this file mentions a size (for example the page title), the spec wins.
+
+Prerequisite: Step 4a and Step 1l are merged. Merge `origin/main` first. Read `CLAUDE.md`, `docs/decisions-log.md` D-043, D-045, D-048, D-049 and `docs/ui-rulebook.md` sections 2b and 5. Do only this step; do not start 4b, 4c or Step 3. Add the checklist at the bottom to `docs/progress-tracker.md` first. No new features and no changes to rules, data or the demo backend: layout, components and styling only. Same fonts and tokens as the public site (Instrument Serif for page titles only, Hanken Grotesk for everything else); no glass, no gradients, no background spots.
 
 ## What the owner saw on a real phone (390 px wide)
 
@@ -14,7 +16,7 @@ Prerequisite: Step 4a is merged (it is). Merge `origin/main` first. Read `CLAUDE
 
 - **Slim top bar**, about 56 px: wordmark "Steam & Spice" left; a small **Demo** pill (tap or click shows the old explanation in a small popover); on the right a menu button holding Log out (and later Security). Remove the large Log out button and the large demo banner.
 - A **paused strip** (amber with text, not colour alone) at the very top of every admin page while ordering is paused: "Ordering is paused" and a "Resume" button.
-- Content gets bottom padding equal to the tab bar height plus the safe-area inset, so the last card and its buttons are never hidden. Page title in Instrument Serif at a sensible admin size (not larger than about 2.4 rem), one line.
+- Content gets bottom padding equal to the tab bar height plus the safe-area inset, so the last card and its buttons are never hidden. Page title in Instrument Serif at the admin size from the spec (1.5rem), one line.
 - Wide screens (from the desktop token up): sidebar plus content with a maximum content width token; no stretched fields; two-column layouts only where they help.
 
 ## 2. Form controls (all admin pages)
