@@ -11,7 +11,7 @@ Real orders: the site saves each order in a database, assigns the order number (
 ## Owner actions first (list them clearly in your first message to the owner, then wait)
 
 1. Create a Supabase project (free tier) and note the project URL and anon key.
-2. In Authentication settings, **disable public sign-ups**. Create two admin users: the owner (her email) and the developer, each with a strong password; both are added to `admins` by a documented SQL statement.
+2. In Authentication settings, **disable public sign-ups**. Create **one** admin user now (the owner, strong password); add it to `admins` by a documented SQL statement. **Update 12 Nov 2026:** the second admin (her) is added later with the same documented statement; build and test the code for two admins, but only one exists now. The Supabase project URL is `https://mohkrxpdqtwnhzzmcxdw.supabase.co`.
 3. Choose the email provider and create an API key (suggestion: Resend free tier). The owner's email address goes only into a Supabase function secret.
 4. Create a fine-grained GitHub token limited to this repository with permission to run workflows. It goes only into a Supabase function secret.
 5. Add repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values) in GitHub.
