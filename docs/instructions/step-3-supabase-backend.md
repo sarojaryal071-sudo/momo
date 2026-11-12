@@ -16,6 +16,8 @@ Real orders: the site saves each order in a database, assigns the order number (
 4. Create a fine-grained GitHub token limited to this repository with permission to run workflows. It goes only into a Supabase function secret.
 5. Add repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values) in GitHub.
 
+**Project settings the owner chose (12 Nov 2026):** project "Steam & Spice", region Europe, Data API on, **"Automatically expose new tables" off**, **"Automatic RLS" on**. Therefore every migration must create tables with RLS enabled and add explicit `GRANT`s for exactly the roles that need access (anon read on public tables only, authenticated for admins), and the policy tests must prove it.
+
 Write `backend/README.md` as a step-by-step guide for these actions in plain language, with where each value goes.
 
 ## Do
