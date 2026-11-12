@@ -71,7 +71,7 @@ function messageBox(order, card) {
     card.append(box);
     return;
   }
-  if (!settings.pickup_address_text) box.append(el('p', { className: 'error', role: 'alert' }, 'Add your pickup address in Settings. ', el('a', { href: 'settings.html' }, 'Open Settings')));
+  if (!settings.pickup_address_text) box.append(el('p', { className: 'error', role: 'alert' }, 'Add your pickup address in Settings. ', el('a', { href: 'settings' }, 'Open Settings')));
   const area = el('textarea', { rows: 8, value: messageText(order, order.status), 'aria-label': 'Message to send' });
   area.id = `msg-${order.id}`;
   const send = el('a', { className: 'btn btn-small', target: '_blank', rel: 'noopener noreferrer' }, 'Open WhatsApp');
@@ -113,7 +113,7 @@ async function changeStatus(order, status, showError, { message = false } = {}) 
   if (message && phone) {
     const link = buildLink(phone, messageText(updated, status));
     if (win) win.location.href = link;
-    if (!settings.pickup_address_text && /\{address\}/.test(settings[`wa_template_${TEMPLATE_BY_STATUS[status]}`] || '')) toast('Add your pickup address in Settings so your messages include it.', { href: 'settings.html' });
+    if (!settings.pickup_address_text && /\{address\}/.test(settings[`wa_template_${TEMPLATE_BY_STATUS[status]}`] || '')) toast('Add your pickup address in Settings so your messages include it.', { href: 'settings' });
   } else if (message && !phone) {
     toast(`${order.order_number} is ${STATUS_LABELS[status].toLowerCase()}. The phone number is not valid, so WhatsApp was not opened.`);
   }
@@ -175,7 +175,7 @@ async function refresh() {
   if (known) { // orders that were not there on the last look: tell her (toast, optional sound, browser notification)
     const added = everything.filter((o) => !known.has(o.id) && o.status === 'new');
     if (added.length) {
-      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS, href: 'orders.html' });
+      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS, href: 'orders' });
       notifyNewOrder(added[0]);
       if (soundOn()) playSoftSound();
     }

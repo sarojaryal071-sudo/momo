@@ -77,7 +77,7 @@ the functions with the CLI: `supabase functions deploy place-order trigger-rebui
 (`supabase link --project-ref mohkrxpdqtwnhzzmcxdw` first), or paste each `functions/<name>/index.ts` (and `_shared/validate.ts`) in the
 dashboard with "Verify JWT" off. Do not mix the two routes on one project: the workflow tracks which migrations it has applied.
 
-**Forgot password (D-059).** In Supabase, Authentication, **URL Configuration**: set the Site URL to `https://sarojaryal071-sudo.github.io/momo/` and add `https://sarojaryal071-sudo.github.io/momo/admin/reset.html` to the Redirect URLs. Supabase's built-in email sender only delivers to members of your Supabase organisation, so the reset email works for your own address now and for her only after a custom email sender is set up later.
+**Forgot password (D-059).** In Supabase, Authentication, **URL Configuration**: set the Site URL to `https://sarojaryal071-sudo.github.io/momo/` and add `https://sarojaryal071-sudo.github.io/momo/admin/reset` to the Redirect URLs. Supabase's built-in email sender only delivers to members of your Supabase organisation, so the reset email works for your own address now and for her only after a custom email sender is set up later.
 
 ## 4. Function secrets (one-time, in Supabase)
 

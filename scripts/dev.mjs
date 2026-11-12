@@ -27,7 +27,10 @@ createServer(async (req, res) => {
     const { pathname } = new URL(req.url, 'http://localhost');
     let file = locate(decodeURIComponent(pathname));
     if (!file) throw new Error('bad path');
-    if ((await stat(file)).isDirectory()) file = join(file, 'index.html');
+    // Clean addresses: /shop serves shop.html, a folder serves its index.html. Old .html addresses still work.
+    const info = await stat(file).catch(() => null);
+    if (info && info.isDirectory()) file = join(file, 'index.html');
+    else if (!info) file = `${file}.html`;
     const body = await readFile(file);
     res.writeHead(200, { 'Content-Type': types[extname(file)] || 'application/octet-stream' });
     res.end(body);

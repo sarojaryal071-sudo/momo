@@ -17,7 +17,7 @@ if (params.get('reset')) say('Your password was changed. Log in with the new pas
 // Already signed in: straight to Home, unless the 30 days are over (then sign out and ask again).
 if (await api.currentUser()) {
   if (isExpired()) { await api.logout(); clearLogin(); say(`Your session ended after ${ADMIN_SESSION_DAYS} days. Please log in again.`); }
-  else location.replace('index.html');
+  else location.replace('./');
 } else if (params.get('expired')) say(`Your session ended after ${ADMIN_SESSION_DAYS} days. Please log in again.`);
 
 form.addEventListener('submit', async (event) => {
@@ -28,7 +28,7 @@ form.addEventListener('submit', async (event) => {
   try {
     await api.login(data.get('email'), data.get('password'));
     markLogin();
-    location.replace('index.html');
+    location.replace('./');
   } catch (err) {
     errorBox.textContent = err.message;
     submit.disabled = false; submit.setAttribute('aria-busy', 'false'); submit.textContent = 'Log in';

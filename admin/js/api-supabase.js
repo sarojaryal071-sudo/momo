@@ -64,7 +64,7 @@ export const supabaseApi = {
   // sender only delivers to members of the Supabase organisation until a custom email sender is set up.
   async requestPasswordReset(email) {
     const sb = await loadClient();
-    try { await sb.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: new URL('reset.html', location.href).href }); } catch { /* same answer either way */ }
+    try { await sb.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: new URL('reset', location.href).href }); } catch { /* same answer either way */ }
     return true;
   },
   // True when the page was opened from a valid reset link (the library turns the link into a short-lived session).

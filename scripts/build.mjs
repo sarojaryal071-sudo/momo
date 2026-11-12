@@ -43,7 +43,9 @@ async function walk(dir) {
   return out;
 }
 const readJson = async (p) => JSON.parse(await readFile(p, 'utf8'));
-const urlFor = (rel) => (rel === 'index.html' ? `${siteUrl}/` : `${siteUrl}/${rel}`);
+// Clean addresses (D-060): /shop, never /shop.html; the home page and the admin are their folders.
+const cleanRel = (rel) => (rel === 'index.html' ? '' : rel === 'admin/index.html' ? 'admin/' : rel.replace(/\.html$/, ''));
+const urlFor = (rel) => `${siteUrl}/${cleanRel(rel)}`;
 const escAttr = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 
 await rm(dist, { recursive: true, force: true });
@@ -130,6 +132,13 @@ for (const file of htmlFiles) {
     noindexed++;
   }
   await writeFile(file, html);
+
+  // Clean addresses (D-060): no link or action may point to index.html or any .html page (the addresses are /shop, /admin/orders, ...).
+  for (const m of html.matchAll(/\b(?:href|action)=["']([^"']+)["']/g)) {
+    const target = m[1];
+    if (/^(?:https?:)?\/\//.test(target) && !target.startsWith(siteUrl)) continue; // other sites are not ours to rename
+    if (/\.html(?:[?#]|$)/.test(target)) errors.push(`${rel}: link to "${target}" must use the clean address (no .html)`);
+  }
 
   // Validation for public pages that could be indexed.
   if (!neverIndex) {

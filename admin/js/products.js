@@ -1,7 +1,7 @@
 // Products (Step 4b): list, edit, stock, photo, options, ingredients and allergens, and the Publish button (D-055).
 import { api } from './shell.js';
 import { PHOTO_QUALITY, PUBLISH_POLL_SECONDS } from './admin-config.js';
-import { el, feedback, field, makeSwitch, saving } from './dom.js';
+import { actionBar, el, feedback, field, makeSwitch, saving } from './dom.js';
 import { ALLERGENS, formatMoney, PHOTO_MAX_BYTES, PHOTO_MAX_EDGE, penceToPounds, poundsToPence, validateGroup, validatePhotoFile } from '../../js/admin-rules.js';
 
 const listBox = document.querySelector('[data-list]');
@@ -122,7 +122,7 @@ async function edit(id) {
   const fileField = field('Photo', 'file', { accept: 'image/jpeg,image/png,image/webp', hint: 'JPEG, PNG or WebP. It is made smaller automatically.' });
   const altField = field('Describe the photo', 'text', { value: product.photo_alt ?? '', maxLength: 200, hint: 'For people who cannot see it, for example "A bag of frozen chicken momo".' });
   const photoPanel = panel('Photo', preview, fileField.wrap, altField.wrap);
-  photoPanel.append(saveRow('Save photo', async () => {
+  photoPanel.append(actionBar([{ label: 'Save photo', work: async () => {
     const file = fileField.control.files[0];
     let path = product.photo_path;
     if (file) {
@@ -135,8 +135,7 @@ async function edit(id) {
     if (!path) throw new Error('Choose a photo.');
     await savePatch({ photo_path: path, photo_alt: altField.control.value });
     setPreview(path); fileField.control.value = '';
-  }));
-  if (product.photo_path) photoPanel.append(saveRow('Remove photo', async () => { await savePatch({ photo_path: null, photo_alt: '' }); setPreview(null); altField.control.value = ''; }, { secondary: true }));
+  } }, ...(product.photo_path ? [{ label: 'Remove photo', secondary: true, work: async () => { await savePatch({ photo_path: null, photo_alt: '' }); setPreview(null); altField.control.value = ''; } }] : [])]));
   editorBox.append(photoPanel);
 
   // 3. Stock (never triggers a rebuild)

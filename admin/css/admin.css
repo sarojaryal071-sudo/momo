@@ -227,3 +227,47 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .home-list { list-style: none; margin: 0; padding: 0; }
 .home-list a { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-xs); min-block-size: var(--tap); padding-block: var(--space-2xs); color: var(--charcoal); text-decoration: none; border-block-end: var(--hairline) solid var(--line); }
 @media (min-width: 48em) { .home-tiles { grid-template-columns: repeat(4, 1fr); } }
+
+/* ---------- Step 4e: tactile controls (D-060). Raised face, darker bottom edge, soft shadow; pressed = down by --press. ---------- */
+.admin-body .btn { border: 0; background: var(--emerald); color: var(--white);
+  box-shadow: inset 0 var(--hairline) 0 var(--edge-light), 0 var(--edge) 0 var(--edge-primary), var(--raise-shadow); translate: none; }
+.admin-body .btn:hover:not(:disabled) { background: var(--emerald-dark); translate: none; }
+.admin-body .btn-secondary { background: var(--white); color: var(--emerald);
+  box-shadow: inset 0 0 0 var(--hairline) var(--emerald), 0 var(--edge) 0 var(--edge-secondary), var(--raise-shadow); }
+.admin-body .btn-secondary:hover:not(:disabled) { background: var(--green-tint); }
+.admin-body .btn-danger { background: var(--white); color: var(--chutney);
+  box-shadow: inset 0 0 0 var(--hairline) var(--chutney), 0 var(--edge) 0 var(--edge-danger), var(--raise-shadow); }
+.admin-body .btn-danger:hover:not(:disabled) { background: var(--peach-tint); }
+.admin-body .btn:active:not(:disabled) { background: var(--emerald-dark); }
+.admin-body .btn-secondary:active:not(:disabled), .admin-body .btn-danger:active:not(:disabled) { background: var(--green-tint); }
+.admin-body .btn:disabled, .admin-body .btn-secondary:disabled { background: var(--line); color: var(--muted); box-shadow: none; opacity: 1; }
+.admin-body .btn[aria-busy="true"]::after { content: ""; flex: none; inline-size: 1em; block-size: 1em; margin-inline-start: var(--space-xs); border: var(--ring-width) solid currentColor; border-inline-end-color: transparent; border-radius: 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .admin-body .btn { transition: translate var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast); }
+  .admin-body .btn:active:not(:disabled) { translate: 0 var(--press); box-shadow: inset 0 var(--hairline) 0 var(--edge-light), 0 calc(var(--edge) - var(--press)) 0 var(--edge-primary), var(--press-shadow); }
+  .admin-body .btn-secondary:active:not(:disabled) { box-shadow: inset 0 0 0 var(--hairline) var(--emerald), 0 calc(var(--edge) - var(--press)) 0 var(--edge-secondary), var(--press-shadow); }
+  .admin-body .btn-danger:active:not(:disabled) { box-shadow: inset 0 0 0 var(--hairline) var(--chutney), 0 calc(var(--edge) - var(--press)) 0 var(--edge-danger), var(--press-shadow); }
+  .admin-body .btn[aria-busy="true"]::after { animation: btn-spin 0.8s linear infinite; }
+  @keyframes btn-spin { to { rotate: 360deg; } }
+}
+/* toggle switches: an inset track and a raised round thumb */
+.admin-body .switch-track { background: var(--line); border: 0; box-shadow: var(--inset-shadow); }
+.admin-body .switch-track::after { background: var(--white); border: var(--hairline) solid var(--line-strong); box-shadow: var(--thumb-shadow), inset 0 var(--hairline) 0 var(--white); }
+.admin-body .switch[aria-checked="true"] .switch-track { background: var(--emerald); }
+.admin-body .switch[aria-checked="true"] .switch-track::after { background: var(--white); border-color: var(--white); }
+/* chips, dropdowns, icon buttons: the same idea, lighter */
+.admin-body .chip, .admin-body .icon-btn, .admin-body .more summary, .admin-body .admin-main .field select { box-shadow: 0 var(--edge-soft) 0 var(--edge-secondary); }
+.admin-body .chip[aria-pressed="true"] { box-shadow: var(--inset-shadow); }
+.admin-body .password-toggle { box-shadow: none; }
+@media (prefers-reduced-motion: no-preference) { .admin-body .chip:active, .admin-body .icon-btn:active, .admin-body .more summary:active { translate: 0 var(--edge-soft); box-shadow: none; } }
+
+/* ---------- glass (D-060): top bar, tab bar, menus, toasts, paused strip. Cards and forms stay solid white. ---------- */
+.admin-bar { position: sticky; inset-block-start: 0; z-index: var(--z-bar); background: var(--glass-solid); }
+.paused-strip { background: var(--turmeric); }
+.toast { background: var(--emerald); }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .admin-bar, .tabbar { background: var(--glass-bg-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  .admin-menu, .more-list { background: var(--glass-bg-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); border-color: var(--glass-border); box-shadow: var(--glass-shadow); }
+  .paused-strip { background: color-mix(in srgb, var(--turmeric) 88%, transparent); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
+  .toast { background: var(--glass-emerald); -webkit-backdrop-filter: blur(var(--glass-blur-strong)); backdrop-filter: blur(var(--glass-blur-strong)); }
+}

@@ -58,7 +58,7 @@ async function refresh() {
   if (known) {
     const added = allNow.filter((o) => !known.has(o.id));
     if (added.length) {
-      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS, href: 'orders.html?status=new' });
+      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS, href: 'orders?status=new' });
       notifyNewOrder(added[0]);
       if (soundOn()) playSoftSound();
     }
@@ -78,10 +78,10 @@ async function refresh() {
 
   greeting.textContent = `${hourNow() < 12 ? 'Good morning' : hourNow() < 18 ? 'Good afternoon' : 'Good evening'}. Today is ${shortDate(today, true)}.`;
   tilesBox.replaceChildren(
-    tile('orders.html?status=new', 'New orders', newOrders.length, newOrders.length ? (waiting.length ? `Waiting: ${waiting.length} for more than ${HOME_WAITING_MINUTES} minutes` : 'Tap to open them') : 'Nothing waiting', { strong: newOrders.length > 0 }),
-    tile('orders.html?status=all', "Today's pickups", todays.length, next ? `Next: ${next.pickup_time || 'no time set'}, ${next.customer_name || 'no name'}` : todays.length ? 'All collected' : 'None today'),
-    tile('orders.html?status=all', 'Tomorrow', tomorrows.length, tomorrows.length ? `${tomorrows.length} to prepare` : 'None yet'),
-    el('a', { className: 'home-tile', href: 'products.html' }, el('span', { className: 'home-tile-label' }, 'Stock'),
+    tile('orders?status=new', 'New orders', newOrders.length, newOrders.length ? (waiting.length ? `Waiting: ${waiting.length} for more than ${HOME_WAITING_MINUTES} minutes` : 'Tap to open them') : 'Nothing waiting', { strong: newOrders.length > 0 }),
+    tile('orders?status=all', "Today's pickups", todays.length, next ? `Next: ${next.pickup_time || 'no time set'}, ${next.customer_name || 'no name'}` : todays.length ? 'All collected' : 'None today'),
+    tile('orders?status=all', 'Tomorrow', tomorrows.length, tomorrows.length ? `${tomorrows.length} to prepare` : 'None yet'),
+    el('a', { className: 'home-tile', href: 'products' }, el('span', { className: 'home-tile-label' }, 'Stock'),
       el('span', { className: 'home-tile-value' }, String(lowStock.length)),
       el('span', { className: 'home-tile-sub' }, lowStock.length ? lowStock.map((p) => `${p.name}: ${p.stock_quantity === 0 ? 'sold out' : `${p.stock_quantity} left`}`).join(', ') : 'Nothing running low')));
 
@@ -89,7 +89,7 @@ async function refresh() {
   if (!todays.length) todayBox.append(el('p', { className: 'muted empty-state' }, 'No orders yet today.'));
   else {
     todayBox.append(el('ul', { className: 'home-list' }, ...(upcoming.length ? upcoming : todays).slice(0, HOME_PICKUPS_SHOWN).map((o) =>
-      el('li', {}, el('a', { href: `orders.html?open=${encodeURIComponent(o.id)}` }, el('strong', {}, o.pickup_time || 'No time'), el('span', {}, o.customer_name || 'No name'), el('span', { className: 'status-badge', 'data-status': o.status }, STATUS_LABELS[o.status]))))));
+      el('li', {}, el('a', { href: `orders?open=${encodeURIComponent(o.id)}` }, el('strong', {}, o.pickup_time || 'No time'), el('span', {}, o.customer_name || 'No name'), el('span', { className: 'status-badge', 'data-status': o.status }, STATUS_LABELS[o.status]))))));
     if (!upcoming.length) todayBox.append(el('p', { className: 'muted' }, 'All of today\'s orders are collected.'));
   }
   if (!busyShop) await drawShop(settings);

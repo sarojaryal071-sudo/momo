@@ -6,6 +6,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; form-action 'self'; base-uri 'self'">
   <meta name="robots" content="noindex, nofollow">
   <title>New order | Admin</title>
+  <script src="../js/clean-url.js"></script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <meta name="theme-color" content="#004D3B">
@@ -21,7 +22,7 @@
 <body class="admin-body" data-auth data-page="orders">
   <div class="paused-strip" data-paused hidden role="status"><span><strong>Ordering is paused.</strong> Customers cannot place orders.</span><button type="button" class="btn btn-small btn-secondary" data-resume>Resume</button></div>
   <header class="admin-bar">
-    <a class="admin-brand" href="index.html">Steam &amp; Spice</a>
+    <a class="admin-brand" href="./">Steam &amp; Spice</a>
     <div class="admin-actions">
       <button type="button" class="icon-btn" aria-expanded="false" aria-controls="logout-confirm" data-logout-btn><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M14 8l4 4-4 4M18 12H9"/></svg><span class="visually-hidden">Log out</span></button>
       <div class="admin-menu" id="logout-confirm" role="alertdialog" aria-label="Log out" hidden>
@@ -31,14 +32,14 @@
     </div>
   </header>
     <nav class="tabbar" aria-label="Admin">
-    <a href="index.html" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg>Home</a>
-    <a href="orders.html" data-tab="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Orders</a>
-    <a href="products.html" data-tab="products"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c0-5 4.5-9 9-9s9 4 9 9c-3 3-15 3-18 0z"/><path d="M12 6v10"/></svg>Products</a>
-    <a href="pickup.html" data-tab="pickup"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Pickup</a>
-    <a href="settings.html" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>Settings</a>
+    <a href="./" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg>Home</a>
+    <a href="orders" data-tab="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Orders</a>
+    <a href="products" data-tab="products"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c0-5 4.5-9 9-9s9 4 9 9c-3 3-15 3-18 0z"/><path d="M12 6v10"/></svg>Products</a>
+    <a href="pickup" data-tab="pickup"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Pickup</a>
+    <a href="settings" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>Settings</a>
   </nav>
   <main class="admin-main" id="main">
-    <div class="title-row"><h1>New order</h1><a class="btn btn-secondary btn-small" href="orders.html">Cancel</a></div>
+    <div class="title-row"><h1>New order</h1><a class="btn btn-secondary btn-small" href="orders">Cancel</a></div>
     <div data-form-root></div>
   </main>
   <script type="module" src="js/new-order.js"></script>

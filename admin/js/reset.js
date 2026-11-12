@@ -19,6 +19,6 @@ form.addEventListener('submit', async (event) => {
   if (password.length < MIN_PASSWORD_LENGTH) { errorBox.textContent = `Use at least ${MIN_PASSWORD_LENGTH} characters.`; return; }
   if (password !== form.confirm.value) { errorBox.textContent = 'The two passwords are not the same.'; return; }
   submit.disabled = true; submit.setAttribute('aria-busy', 'true'); submit.textContent = 'Saving...';
-  try { await api.updatePassword(password); location.replace('login.html?reset=1'); }
+  try { await api.updatePassword(password); location.replace('login?reset=1'); }
   catch (err) { errorBox.textContent = err.message; submit.disabled = false; submit.setAttribute('aria-busy', 'false'); submit.textContent = 'Save new password'; }
 });

@@ -2,7 +2,7 @@
   "name": "Steam & Spice Admin",
   "short_name": "S&S Admin",
   "description": "Orders, products and settings for Steam & Spice.",
-  "start_url": "index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

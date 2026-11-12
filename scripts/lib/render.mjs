@@ -24,7 +24,7 @@ function productJsonLd(products, siteUrl) {
       priceCurrency: 'GBP',
       price: (p.price_pence / 100).toFixed(2),
       availability: p.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      url: `${base}shop.html`,
+      url: `${base}shop`,
     },
   }));
   return items.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n');
@@ -139,7 +139,7 @@ function card(p) {
   return `<li class="product-card" ${attrs}>
   ${mediaHtml(p)}
   <div class="card-body">
-    <h3><a class="card-link" href="shop.html#product-${esc(p.slug)}" data-card-open>${esc(p.name)}</a></h3>
+    <h3><a class="card-link" href="shop#product-${esc(p.slug)}" data-card-open>${esc(p.name)}</a></h3>
     <p class="card-meta">${esc(p.unit_label)}${p.available ? '' : ' <span class="badge badge-unavailable">Unavailable</span>'}</p>
     ${priceBlock(p)}
     ${action}

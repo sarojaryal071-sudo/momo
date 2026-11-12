@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Step 4d, coding agent)
+- Last updated: 2026-11-12 (Step 4e, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4e (admin tactile look, one-row buttons, clean URLs, D-060), then Step 5 (SEO, hardening, launch).
 
@@ -221,6 +221,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Navigation: Home, Orders (`orders.html`), Products, Pickup, Settings on every page; Prep list from Home and Orders; `?status=new` and `?open=<id>` links
 - [ ] Owner checks: login on phone and laptop, forgot password with the owner's own email (Supabase Redirect URL needed), 30-day limit, Home tiles with a test order, tab bar on every page
 
+## Step 4e — Admin tactile and glass look, one-row buttons, clean URLs (D-060)
+
+- [x] Button groups on one row (Pickup rows: Save and Delete; photo Save and Remove) through one `actionBar` helper
+- [x] Tactile controls in the admin only: raised primary, secondary and destructive buttons, spinner when busy, inset-track toggles with a raised thumb, lighter raise for chips, dropdowns and icon buttons; all values are tokens; press-down only under no-preference motion
+- [x] Glass in the admin: sticky top bar, tab bar, menus, toast and paused strip, with a solid fallback; cards and forms stay solid white. The customer site's soft light background was not added: the public site has no ambient layer since D-044, so there was nothing to match
+- [x] Clean URLs: links, redirects, canonicals, sitemap and structured data without `.html` or `index.html`; the build fails on any such link; `js/clean-url.js` cleans an old address in the address bar; the dev server serves extensionless pages
+- [ ] Owner checks: Pickup buttons on one row; raised buttons and toggles; glass bars and menu; `/momo/`, `/momo/shop`, `/momo/admin/`, `/momo/admin/orders` and an old `.html` address
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
@@ -328,6 +336,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 - 2026-11-12, step 4d refinement (plate photo alt text, peach tagline between hairlines, field icons and eye toggle per the approved mockup, no logo mark): build passes; login re-checked at 390 and 1440 px on the demo backend.
 - 2026-11-12, step 4d (demo backend only): build passes; `admin-session` tests pass. One Playwright run at 390 and 1440 px: login (overflow, only the patches blur, 16px and 44px inputs, show password, neutral error, forgot message, invalid reset link), Home tiles and links, five tabs on every page, pause from Home, 30-day sign-out, signed-in user on the login page. Not checked: Supabase login, the real reset email and link, Realtime on Home.
+
+- 2026-11-12, step 4e: build passes (with the new link check); `regions`, `build-supabase` (first real run; its fake server was blocked by a synchronous spawn, now asynchronous) and `launch-gate` tests pass (10). Playwright at 390 px on the demo backend: public and admin addresses clean, old `.html` addresses stripped, 404 works, tab bar links, Pickup Save and Delete on one row, raised edge, sticky glass bar. Not checked: GitHub Pages serving the clean addresses live (it serves `shop.html` at `/shop`), the other admin pages' buttons by eye, Safari without `backdrop-filter`.
 
 ## Known issues
 

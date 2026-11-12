@@ -217,7 +217,7 @@ async function confirm(e) {
     const result = await submitOrder({ ...order, totalPenceHint: totalPence });
     try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name, placedAt: new Date().toISOString() })); } catch { /* the done page copes without it */ }
     getCart().clear();
-    location.href = `done.html?o=${encodeURIComponent(result.orderNumber)}`;
+    location.href = `done?o=${encodeURIComponent(result.orderNumber)}`;
   } catch (err) {
     if (err instanceof OrderRejected) { // a rule said no: show why, keep the cart
       errorBox.textContent = err.message;

@@ -58,3 +58,14 @@ export function toast(message, { seconds = 8, href } = {}) {
   document.body.append(node);
   setTimeout(() => node.remove(), seconds * 1000);
 }
+
+// One row of action buttons that share one "Saved" or error message. Each item: { label, work, secondary, small }.
+// The buttons sit side by side and only wrap when they do not fit.
+export function actionBar(items) {
+  const row = el('div', { className: 'btn-row' });
+  const buttons = items.map((it) => el('button', { type: 'button', className: `btn${it.secondary ? ' btn-secondary' : ''}${it.small ? ' btn-small' : ''}` }, it.label));
+  row.append(...buttons);
+  const fb = feedback(row);
+  buttons.forEach((b, i) => b.addEventListener('click', () => saving(b, fb, items[i].work)));
+  return row;
+}

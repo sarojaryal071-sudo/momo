@@ -2,7 +2,7 @@
 import { api } from './shell.js';
 import { PREVIEW_DAYS } from './admin-config.js';
 import { addDays, shortDate } from './dates.js';
-import { el, feedback, field, makeSwitch, saving } from './dom.js';
+import { actionBar, el, feedback, field, makeSwitch, saving } from './dom.js';
 import { WEEKDAYS } from '../../js/admin-rules.js';
 import { getPickupOptions } from '../../js/pickup.js';
 import { ukToday } from '../../js/mock-backend.js';
@@ -29,11 +29,12 @@ function ruleRow(rule) {
   const end = field('To', 'time', { value: rule.end_time || '18:00' });
   const on = makeSwitch('In use', rule.active !== false);
   const row = el('div', { className: 'group-card' }, el('div', { className: 'form-grid' }, day.wrap, start.wrap, end.wrap), on.row);
-  row.append(actionRow(rule.id ? 'Save' : 'Add this day', async () => {
+  const save = { label: rule.id ? 'Save' : 'Add this day', work: async () => {
     await api.saveRule({ id: rule.id, weekday: Number(day.control.value), start_time: start.control.value, end_time: end.control.value, slot_minutes: rule.slot_minutes ?? state.rules[0]?.slot_minutes ?? 1, active: on.get() });
     await reload();
-  }));
-  if (rule.id) row.append(actionRow('Delete', async () => { if (!window.confirm('Delete this opening time?')) return; await api.deleteRule(rule.id); await reload(); }, { secondary: true, small: true }));
+  } };
+  const remove = { label: 'Delete', secondary: true, work: async () => { if (!window.confirm('Delete this opening time?')) return; await api.deleteRule(rule.id); await reload(); } };
+  row.append(actionBar(rule.id ? [save, remove] : [save])); // Save and Delete side by side
   return row;
 }
 

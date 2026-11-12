@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { mkdtempSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -22,11 +22,12 @@ async function withServer(handler, fn) {
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   try { return await fn(`http://127.0.0.1:${server.address().port}`); } finally { await new Promise((r) => server.close(r)); }
 }
-const build = (url, extraEnv = {}) => {
+// Asynchronous on purpose: the fake Supabase server runs in this process, which must stay free to answer the build's requests.
+const build = (url, extraEnv = {}) => new Promise((resolve) => {
   const out = mkdtempSync(join(tmpdir(), 'ss-dist-'));
-  const r = spawnSync(process.execPath, ['scripts/build.mjs'], { encoding: 'utf8', env: { ...process.env, DIST_DIR: out, SITE_URL: 'https://example.test', SITE_BACKEND: 'supabase', SUPABASE_URL: url, SUPABASE_ANON_KEY: 'sb_publishable_test', ...extraEnv } });
-  return { ...r, out };
-};
+  execFile(process.execPath, ['scripts/build.mjs'], { encoding: 'utf8', env: { ...process.env, DIST_DIR: out, SITE_URL: 'https://example.test', SITE_BACKEND: 'supabase', SUPABASE_URL: url, SUPABASE_ANON_KEY: 'sb_publishable_test', ...extraEnv } },
+    (error, stdout, stderr) => resolve({ status: error ? error.code ?? 1 : 0, stdout, stderr, out }));
+});
 const jpeg = await sharp({ create: { width: 600, height: 400, channels: 3, background: '#cc8844' } }).jpeg().toBuffer();
 const api = (data, seen = []) => (req, res) => {
   seen.push({ url: req.url, key: req.headers.apikey });
@@ -45,7 +46,7 @@ test('mapProducts keeps active options, the stock and drops products without a p
 test('a live build writes products.json, the product cards, the photos and the public config', async () => {
   const seen = [];
   await withServer(api(rows(), seen), async (url) => {
-    const r = build(url);
+    const r = await build(url);
     assert.equal(r.status, 0, r.stderr + r.stdout);
     const json = JSON.parse(readFileSync(join(r.out, 'data/products.json'), 'utf8'));
     assert.equal(json.length, 1);
@@ -66,16 +67,16 @@ test('a live build writes products.json, the product cards, the photos and the p
 });
 
 test('a failed or empty fetch fails the build', async () => {
-  await withServer((req, res) => { res.statusCode = 500; res.end('x'); }, async (url) => assert.notEqual(build(url).status, 0));
-  await withServer(api([]), async (url) => { const r = build(url); assert.notEqual(r.status, 0); assert.match(r.stderr, /no active products/); });
+  await withServer((req, res) => { res.statusCode = 500; res.end('x'); }, async (url) => assert.notEqual((await build(url)).status, 0));
+  await withServer(api([]), async (url) => { const r = await build(url); assert.notEqual(r.status, 0); assert.match(r.stderr, /no active products/); });
 });
 
 test('a photo without alt text fails the build', async () => {
-  await withServer(api(rows({ photo_alt: null })), async (url) => { const r = build(url); assert.notEqual(r.status, 0); assert.match(r.stderr, /alt text/); });
+  await withServer(api(rows({ photo_alt: null })), async (url) => { const r = await build(url); assert.notEqual(r.status, 0); assert.match(r.stderr, /alt text/); });
 });
 
-test('the real backend without the variables fails the build instead of using stale data', () => {
-  const r = build('', { SUPABASE_URL: '', SUPABASE_ANON_KEY: '' });
+test('the real backend without the variables fails the build instead of using stale data', async () => {
+  const r = await build('', { SUPABASE_URL: '', SUPABASE_ANON_KEY: '' });
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /SUPABASE_ANON_KEY/);
 });
