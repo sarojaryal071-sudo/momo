@@ -4,7 +4,7 @@ This folder is the whole real backend. Nothing in it contains a secret. The site
 one switch in section 6, so you can do these steps in any quiet moment.
 
 ```
-backend/supabase/migrations/   0001 tables, security, grants   0002 order and admin functions   0003 photo bucket   0004 starting data
+backend/supabase/migrations/   0001 tables, security, grants   0002 order and admin functions   0003 photo bucket   0004 starting data   0005 live order feed
 backend/supabase/functions/    place-order   trigger-rebuild   build-status   (+ _shared)
 backend/supabase/config.toml   turns the default JWT check off for the three functions (see "Keys" below)
 backend/tests/                 database tests that run on a throw-away PostgreSQL (section 7)
@@ -21,22 +21,20 @@ backend/tests/                 database tests that run on a throw-away PostgreSQ
 
 | # | What | Where it goes | Why |
 |---|---|---|---|
-| 1 | **Email API key** (Resend: free account, API Keys, Create) | Supabase function secret `EMAIL_API_KEY` | emails you each new order |
-| 2 | **Your email address** | Supabase function secret `OWNER_EMAIL` | where the alert goes. Never in the repo |
-| 3 | **GitHub fine-grained token**: only this repository, permission *Actions: Read and write*, nothing else | Supabase function secret `GITHUB_DISPATCH_TOKEN` | the Publish button starts the build |
-| 4 | **A random string** you make up (30+ characters), used twice | Supabase function secret `BUILD_STATUS_TOKEN` **and** GitHub repository *secret* (not variable) `BUILD_STATUS_TOKEN` | lets the build report "Live" or "Failed" to the admin. It can do nothing else |
-| 5 | The site's web address(es), for example `https://sarojaryal071-sudo.github.io` (no path) | Supabase function secret `ALLOWED_ORIGINS` (comma separated, add your own domain later) | only your site may call the order function |
+| 1 | **GitHub fine-grained token**: only this repository, permission *Actions: Read and write*, nothing else | Supabase function secret `GITHUB_DISPATCH_TOKEN` | the Publish button starts the build |
+| 2 | **A random string** you make up (30+ characters), used twice | Supabase function secret `BUILD_STATUS_TOKEN` **and** GitHub repository *secret* (not variable) `BUILD_STATUS_TOKEN` | lets the build report "Live" or "Failed" to the admin. It can do nothing else |
+| 3 | The site's web address(es), for example `https://sarojaryal071-sudo.github.io` (no path) | Supabase function secret `ALLOWED_ORIGINS` (comma separated, add your own domain later) | only your site may call the order function |
 
-Optional secrets: `EMAIL_FROM` (default `Steam & Spice <onboarding@resend.dev>`, change it once you have verified a sending domain in Resend),
-`ADMIN_URL` (link in the email, for example `https://sarojaryal071-sudo.github.io/momo/admin/`), `GITHUB_REPO`, `GITHUB_WORKFLOW`.
+There is **no email service** (D-056): no email key and no owner email anywhere. New orders reach you through the admin panel (it refreshes
+every minute and, from Step 4bc, shows new orders live). Optional secrets: `GITHUB_REPO`, `GITHUB_WORKFLOW`.
 
 Never paste the Supabase **secret key** (`sb_secret_...`) or the service-role key anywhere in the repo, in GitHub variables or in chat.
 Supabase gives it to the functions itself.
 
 ## 3. Create the database (once)
 
-Easiest, no tools: open the Supabase dashboard, SQL Editor, and run the four files **in order**, each one as a new query:
-`0001_core_tables.sql`, `0002_order_functions.sql`, `0003_storage.sql`, `0004_seed_shop_data.sql`. Each must finish with "Success".
+Easiest, no tools: open the Supabase dashboard, SQL Editor, and run the five files **in order**, each one as a new query:
+`0001_core_tables.sql`, `0002_order_functions.sql`, `0003_storage.sql`, `0004_seed_shop_data.sql`, `0005_realtime.sql`. Each must finish with "Success".
 (With the CLI instead: `supabase link --project-ref mohkrxpdqtwnhzzmcxdw` then `supabase db push`.)
 
 The files are forward-only and written to be re-run on a new project. `0004` can be run again safely (it never overwrites). The others
@@ -57,8 +55,8 @@ With the Supabase CLI (`npm i -g supabase`, or `npx supabase`), logged in (`supa
 
 ```
 supabase functions deploy place-order trigger-rebuild build-status --no-verify-jwt
-supabase secrets set OWNER_EMAIL=you@example.com EMAIL_API_KEY=re_xxx GITHUB_DISPATCH_TOKEN=github_pat_xxx \
-  BUILD_STATUS_TOKEN=your-random-string ALLOWED_ORIGINS=https://sarojaryal071-sudo.github.io
+supabase secrets set GITHUB_DISPATCH_TOKEN=github_pat_xxx BUILD_STATUS_TOKEN=your-random-string \
+  ALLOWED_ORIGINS=https://sarojaryal071-sudo.github.io
 ```
 
 Or in the dashboard: Edge Functions, create each function and paste the code from `backend/supabase/functions/<name>/index.ts`
@@ -73,8 +71,9 @@ session), `build-status` (the secret token).
 
 - The shop calls `place-order`. The function validates the shape, applies a per-IP rate limit and calls the SQL function
   `place_order`, which recomputes every price from the tables, checks options, stock, pickup day and time, notice period, pause and the
-  daily limit, then takes the next number (`SS-DDMM-NN`) and lowers stock, all in one locked transaction. Then it emails you; if the
-  email fails the order is still saved.
+  daily limit, then takes the next number (`SS-DDMM-NN`) and lowers stock, all in one locked transaction. No email is sent (D-056).
+- Live feed (D-057): `0005_realtime.sql` publishes `orders` to Supabase Realtime. Row-level security applies, so only a signed-in admin
+  receives events; the admin's live view is built in Step 4bc. Check in Database, Replication, that `orders` is listed.
 - Status changes (confirm, cancel, ...) go only through `set_order_status` (stock returns once on cancel, is taken again on re-open).
 - Product, option and photo edits mark "unpublished changes". Publishing (a button in the admin, built in Step 4bc) calls
   `trigger-rebuild`, which starts the GitHub workflow; the workflow reports Live or Failed through `build-status`.
@@ -88,7 +87,7 @@ Do this only after sections 2 to 4 are done and a test order works.
 1. GitHub, Settings, Secrets and variables, Actions, **Variables**: add `SITE_BACKEND` = `supabase`. (To go back to the demo data, delete it.)
 2. Run the deploy workflow (Actions, "Deploy to GitHub Pages", Run workflow). The build now reads the products from Supabase.
    If Supabase cannot be read or has no products, the build **fails** and the live site keeps its last good version.
-3. Place a real order on the site; check the row in Supabase (Table editor, `orders`), the email, and the admin Orders page.
+3. Place a real order on the site; check the row in Supabase (Table editor, `orders`) and the admin Orders page.
 
 ## 7. Tests
 
@@ -98,4 +97,4 @@ Do this only after sections 2 to 4 are done and a test order works.
 - To run `backend/tests/policies.test.sql` against a **disposable** Supabase test project instead, connect with `psql` as the
   `postgres` user and run it. Never run it on the real project: it creates test users, orders and settings.
 - The functions' request checks are tested in `tests/functions.test.mjs`; the build against a fake Supabase in `tests/build-supabase.test.mjs`.
-- Not testable without your accounts: the real email delivery, the GitHub dispatch, Supabase Auth login. Section 6 step 3 covers them.
+- Not testable without your accounts: the GitHub dispatch, Supabase Auth login. Section 6 step 3 covers them.

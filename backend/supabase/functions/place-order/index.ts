@@ -1,11 +1,11 @@
 // place-order: the public endpoint that saves an order (Step 3, architecture section 6).
 // Everything that matters is decided in the database function public.place_order (prices, options, stock, pickup rules,
 // notice period, pause, daily limit, order number). This function adds: CORS for the site's origins only, the honeypot,
-// a per-IP rate limit, and the email to the owner (a failed email never loses the order).
-// Secrets (Supabase function secrets): ALLOWED_ORIGINS, OWNER_EMAIL, EMAIL_API_KEY, EMAIL_FROM (optional), ADMIN_URL (optional).
+// a per-IP rate limit. There is no email (D-056): new orders reach the owner through the admin panel.
+// Secrets (Supabase function secrets): ALLOWED_ORIGINS.
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { allowedOrigin, clientIp, LIMITS, ownerEmail, parseOrderBody } from '../_shared/validate.ts';
+import { allowedOrigin, clientIp, LIMITS, parseOrderBody } from '../_shared/validate.ts';
 
 const json = (status: number, body: unknown, cors: Record<string, string>) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -41,22 +41,5 @@ Deno.serve(async (req) => {
   if (error || !data) { console.error('place_order failed', error?.message); return json(500, { code: 'server', message: 'We could not place your order.' }, cors); }
   if (!data.ok) return json(422, { code: data.code, message: data.message }, cors);
 
-  // Email the owner. A failure is logged and never loses the order (D-037).
-  let emailed = false;
-  try {
-    const key2 = Deno.env.get('EMAIL_API_KEY'), to = Deno.env.get('OWNER_EMAIL');
-    if (key2 && to) {
-      const { data: row } = await db.from('orders').select('items').eq('id', data.order_id).single();
-      const mail = ownerEmail({ order_number: data.order_number, total_pence: data.total_pence, items: row?.items ?? [], ...parsed.payload }, Deno.env.get('ADMIN_URL') ?? '');
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${key2}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: Deno.env.get('EMAIL_FROM') ?? 'Steam & Spice <onboarding@resend.dev>', to: [to], subject: mail.subject, text: mail.text }),
-      });
-      emailed = res.ok;
-      if (!res.ok) console.error('email failed', res.status);
-    }
-  } catch (e) { console.error('email error', (e as Error).message); }
-
-  return json(200, { orderNumber: data.order_number, totalPence: data.total_pence, emailed }, cors);
+  return json(200, { orderNumber: data.order_number, totalPence: data.total_pence, emailed: false }, cors);
 });

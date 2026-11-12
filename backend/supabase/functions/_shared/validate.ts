@@ -52,17 +52,3 @@ export function allowedOrigin(origin: string | null, allowed: string): string | 
 export function clientIp(headers: { get(name: string): string | null }): string {
   return (headers.get('cf-connecting-ip') || headers.get('x-forwarded-for') || headers.get('x-real-ip') || 'unknown').split(',')[0].trim();
 }
-
-const pounds = (pence: number) => (pence % 100 === 0 ? `£${pence / 100}` : `£${(pence / 100).toFixed(2)}`);
-
-// The plain-text email to the owner (D-037). Customer text is only ever put into text, never into HTML.
-export function ownerEmail(order: { order_number: string; total_pence: number; items: any[]; name: string; phone: string; notes: string; pickupDate: string | null; pickupTime: string | null }, adminUrl: string) {
-  const lines = order.items.map((l) => `- ${l.qty} x ${l.name}${l.unit_label ? ` (${l.unit_label})` : ''}${l.options?.length ? ` [${l.options.map((o: any) => o.label).join(', ')}]` : ''}${l.customised ? ' - customised' : ''}  ${pounds(l.unit_price_pence * l.qty)}`);
-  const text = [
-    `New order ${order.order_number}`, '',
-    ...lines, '', `Total: ${pounds(order.total_pence)} (cash on pickup)`,
-    `Pickup: ${order.pickupDate ? `${order.pickupDate}${order.pickupTime ? ` at ${order.pickupTime}` : ''}` : 'no date chosen'}`,
-    `Name: ${order.name}`, `Phone: ${order.phone}`, order.notes ? `Notes: ${order.notes}` : '', '', `Open the admin: ${adminUrl}`,
-  ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
-  return { subject: `New order ${order.order_number} (${pounds(order.total_pence)})`, text };
-}

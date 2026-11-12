@@ -156,16 +156,16 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 3 — Supabase backend and real orders (D-055)
 
-- [x] Migrations: 4 files in `backend/supabase/migrations/` (tables, indexes, `is_admin()`, RLS and grants on every table, `place_order`, `set_order_status`, `create_manual_order`, `full_pickup_dates`, storage bucket) — a3bcd18, applied on a local PostgreSQL 16 with a Supabase shim; not yet run on the real project
+- [x] Migrations: 5 files in (0005 publishes `orders` to Realtime, D-057) `backend/supabase/migrations/` (tables, indexes, `is_admin()`, RLS and grants on every table, `place_order`, `set_order_status`, `create_manual_order`, `full_pickup_dates`, storage bucket) — a3bcd18, applied on a local PostgreSQL 16 with a Supabase shim; not yet run on the real project
 - [x] Seed data as migration 0004 (D-055 replaces `seed.sql`): 2 real products, sauces unpriced and hidden, option groups, settings, pickup rules, notice and site_status rows — a3bcd18, re-run is a no-op
-- [x] `place-order` edge function (shape check, honeypot, per-IP rate limit, DB rules, owner email) — a3bcd18, request checks tested; function itself not deployed
+- [x] `place-order` edge function (shape check, honeypot, per-IP rate limit, DB rules; no email, D-056) — a3bcd18, request checks tested; function itself not deployed
 - [x] `trigger-rebuild` (admin session only) and `build-status` (token) functions; **no database webhook** (D-055: an explicit Publish action) — a3bcd18, not deployed
 - [x] Frontend: Supabase gateway, runtime pickup rules, settings, stock and full dates, `notice.js` — a3bcd18, gateway tests with a faked fetch
 - [x] `build.mjs` fetches products and photos, merges content, fills regions, writes `products.json`, injects public config; `SITE_BACKEND` variable is the one switch — a3bcd18, tested against a fake Supabase
 - [x] Admin on Supabase: `api-supabase.js` (Auth, RLS reads, RPC status changes), vendored `supabase-js` 2.118.0, demo admin left out of a Supabase build — a3bcd18, not run against a real project
-- [x] Backend tests: `backend/tests/run-local.sh` (about 150 checks: RLS per table, tampered prices and options, sold out, lead times, pause, daily limit, status and stock exactly once, simultaneous orders) — a3bcd18, passed locally before the last doc edits
-- [ ] Owner actions: email key, GitHub token, `BUILD_STATUS_TOKEN`, `ALLOWED_ORIGINS`, `OWNER_EMAIL`; run the migrations; deploy the functions; add the admin row (see `backend/README.md`)
-- [ ] Live checks (need the owner actions): real order saved, owner email received, Publish rebuilds, then set `SITE_BACKEND=supabase`
+- [x] Backend tests: `backend/tests/run-local.sh` (158 checks: RLS per table, tampered prices and options, sold out, lead times, pause, daily limit, status and stock exactly once, simultaneous orders) — a3bcd18, passed locally before the last doc edits
+- [ ] Owner actions: GitHub token, `BUILD_STATUS_TOKEN`, `ALLOWED_ORIGINS` (no email, D-056); run the 5 migrations; deploy the functions; add the admin row (see `backend/README.md`)
+- [ ] Live checks (need the owner actions): real order saved, Publish rebuilds, then set `SITE_BACKEND=supabase`
 
 ## Step 4 — Admin panel
 
@@ -218,7 +218,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [ ] Decide order number date format: MMDD or DDMM (decision D-007)
 - [ ] Real sauce pot prices, steam time, pickup hours and capacity (sample values in use, D-023; each marked `data-placeholder` or `"placeholder": true`)
 - [x] Supabase project, one admin user, `SUPABASE_URL` and `SUPABASE_ANON_KEY` variables (done by the owner)
-- [ ] Email provider key, `OWNER_EMAIL`, GitHub dispatch token, `BUILD_STATUS_TOKEN` (Supabase secrets; and a GitHub secret for the last), `ALLOWED_ORIGINS`; run migrations, deploy functions, add the admin row; then set the `SITE_BACKEND` variable (`backend/README.md`)
+- [ ] GitHub dispatch token, `BUILD_STATUS_TOKEN` (Supabase secrets; and a GitHub secret for the last), `ALLOWED_ORIGINS`; run migrations, deploy functions, add the admin row; then set the `SITE_BACKEND` variable (`backend/README.md`)
 - [ ] Generate AI mood images for the slots listed after Step 1
 
 ## File map (agent keeps current, one line per file or folder)
@@ -296,7 +296,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 - 2026-11-12, step 4a2 update for D-053 (0fae91d): `npm test` 50 pass; build passes. Playwright 390 and 1440: Log out icon 44x44, confirm opens with focus on Cancel, Escape closes, Log out leads to login; Status and When selects 16px and 44px high side by side; Custom range reveals From and To (stacked at 390, no overflow), shows the 15 Nov orders; choices survived a reload; first order action button ends at 472 px at 390x844.
 
-- 2026-11-12, step 3 (code only; the Supabase project is not reachable from the agent's sandbox): `backend/tests/run-local.sh` on a local PostgreSQL 16: migrations apply, seed re-runs, about 150 checks pass (RLS for every table, order rules, stock, status changes, simultaneous orders). Fast tests `functions` and `gateway` pass (16). The build tests against a fake Supabase were written but not run in the final session at the owner's request; the default demo build passes. Not tested: real email, GitHub dispatch, Supabase Auth, the deployed functions.
+- 2026-11-12, step 3 (code only; the Supabase project is not reachable from the agent's sandbox): `backend/tests/run-local.sh` on a local PostgreSQL 16: migrations apply, seed re-runs, 158 checks pass (RLS for every table, order rules, stock, status changes, simultaneous orders). Fast tests `functions` and `gateway` pass (16). The build tests against a fake Supabase were written but not run in the final session at the owner's request; the default demo build passes. Not tested: real email, GitHub dispatch, Supabase Auth, the deployed functions.
 
 ## Known issues
 

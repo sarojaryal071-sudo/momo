@@ -117,6 +117,11 @@ select t.chk(t.try('authenticated', :'a', 'select * from order_counters') = 'den
 select t.chk(t.try('authenticated', :'a', 'insert into storage.objects (bucket_id, name) values (''product-images'', ''a.webp'')') = 'ok', 'an admin can upload a photo');
 select t.chk(t.try('authenticated', :'b', 'insert into storage.objects (bucket_id, name) values (''product-images'', ''b.webp'')') = 'denied', 'a non-admin cannot upload a photo');
 
+-- ===== live order feed (D-057) =====
+select t.chk((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'orders') = 1, 'orders are published to Realtime');
+select t.chk((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and tablename not in ('orders')) = 0, 'no other table is published to Realtime');
+select t.chk(not has_table_privilege('anon', 'public.orders', 'select') and not exists (select 1 from pg_policies where tablename = 'orders' and 'anon' = any (roles)), 'an anonymous client can read no orders, so Realtime sends it no events');
+
 -- ===== placing orders =====
 select t.chk(t.seq($$select t.place(t.order_json('chicken-momo', 1))$$, $$select (select order_number from orders order by created_at desc limit 1) = 'SS-1311-01'$$), 'an order with every optional field empty succeeds, number SS-DDMM-NN');
 select t.chk((select total_pence from orders where order_number = 'SS-1311-01') = 1000 and (select pickup_date from orders where order_number = 'SS-1311-01') is null, 'no pickup date is allowed and the price comes from the table');

@@ -14,3 +14,4 @@ grant usage on schema public, auth, storage to anon, authenticated, service_role
 grant select, insert, update, delete on storage.objects to anon, authenticated;
 grant select on storage.buckets to anon, authenticated;
 grant execute on function auth.uid() to anon, authenticated, service_role;
+create publication supabase_realtime;  -- Supabase creates this publication itself
