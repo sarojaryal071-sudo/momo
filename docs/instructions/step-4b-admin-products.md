@@ -1,3 +1,5 @@
+> **Do Steps 4b and 4c as one session (D-054).** Do all of this file, commit, then do all of `step-4c-admin-pickup-settings.md`, commit, and give one combined report (under 50 lines). Run each part's own checks once. Merge to `main` only after both parts are done. Remember D-052 (no visible placeholders or demo wording) and the fonts in D-051.
+
 # Step 4b — Admin: products, options, stock, ingredients and allergens (D-009, D-031, D-046)
 
 Prerequisite: Step 1k is merged (it is) and, for 4b and 4c, the earlier admin sub-step is merged. **Step 3 is not required** (D-048). Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 6, 11 and 12, `docs/technical-rulebook.md` sections 4, 5 and 7, and `docs/ui-rulebook.md` sections 2b and 5. Do only this sub-step. Add its checklist to `docs/progress-tracker.md` first.
