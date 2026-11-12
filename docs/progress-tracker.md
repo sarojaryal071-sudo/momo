@@ -167,6 +167,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [ ] CSV export
 - [ ] Verified: phone-size login, order lifecycle, product change reaches the shop, anonymous and non-admin refused
 
+## Step 4a — Admin: login, orders, prep list, messages, pause ordering (D-036, D-037, D-045, D-048)
+
+- [ ] Demo backend: `mock-backend.js` rules and store, `admin/js/api.js` with `mock` and a `supabase` stub, public mock gateway saves orders
+- [ ] Admin shell (top bar, demo banner, bottom tabs and wide sidebar) and login with two demo accounts
+- [ ] Orders by pickup date, new-order count and tab title, refresh every 60 s, status buttons through the rules
+- [ ] Message customer (editable template, address warning, phone check)
+- [ ] Prep list with totals per product and option, printable
+- [ ] Settings: pause ordering, WhatsApp templates, pickup address text
+- [ ] Tests for the mock rules
+- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
