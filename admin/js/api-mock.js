@@ -3,10 +3,9 @@
 // site that runs on Supabase, so the fixed demo logins below never ship to production.
 import { createMock, fetchSeed, STORE_KEY } from '../../js/mock-backend.js';
 
-// Two fixed logins, not shown on the page. They are never a security control.
+// One fixed login, not shown on the page. They are never a security control.
 const DEMO_ACCOUNTS = [
-  { label: 'Owner', email: 'owner@demo.test', password: 'owner-demo-1' },
-  { label: 'Developer', email: 'dev@demo.test', password: 'dev-demo-1' },
+  { label: 'Owner', email: 'admin@momo.com', password: 'Admin123' },
 ];
 const SESSION_KEY = 'ss-demo-session';
 
