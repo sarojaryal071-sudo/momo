@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Step 4a, coding agent)
-- Current step: **Step 4a built and merged on a demo backend (D-048). Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
-- Next action: Step 4b (products admin) or Step 3, as the owner decides. Do not start either without instruction.
+- Last updated: 2026-11-12 (Step 1l, coding agent)
+- Current step: **Step 1l built and merged (Bebas Neue and Space Grotesk, density, no visible placeholders). Steps 0 to 2 live-URL checks still open**
+- Next action: Step 4a2 (admin polish), then 4b, 4c or Step 3, as the owner decides. Do not start one without instruction.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -131,14 +131,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 1l — Klandestina typography, density and no visible placeholders (D-050, D-051, D-052)
 
-- [ ] Fonts switched to Bebas Neue and Space Grotesk, old fonts removed (public and admin)
-- [ ] Visible placeholders and demo data removed; `data-pending` gate in place
-- [ ] Audit table and new type and spacing tokens; old `--step-*` removed
-- [ ] All public components switched to the tokens
-- [ ] Hero and sections at the new density
-- [ ] Buttons, inputs, focus rings, loading state per spec
-- [ ] `--muted` token and contrast checked; `overflow-x` hacks removed
-- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+- [x] Fonts switched to Bebas Neue and Space Grotesk, old fonts removed (public and admin) — 96c6bab, Bebas Neue 400 + Space Grotesk variable (36 kB woff2), OFL texts added, Instrument Serif and Hanken removed; computed fonts checked on public and admin
+- [x] Visible placeholders and demo data removed; `data-pending` gate in place — 96c6bab, all visible sample/demo/TODO wording removed from 5 public and 6 admin pages (text scan clean); `data-pending` and `"pending": true` gate checked by the indexable build; admin starts empty with "No orders yet"
+- [x] Audit table and new type and spacing tokens; old `--step-*` removed — 96c6bab, audit before/after in the report; `--text-*`, `--section-space`, admin tokens in theme.css; `--step-*`, `--display-*`, `--band-pad`, `--section-gap` removed
+- [x] All public components switched to the tokens — 96c6bab, header, menu, hero, trust row, cards, sheet, tiles, steps, statement, footer, shop, cart, done, how to cook, receipt switched (screenshots at 390 and 1440)
+- [x] Hero and sections at the new density — 96c6bab, hero 538 px at 390 (first card name ends at 1013 px = 1.2 screens); hero panel 433 px at 1440; section gaps 40 to 80 px
+- [x] Buttons, inputs, focus rings, loading state per spec — 96c6bab, buttons 0.9375rem, inputs 16px, 2px focus ring, "Placing order..." with aria-busy and disabled while saving
+- [x] `--muted` token and contrast checked; `overflow-x` hacks removed — 96c6bab, `--muted` 7.2:1 on white and 6.3:1 on tints; no `overflow-x` hacks; no horizontal scroll at 320 to 1440
+- [x] Checked in own screenshots, merged to `main`, deploy confirmed — 96c6bab, own screenshots checked; merge and deploy recorded in the log
 
 ## Step 2 — Cart and order flow (mock)
 
@@ -242,6 +242,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `frontend/js/cart.js`, `main.js` | Cart store, lines and totals, `formatPrice`, header count | 2 |
 | `frontend/js/shop.js`, `cart-page.js`, `done.js`, `data.js` | Page scripts and data loading (products.json, seed fallback) | 2 |
 | `frontend/js/pickup.js`, `data/pickup.seed.json` | Pickup dates and times; sample hours | 2 |
+| `frontend/assets/fonts/` | Bebas Neue 400 and Space Grotesk variable woff2 with OFL texts (D-051) | 1l |
 | `frontend/js/mock-backend.js` | Demo backend rules and localStorage store, shared by shop and admin (D-048) | 4a |
 | `admin/` (`login/index/prep/settings/products/pickup.html`, `js/`, `css/admin.css`) | Admin on `api.js` (mock now, supabase stub); products and pickup are placeholders | 4a |
 | `frontend/js/order-gateway.js`, `whatsapp.js` | Mock/supabase gateway with timeout; message, link, phone conversion | 2 |
@@ -274,6 +275,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-10, step 0: dev server 200s and styles applied at 360 px; build with `SITE_INDEXABLE` unset gives noindex + `Disallow: /`; with `true` gives no noindex, `Allow`, sitemap line; `npm test` runs clean. Live deploy not yet run.
 
 - 2026-11-12, step 4a (demo mode): `npm test` 49 pass; build validation passes. Browser run: both demo logins, logout, 5 admin URLs redirect when logged out; public cart order appeared in admin; statuses new>confirmed>ready>collected>new; cancel returned stock (19>21), re-open took it (19), re-open with 0 stock refused with a message; WhatsApp texts for 3 statuses, address-empty warning, invalid phone disabled; pause refused on public cart; prep totals correct and 1 A4 page; 390 and 1440 px screenshots checked, no overflow. Not tested: a real phone, real WhatsApp, the 60 s refresh by waiting (storage-event path used).
+
+- 2026-11-12, step 1l: `npm test` 50 pass; build validation passes; `SITE_INDEXABLE=true` build fails on `data-pending` and `"pending": true` as intended. Playwright at 390x844 and 1440x900 on home, shop, product sheet, cart, done, how to cook, menu and the admin; body 16px on both (admin 15px); h1 49px/96px, h2 38px/60px; no horizontal scroll at 320, 375, 390, 414, 768, 1280, 1440; only font files requested: bebas-neue and space-grotesk; Place order showed "Placing order..." disabled with aria-busy. Home page 305 kB uncompressed on a full scroll (fonts 36 kB, images 157 kB, CSS 56 kB, JS 28 kB).
 
 ## Known issues
 
