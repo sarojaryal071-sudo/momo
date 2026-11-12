@@ -1,0 +1,112 @@
+name: Deploy backend (Supabase)
+
+# Applies new database migrations and deploys the three edge functions whenever backend/supabase/** changes on main (D-058).
+# Never runs on pull requests. Runs in the GitHub Environment "production" (the owner can require approval there).
+# The site build and deploy (deploy.yml) do not depend on this workflow.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/supabase/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Two runs never overlap, and a run is never cancelled half way through a migration.
+concurrency:
+  group: backend-deploy
+  cancel-in-progress: false
+
+env:
+  SUPABASE_CLI_VERSION: 2.122.0 # pinned
+  FUNCTIONS: place-order trigger-rebuild build-status
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      # Without the three repository secrets the job skips cleanly with a message (it is not a red failure).
+      - name: Check that the secrets are set
+        id: secrets
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          missing=""
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || missing="$missing SUPABASE_ACCESS_TOKEN"
+          [ -n "$SUPABASE_DB_PASSWORD" ] || missing="$missing SUPABASE_DB_PASSWORD"
+          [ -n "$SUPABASE_PROJECT_REF" ] || missing="$missing SUPABASE_PROJECT_REF"
+          if [ -n "$missing" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Backend deploy skipped::These repository secrets are not set:$missing. Nothing was changed. See backend/README.md, section 3."
+            { echo "### Backend deploy skipped"; echo; echo "These repository secrets are not set:$missing"; echo; echo "Nothing was changed. Add them, then run this workflow again (see \`backend/README.md\`, section 3)."; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install the Supabase CLI
+        if: steps.secrets.outputs.ready == 'true'
+        uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - name: Link the project
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: supabase --workdir backend link --project-ref "$SUPABASE_PROJECT_REF"
+
+      # Which migrations are already on the project? (Empty on the first run: then all of them are new.)
+      - name: Read the applied migrations
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase --workdir backend migration list 2>/dev/null | tr '│' '|' \
+            | awk -F'|' 'NF >= 3 { gsub(/[[:space:]]/, "", $2); if ($2 ~ /^[0-9]+$/) print $2 }' > "$RUNNER_TEMP/applied.txt" || true
+          echo "Already applied: $(wc -l < "$RUNNER_TEMP/applied.txt")"
+
+      - name: Guard against destructive migrations
+        if: steps.secrets.outputs.ready == 'true'
+        run: node scripts/check-migrations.mjs --dir backend/supabase/migrations --applied "$RUNNER_TEMP/applied.txt"
+
+      - name: Apply new migrations
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase --workdir backend db push
+
+      - name: Deploy the edge functions
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: supabase --workdir backend functions deploy $FUNCTIONS --no-verify-jwt --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Summary
+        if: steps.secrets.outputs.ready == 'true'
+        run: |
+          new=""
+          for f in backend/supabase/migrations/*.sql; do
+            v="$(basename "$f" | cut -d_ -f1)"
+            grep -qx "$v" "$RUNNER_TEMP/applied.txt" || new="$new\n- $(basename "$f")"
+          done
+          {
+            echo "### Backend deployed"
+            echo
+            echo "Migrations applied in this run:"
+            if [ -n "$new" ]; then printf '%b\n' "$new"; else echo "- none (the database was already up to date)"; fi
+            echo
+            echo "Edge functions deployed: $FUNCTIONS"
+            echo
+            echo "Function secrets are not touched by this workflow (backend/README.md, section 4)."
+          } >> "$GITHUB_STEP_SUMMARY"

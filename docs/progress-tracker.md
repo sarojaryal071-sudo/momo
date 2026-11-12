@@ -167,6 +167,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [ ] Owner actions: GitHub token, `BUILD_STATUS_TOKEN`, `ALLOWED_ORIGINS` (no email, D-056); run the 5 migrations; deploy the functions; add the admin row (see `backend/README.md`)
 - [ ] Live checks (need the owner actions): real order saved, Publish rebuilds, then set `SITE_BACKEND=supabase`
 
+## Step 3b — Backend deploys itself (D-058)
+
+- [ ] `.github/workflows/backend-deploy.yml` (push to main on `backend/supabase/**` and by hand; environment `production`; pinned CLI 2.122.0; link, guard, `db push`, functions deploy; skips cleanly without secrets)
+- [ ] `scripts/check-migrations.mjs` guard and `tests/check-migrations.test.mjs` (4 tests; the real migrations pass)
+- [ ] `backend/README.md` rewritten for the owner steps (access token, database password, three secrets, environment, first run, function secrets, admin SQL, `SITE_BACKEND`)
+- [ ] First real run (needs the owner's three secrets; cannot be done from the agent's sandbox)
+
 ## Step 4 — Admin panel
 
 - [ ] Login and session guard
