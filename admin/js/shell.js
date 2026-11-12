@@ -1,4 +1,4 @@
-// Runs on every admin page except the login: checks the session, wires the menu and log out, and shows the paused strip.
+// Runs on every admin page except the login: checks the session, wires the Log out button and its confirm, and shows the paused strip.
 // With the real backend the database checks the session too; this check is only for friendliness.
 import { api } from './api.js';
 
@@ -11,13 +11,14 @@ if (!user) {
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === current) a.setAttribute('aria-current', 'page'); });
   document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api.logout(); location.replace('login.html'); }));
 
-  // Menu: opens under the button, closes on Escape, on a click elsewhere, or when focus leaves.
-  const menuBtn = document.querySelector('[data-menu-btn]');
-  const menu = document.getElementById('admin-menu');
-  const setMenu = (open) => { menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open)); };
-  menuBtn.addEventListener('click', () => { setMenu(menu.hidden); if (!menu.hidden) menu.querySelector('button').focus(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); menuBtn.focus(); } });
-  document.addEventListener('click', (e) => { if (!menu.hidden && !e.target.closest('.admin-menu-wrap')) setMenu(false); });
+  // Log out: an icon button that opens a small in-page confirm. Escape or a click elsewhere closes it.
+  const outBtn = document.querySelector('[data-logout-btn]');
+  const confirmBox = document.getElementById('logout-confirm');
+  const setConfirm = (open) => { confirmBox.hidden = !open; outBtn.setAttribute('aria-expanded', String(open)); };
+  outBtn.addEventListener('click', () => { setConfirm(confirmBox.hidden); if (!confirmBox.hidden) confirmBox.querySelector('[data-logout-cancel]').focus(); });
+  confirmBox.querySelector('[data-logout-cancel]').addEventListener('click', () => { setConfirm(false); outBtn.focus(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !confirmBox.hidden) { setConfirm(false); outBtn.focus(); } });
+  document.addEventListener('click', (e) => { if (!confirmBox.hidden && !e.target.closest('.admin-actions')) setConfirm(false); });
 
   // Paused strip: at the top of every page while ordering is paused. Settings fires "settings-changed" after a save.
   const strip = document.querySelector('[data-paused]');

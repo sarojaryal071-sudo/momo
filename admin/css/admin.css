@@ -8,8 +8,9 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .admin-brand { font-family: var(--font-head); font-size: var(--brand-size); letter-spacing: var(--tracking-display); text-transform: uppercase; color: var(--emerald); text-decoration: none; }
 .icon-btn { display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap); padding: 0; background: var(--white); color: var(--emerald); border: var(--hairline) solid var(--line-strong); border-radius: var(--radius); cursor: pointer; }
 .icon-btn svg { inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
-.admin-menu-wrap { position: relative; }
-.admin-menu { position: absolute; inset-block-start: calc(100% + var(--space-3xs)); inset-inline-end: 0; z-index: var(--z-bar); min-inline-size: 10rem; padding: var(--space-3xs); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow-card); }
+.admin-actions { position: relative; }
+.admin-menu { position: absolute; inset-block-start: calc(100% + var(--space-3xs)); inset-inline-end: 0; z-index: var(--z-bar); min-inline-size: 13rem; padding: var(--space-s); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow-card); }
+.admin-menu p { margin: 0 0 var(--space-xs); font-weight: 600; }
 .menu-item { display: block; inline-size: 100%; min-block-size: var(--tap); padding-inline: var(--space-s); text-align: start; font: inherit; font-weight: 600; color: var(--charcoal); background: none; border: 0; border-radius: var(--radius); cursor: pointer; }
 .menu-item:hover { background: var(--green-tint); }
 .paused-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xs); padding: var(--space-xs) var(--gutter); background: var(--turmeric); color: var(--charcoal); border-block-end: var(--hairline) solid var(--charcoal); font-size: var(--text-small); }
@@ -65,6 +66,9 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .chip[aria-pressed="true"] { background: var(--emerald); color: var(--white); border-color: var(--emerald); }
 .chip small { font-size: var(--text-small); font-weight: 600; opacity: 1; }
 .date-range { margin-block-end: var(--space-s); }
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xs); }
+.filters .field { margin: 0 0 var(--space-xs); }
+.custom-range { --field-min: 14rem; } /* stacked on phones, side by side once there is room */
 .date-range summary { display: flex; align-items: center; min-block-size: var(--tap); font-weight: 600; color: var(--emerald); cursor: pointer; }
 
 .panel { background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius); padding: var(--space-m); margin-block-end: var(--space-m); }

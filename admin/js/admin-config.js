@@ -6,6 +6,7 @@ export const DEMO_ACCOUNTS = [
   { label: 'Developer', email: 'dev@demo.test', password: 'dev-demo-1' },
 ];
 export const SESSION_KEY = 'ss-demo-session';
+export const FILTER_KEY = 'ss-admin-orders-filter'; // the chosen Status and When survive a reload
 export const SEEN_KEY = 'ss-admin-seen'; // ids of orders she has opened, so new ones stay highlighted until then
 export const ORDERS_REFRESH_SECONDS = 60; // the orders list refreshes itself (no sound, no live subscription, D-045g)
 export const PREP_DEFAULT_OFFSET_DAYS = 1; // the prep list opens on tomorrow

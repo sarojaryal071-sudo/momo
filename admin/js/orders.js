@@ -1,5 +1,5 @@
 import { api } from './shell.js';
-import { ORDERS_REFRESH_SECONDS, SEEN_KEY, STATUS_LABELS, TEMPLATE_BY_STATUS, NEXT_STATUS } from './admin-config.js';
+import { FILTER_KEY, ORDERS_REFRESH_SECONDS, SEEN_KEY, STATUS_LABELS, TEMPLATE_BY_STATUS, NEXT_STATUS } from './admin-config.js';
 import { formatPrice } from '../../js/cart.js';
 import { ukToday } from '../../js/mock-backend.js';
 import { addDays, endOfWeek, shortDate } from './dates.js';
@@ -9,7 +9,9 @@ const root = document.querySelector('[data-orders]');
 const emptyNote = document.querySelector('[data-empty]');
 const fromInput = document.querySelector('[data-from]');
 const toInput = document.querySelector('[data-to]');
-const pastSwitch = document.querySelector('[data-past]');
+const statusSelect = document.querySelector('[data-status]');
+const whenSelect = document.querySelector('[data-when]');
+const customBox = document.querySelector('[data-custom]');
 const countBadge = document.querySelector('[data-new-count]');
 const countNumber = document.querySelector('[data-new-number]');
 const baseTitle = 'Orders | Admin';
@@ -17,7 +19,7 @@ const baseTitle = 'Orders | Admin';
 const seen = (() => { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); } })();
 const markSeen = (id) => { seen.add(id); try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seen])); } catch { /* ignore */ } };
 
-const view = { status: 'active', range: 'upcoming', past: false };
+const view = { status: 'active', range: 'upcoming' };
 let settings = await api.getSettings();
 let busy = false; // do not redraw while a confirmation or message box is open
 
@@ -40,8 +42,9 @@ function window_() {
   if (view.range === 'today') return { from: today, to: today };
   if (view.range === 'tomorrow') { const d = addDays(today, 1); return { from: d, to: d }; }
   if (view.range === 'week') return { from: today, to: endOfWeek(today) };
+  if (view.range === 'past') return { from: null, to: addDays(today, -1) };
   if (view.range === 'custom') return { from: fromInput.value || null, to: toInput.value || null };
-  return { from: view.past ? null : today, to: null };
+  return { from: today, to: null };
 }
 
 function messageText(order, status) {
@@ -165,20 +168,22 @@ async function refresh() {
   emptyNote.hidden = shown.length > 0;
 }
 
-function press(group, attr, value) {
-  group.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset[attr] === value)));
-}
-const statusGroup = document.querySelector('[data-status-chips]');
-const rangeGroup = document.querySelector('[data-range-chips]');
-statusGroup.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c) return; view.status = c.dataset.status; press(statusGroup, 'status', view.status); busy = false; refresh(); });
-rangeGroup.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c) return; view.range = c.dataset.range; press(rangeGroup, 'range', view.range); busy = false; refresh(); });
-for (const input of [fromInput, toInput]) input.addEventListener('change', () => { view.range = 'custom'; press(rangeGroup, 'range', ''); busy = false; refresh(); });
-pastSwitch.addEventListener('click', () => {
-  view.past = pastSwitch.getAttribute('aria-checked') !== 'true';
-  pastSwitch.setAttribute('aria-checked', String(view.past));
-  pastSwitch.querySelector('.switch-text').textContent = view.past ? 'On' : 'Off';
-  busy = false; refresh();
-});
+// Filters: two dropdowns (D-053). The choice survives a reload.
+const saveFilters = () => { try { localStorage.setItem(FILTER_KEY, JSON.stringify({ ...view, from: fromInput.value, to: toInput.value })); } catch { /* ignore */ } };
+const showFilters = () => { statusSelect.value = view.status; whenSelect.value = view.range; customBox.hidden = view.range !== 'custom'; };
+try {
+  const saved = JSON.parse(localStorage.getItem(FILTER_KEY) || 'null');
+  if (saved) {
+    if ([...statusSelect.options].some((o) => o.value === saved.status)) view.status = saved.status;
+    if ([...whenSelect.options].some((o) => o.value === saved.range)) view.range = saved.range;
+    fromInput.value = saved.from || ''; toInput.value = saved.to || '';
+  }
+} catch { /* start with the defaults */ }
+showFilters();
+const onFilter = () => { view.status = statusSelect.value; view.range = whenSelect.value; showFilters(); saveFilters(); busy = false; refresh(); };
+statusSelect.addEventListener('change', onFilter);
+whenSelect.addEventListener('change', onFilter);
+for (const input of [fromInput, toInput]) input.addEventListener('change', onFilter);
 document.addEventListener('click', (e) => { document.querySelectorAll('.more[open]').forEach((d) => { if (!d.contains(e.target)) d.open = false; }); });
 api.onChange(() => refresh());
 setInterval(refresh, ORDERS_REFRESH_SECONDS * 1000);
