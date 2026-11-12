@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-10 (Step 2 build, coding agent)
-- Current step: **Step 1k done and merged to `main`; Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
-- Next action: After the owner switches Pages and merges to `main`: open the pages on the live URL, run Lighthouse on `index.html` and `shop.html`, check the WhatsApp link on a phone, then tick the open Step 0, 1 and 2 verify items. Step 3 needs the owner's Supabase actions first.
+- Last updated: 2026-11-12 (Step 4a, coding agent)
+- Current step: **Step 4a built and merged on a demo backend (D-048). Steps 0 to 2 live-URL checks still open (the agent cannot reach github.io)**
+- Next action: Step 4b (products admin) or Step 3, as the owner decides. Do not start either without instruction.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -169,14 +169,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 4a — Admin: login, orders, prep list, messages, pause ordering (D-036, D-037, D-045, D-048)
 
-- [ ] Demo backend: `mock-backend.js` rules and store, `admin/js/api.js` with `mock` and a `supabase` stub, public mock gateway saves orders
-- [ ] Admin shell (top bar, demo banner, bottom tabs and wide sidebar) and login with two demo accounts
-- [ ] Orders by pickup date, new-order count and tab title, refresh every 60 s, status buttons through the rules
-- [ ] Message customer (editable template, address warning, phone check)
-- [ ] Prep list with totals per product and option, printable
-- [ ] Settings: pause ordering, WhatsApp templates, pickup address text
-- [ ] Tests for the mock rules
-- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+- [x] Demo backend: `mock-backend.js` rules and store, `admin/js/api.js` with `mock` and a `supabase` stub, public mock gateway saves orders — 5f8da99, `frontend/js/mock-backend.js` (rules+store), `admin/js/api.js`, public gateway saves orders; order numbers SS-DDMM-NN
+- [x] Admin shell (top bar, demo banner, bottom tabs and wide sidebar) and login with two demo accounts — 5f8da99, bottom tabs at 390 px, sidebar at 1440 px, demo banner; both demo logins work; logged-out URLs redirect
+- [x] Orders by pickup date, new-order count and tab title, refresh every 60 s, status buttons through the rules — 5f8da99, live order from the shop appeared under its date; tab title "(4) Orders"; statuses walked through the rules
+- [x] Message customer (editable template, address warning, phone check) — 5f8da99, texts read for confirmed, ready, cancelled; address warning; invalid phone disables the button
+- [x] Prep list with totals per product and option, printable — 5f8da99, 14 Nov: chicken x4, veg x4, hot sauce x1, customised x2; prints on 1 A4 page
+- [x] Settings: pause ordering, WhatsApp templates, pickup address text — 5f8da99, pause shown on public cart and order refused; address and templates save
+- [x] Tests for the mock rules — 5f8da99, `npm test` 49 pass (12 mock rules, gateway, whatsapp templates)
+- [x] Checked in own screenshots, merged to `main`, deploy confirmed — 5f8da99, screenshots at 390 and 1440 px opened and checked; merge/deploy recorded in the log
 
 ## Step 5 — SEO, hardening and launch checks
 
@@ -231,6 +231,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `frontend/js/cart.js`, `main.js` | Cart store, lines and totals, `formatPrice`, header count | 2 |
 | `frontend/js/shop.js`, `cart-page.js`, `done.js`, `data.js` | Page scripts and data loading (products.json, seed fallback) | 2 |
 | `frontend/js/pickup.js`, `data/pickup.seed.json` | Pickup dates and times; sample hours | 2 |
+| `frontend/js/mock-backend.js` | Demo backend rules and localStorage store, shared by shop and admin (D-048) | 4a |
+| `admin/` (`login/index/prep/settings/products/pickup.html`, `js/`, `css/admin.css`) | Admin on `api.js` (mock now, supabase stub); products and pickup are placeholders | 4a |
 | `frontend/js/order-gateway.js`, `whatsapp.js` | Mock/supabase gateway with timeout; message, link, phone conversion | 2 |
 | `scripts/lib/validate.mjs` | Launch blockers: `TODO:`, `data-placeholder`, `"placeholder": true` | 2 |
 | `tests/{cart,pickup,whatsapp,gateway,launch-gate}.test.mjs` | Unit tests for Step 2 and the launch gate | 2 |
@@ -259,6 +261,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-10, step 2: merged origin/main (D-023). `npm test` 23 pass. Dev server at 360 px: added both packs and a sauce pot (header count 4), edited qty, removed a line, reload kept cart (£40). Empty-field confirm -> `done.html?o=SS-TEST-01`, cart cleared. Filled confirm: pickup, name and notes appear in the message; notes with `<b>` shown as text. Forced failure (backend `broken`): plain error text, WhatsApp link without number opened, cart kept, button re-enabled. Keyboard: tab order sane, Enter adds and submits, focus ring visible. Only console errors: expected 404 for `data/products.json` on the dev server (seed fallback used). Not done: live URL, real WhatsApp on a phone.
 - 2026-11-10, step 1: merged origin/main (D-022). `npm test` 3 pass; `npm run build` validations pass (3 pages, titles and descriptions in range, one h1, canonical); `SITE_INDEXABLE=true` build fails on the `TODO:` text as intended; 3 pages at 320, 360 and 1280 px had no horizontal overflow; screenshots checked for home and shop. Contrast ratios: charcoal/cream 13.57, chutney link/cream 5.05, cream-light/chutney 5.45, cream/charcoal 13.57, charcoal/turmeric 7.12, clay/cream 4.92, cream-light/clay 5.31. Lighthouse not run (not available).
 - 2026-11-10, step 0: dev server 200s and styles applied at 360 px; build with `SITE_INDEXABLE` unset gives noindex + `Disallow: /`; with `true` gives no noindex, `Allow`, sitemap line; `npm test` runs clean. Live deploy not yet run.
+
+- 2026-11-12, step 4a (demo mode): `npm test` 49 pass; build validation passes. Browser run: both demo logins, logout, 5 admin URLs redirect when logged out; public cart order appeared in admin; statuses new>confirmed>ready>collected>new; cancel returned stock (19>21), re-open took it (19), re-open with 0 stock refused with a message; WhatsApp texts for 3 statuses, address-empty warning, invalid phone disabled; pause refused on public cart; prep totals correct and 1 A4 page; 390 and 1440 px screenshots checked, no overflow. Not tested: a real phone, real WhatsApp, the 60 s refresh by waiting (storage-event path used).
 
 ## Known issues
 
