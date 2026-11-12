@@ -18,6 +18,8 @@ Real orders: the site saves each order in a database, assigns the order number (
 
 **Project settings the owner chose (12 Nov 2026):** project "Steam & Spice", region Europe, Data API on, **"Automatically expose new tables" off**, **"Automatic RLS" on**. Therefore every migration must create tables with RLS enabled and add explicit `GRANT`s for exactly the roles that need access (anon read on public tables only, authenticated for admins), and the policy tests must prove it.
 
+**Key type:** this project uses Supabase's new key format. The public key is a *publishable key* (`sb_publishable_...`) and replaces the old anon key; it is public and may live in the repo and in the `SUPABASE_ANON_KEY` variable. It is not a JWT, so Edge Functions must not rely on the default JWT check for anonymous calls: for `place-order` set `verify_jwt = false` and validate everything yourself (honeypot, rate limit, server-side prices); for admin-only functions such as `trigger-rebuild`, verify the admin's session inside the function. Never use or ask for the secret key in the repo.
+
 Write `backend/README.md` as a step-by-step guide for these actions in plain language, with where each value goes.
 
 ## Do
