@@ -1,4 +1,4 @@
-# Step 4a2 — Admin UI polish (decisions D-049, D-050)
+# Step 4a2 — Admin UI polish (decisions D-049, D-050, D-052, D-053)
 
 > **Fonts are Bebas Neue and Space Grotesk (D-051), and no placeholder or demo wording is visible (D-052); Step 1l sets both.** **Do Step 1l first** (it sets the new tokens). In this step use the **admin type tokens and spacing in `docs/design/type-and-spacing-spec.md` sections 3 to 5**; where this file mentions a size (for example the page title), the spec wins.
 
@@ -14,7 +14,7 @@ Prerequisite: Step 4a and Step 1l are merged. Merge `origin/main` first. Read `C
 
 ## 1. Shell
 
-- **Slim top bar**, about 56 px: wordmark "Steam & Spice" left; a small **Demo** pill (tap or click shows the old explanation in a small popover); on the right a menu button holding Log out (and later Security). Remove the large Log out button and the large demo banner.
+- **Slim top bar**, about 56 px: wordmark left; on the right a single **Log out icon button** (a door with an arrow, 44 px, accessible name "Log out", visible focus). **No hamburger menu** (decision D-053): every page is in the bottom tab bar. Tapping Log out asks a small in-page confirm ("Log out?" with Log out and Cancel). There is no Demo pill or demo banner (D-052). Remove the large Log out button.
 - A **paused strip** (amber with text, not colour alone) at the very top of every admin page while ordering is paused: "Ordering is paused" and a "Resume" button.
 - Content gets bottom padding equal to the tab bar height plus the safe-area inset, so the last card and its buttons are never hidden. Page title in Instrument Serif at the admin size from the spec (1.5rem), one line.
 - Wide screens (from the desktop token up): sidebar plus content with a maximum content width token; no stretched fields; two-column layouts only where they help.
@@ -28,7 +28,7 @@ Prerequisite: Step 4a and Step 1l are merged. Merge `origin/main` first. Read `C
 
 ## 3. Orders page
 
-- **Compact filters:** one horizontally scrollable row of status chips (Open, New, Confirmed, Ready, Collected, Cancelled, All) and a row of quick ranges (Today, Tomorrow, This week, All upcoming); the exact From and To dates live in a collapsed "Date range" section. "Prep list" is a link-style button at the top right of the title row; "Show past orders too" becomes a toggle in the same collapsed section. The first order must be visible without scrolling on a 390 by 844 phone.
+- **Compact filters (D-053): two native dropdowns side by side in one row**, 16 px text, 44 px high, no pills. **Status:** Open (default), New, Confirmed, Ready, Collected, Cancelled, All. **When:** Today, Tomorrow, This week, All upcoming (default), Past, Custom range. Choosing Custom range reveals the From and To date fields directly below (stacked on phones, side by side from 480 px, no overflow); no empty "Date range" label otherwise. "Prep list" is a link-style button at the top right of the title row. Chosen filters survive a reload. The first order must be visible without scrolling on a 390 by 844 phone. The old chip rows are removed.
 - **New orders count:** a compact badge next to the title ("3 new") in emerald, not the large red numeral.
 - **Order card**, white with a hairline border and a 4 px emerald left bar only for `new`:
   1. Top row: order number (left) and a **status badge** (right) with text, for example New (solid emerald, white text), Confirmed (green tint, emerald text), Ready (peach tint), Collected (outline), Cancelled (outline, struck number). Sample or manual tags are small outline pills.
@@ -61,7 +61,7 @@ Change behaviour, rules, data, tests (except where markup changes, then update a
 - A card for each status (create demo orders in each state) looks right, and status is never shown by colour alone.
 - Prep list: day chips, the page opens on a day with orders, fields aligned, printed layout checked in print preview.
 - Settings: toggle switch works by tap and keyboard; card headings readable; Saved confirmation visible.
-- Top bar slim; Demo pill popover; paused strip appears when paused; the bottom tab bar never hides content.
+- Top bar slim with the Log out icon (no hamburger, no demo pill); paused strip appears when paused; the bottom tab bar never hides content.
 - Keyboard focus visible on chips, buttons, toggle and menus; reduced motion honoured.
 
 ## Verify (once each)
@@ -70,7 +70,7 @@ Change behaviour, rules, data, tests (except where markup changes, then update a
 
 ## Tracker checklist to add
 
-- [ ] Slim top bar, Demo pill, paused strip, bottom padding
+- [ ] Slim top bar with Log out icon and confirm, paused strip, bottom padding
 - [ ] Form controls: no overflow, aligned fields, toggle switch
 - [ ] Orders: compact filters, new card layout with primary next action and More menu
 - [ ] Prep list: day chips, clear result layout, print
