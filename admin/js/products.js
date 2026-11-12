@@ -246,4 +246,5 @@ async function shrink(file) {
 }
 
 addButton.addEventListener('click', () => edit(null));
-await load(); drawList(); await drawPublish();
+try { await load(); drawList(); await drawPublish(); }
+catch (e) { listBox.replaceChildren(el('p', { className: 'error', role: 'alert' }, `The products could not be loaded: ${e.message}`)); }

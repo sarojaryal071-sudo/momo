@@ -342,6 +342,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 - 2026-11-12, step 4e tab bar fix: Chromium with a mobile 390x844 profile on Home, Orders, Products, Pickup and Settings (demo data, all long pages): the bar's bottom edge equals the viewport at the top, at the end of the scroll, after the viewport shrank to 760 (toolbar collapse emulated by resizing) and after it grew back; the document never scrolls; desktop keeps the fixed sidebar. Could not reproduce the iPhone bug or test real Safari, so the exact cause is unconfirmed.
 
+- 2026-11-12, Products tab blank on the owner's iPhone: could not reproduce on the built site under `/momo/` (demo data) nor with a faked Supabase client; added `admin/js/boot-guard.js` (a failing admin page now shows the error and a Reload link instead of staying blank) and a visible error if the product list cannot load. Cause unconfirmed; ask the owner for the message it shows.
+
 ## Known issues
 
 - Dev server has no `data/products.json` (build writes it), so `data.js` falls back to the seed after one 404. Unpriced add-ons omit `data-price-pence`. Product JSON-LD skips sample-priced products and has no `image` yet. `dist/admin/` is an empty folder. Done page auto-opens WhatsApp once per order number per tab session. The mock total comes from the browser (`totalPenceHint`); the real backend recomputes (Step 3). Sample label wording is "sample".

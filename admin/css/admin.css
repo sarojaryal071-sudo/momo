@@ -291,3 +291,6 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
   .admin-body:not(.login-body) { display: block; block-size: auto; overflow: visible; }
   .admin-body:not(.login-body) > .admin-main { overflow: visible; inline-size: 100%; padding-inline: 0; }
 }
+
+.boot-error { padding: var(--space-s) var(--gutter); background: var(--peach-tint); color: var(--chutney); font-weight: 700; border-block-end: var(--hairline) solid var(--chutney); }
+.boot-error a { color: var(--chutney); }
