@@ -167,3 +167,30 @@ test('allergens are an editable list: usage, rename, delete removes it from prod
   assert.throws(() => saveProduct(s, { id: 'veg-momo', name: 'Frozen veg momo', kind: 'pack', price_pence: 1000, active: true, available: true, allergen_ids: [], ingredients: [] }), /I have checked/);
   assert.ok(saveProduct(s, { id: 'veg-momo', name: 'Frozen veg momo', kind: 'pack', price_pence: 1000, active: false, available: true, allergen_ids: [], ingredients: [] }));
 });
+
+// Step 4i: sales summary (D-064)
+import { salesBars, salesRange } from '../frontend/js/admin-rules.js';
+import { salesSummary } from '../frontend/js/mock-backend.js';
+test('sales: only Collected orders count, per pickup day, zero days included', () => {
+  const o = (status, pickup_date, total_pence, order_date = '2026-03-01') => ({ status, pickup_date, total_pence, order_date });
+  const rows = salesSummary({ orders: [o('collected', '2026-03-02', 1000), o('collected', '2026-03-02', 2050), o('cancelled', '2026-03-02', 999), o('new', '2026-03-02', 999), o('collected', null, 500, '2026-03-04')] }, '2026-03-01', '2026-03-05');
+  assert.equal(rows.length, 5);
+  assert.deepEqual(rows[1], { day: '2026-03-02', total_pence: 3050, order_count: 2 });
+  assert.equal(rows[3].total_pence, 500); assert.equal(rows[0].total_pence, 0);
+  assert.throws(() => salesSummary({ orders: [] }, '2026-03-05', '2026-03-01'));
+});
+test('sales: periods start on Monday, month is the calendar month, custom is validated', () => {
+  assert.deepEqual(salesRange('week', '2026-11-15'), { from: '2026-11-09', to: '2026-11-15' }); // a Sunday
+  assert.deepEqual(salesRange('week', '2026-11-13'), { from: '2026-11-09', to: '2026-11-15' });
+  assert.deepEqual(salesRange('month', '2026-02-10'), { from: '2026-02-01', to: '2026-02-28' });
+  assert.ok(salesRange('custom', '2026-11-13', '2026-11-10', '2026-11-01').error);
+  assert.ok(salesRange('custom', '2026-11-13', '', '').error);
+  assert.deepEqual(salesRange('custom', '2026-11-13', '2026-11-01', '2026-11-01'), { from: '2026-11-01', to: '2026-11-01' });
+});
+test('sales: a month becomes weekly bars, a week stays daily, totals match', () => {
+  const rows = (from, n) => Array.from({ length: n }, (_, i) => ({ day: new Date(Date.UTC(2026, 10, from + i, 12)).toISOString().slice(0, 10), total_pence: 100, order_count: 1 }));
+  const week = salesBars(rows(9, 7)); assert.equal(week.bars.length, 7); assert.equal(week.weekly, false);
+  const month = salesBars(rows(1, 30)); assert.equal(month.weekly, true); assert.equal(month.total, 3000); assert.equal(month.count, 30);
+  assert.equal(month.bars.reduce((s, b) => s + b.total, 0), 3000);
+  assert.equal(month.bars[0].to, '2026-11-01'); // Sunday 1 Nov closes the first week
+});

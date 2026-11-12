@@ -5,9 +5,11 @@ import { addDays, shortDate } from './dates.js';
 import { notifyNewOrder, playSoftSound, soundOn } from './alerts.js';
 import { el, makeSwitch, toast } from './dom.js';
 import { ukToday } from '../../js/mock-backend.js';
+import { formatMoney, salesBars, salesRange } from '../../js/admin-rules.js';
 
 const tilesBox = document.querySelector('[data-tiles]');
 const todayBox = document.querySelector('[data-today]');
+const weekBox = document.querySelector('[data-week]');
 const shopBox = document.querySelector('[data-shop]');
 const greeting = document.querySelector('[data-greeting]');
 const liveStatus = document.querySelector('[data-live]');
@@ -47,11 +49,13 @@ async function drawShop(settings) {
 async function refresh() {
   const today = ukToday();
   const tomorrow = addDays(today, 1);
-  const [newOrders, near, products, settings] = await Promise.all([
+  const wk = salesRange('week', today);
+  const [newOrders, near, products, settings, weekRows] = await Promise.all([
     api.listOrders({ statuses: ['new'] }),
     api.listOrders({ from: today, to: tomorrow }),
     api.listProducts(),
     api.getSettings(),
+    api.salesSummary(wk.from, wk.to).catch(() => null),
   ]);
   // new orders she has not seen since the last look: toast, optional sound, browser notification
   const allNow = [...newOrders];
@@ -84,6 +88,15 @@ async function refresh() {
     el('a', { className: 'home-tile', href: 'products' }, el('span', { className: 'home-tile-label' }, 'Stock'),
       el('span', { className: 'home-tile-value' }, String(lowStock.length)),
       el('span', { className: 'home-tile-sub' }, lowStock.length ? lowStock.map((p) => `${p.name}: ${p.stock_quantity === 0 ? 'sold out' : `${p.stock_quantity} left`}`).join(', ') : 'Nothing running low')));
+
+  weekBox.replaceChildren();
+  const week = weekRows ? salesBars(weekRows) : null;
+  if (!week) weekBox.append(el('p', { className: 'muted' }, 'Sales could not be loaded.'));
+  else if (!week.count) weekBox.append(el('p', { className: 'muted empty-state' }, 'No collected orders yet this week'));
+  else weekBox.append(el('div', { className: 'sales-figures' },
+    el('p', { className: 'sales-figure' }, el('span', { className: 'sales-label' }, 'Sales'), el('span', { className: 'sales-value' }, formatMoney(week.total))),
+    el('p', { className: 'sales-figure' }, el('span', { className: 'sales-label' }, 'Orders'), el('span', { className: 'sales-value' }, String(week.count)))),
+    el('p', { className: 'muted' }, 'Collected orders, Mon to Sun'));
 
   todayBox.replaceChildren();
   if (!todays.length) todayBox.append(el('p', { className: 'muted empty-state' }, 'No orders yet today.'));

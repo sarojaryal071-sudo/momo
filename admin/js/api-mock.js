@@ -29,6 +29,7 @@ export const mockApi = {
     try { const raw = storage()?.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
   },
   listOrders: (filter) => store.listOrders(filter),
+  salesSummary: (from, to) => store.salesSummary(from, to),
   setOrderStatus: (id, status) => store.setOrderStatus(id, status),
   getSettings: () => store.getSettings(),
   saveSettings: (patch) => store.saveSettings(patch),

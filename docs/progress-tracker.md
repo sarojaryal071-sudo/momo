@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4h, coding agent)
+- Last updated: 2026-11-13 (Step 4i, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 4h (weekly pickup hours redesign, D-063), then Step 4i (admin sales summary, D-064), then Step 5 (SEO, hardening, launch).
 
@@ -239,6 +239,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
 
+## Step 4i — Admin sales summary (D-064)
+
+- [x] Migration 0009 `sales_summary(from_date, to_date)`: admin-only, Collected orders per day (pence + count), zero days included, totals only
+- [x] Home "This week" strip (Sales, Orders, "Collected orders, Mon to Sun", See sales link, empty state)
+- [x] `admin/sales` page: period chips (Today, This week, This month, Custom), two figures, SVG bar chart (weekly bars over 14 days), hidden table, empty state; link on Orders title row; Home tab highlighted
+- Attribution: orders have no collected timestamp, so an order counts on its pickup date (or the date it was placed if it has none).
+
 ## Step 4h — Pickup weekly hours (D-063)
 
 - [x] Day chips, shared From–To windows with "Add another window", per-day custom hours, live summary line
@@ -389,3 +396,5 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - Indexable build fails while any of these remain (tested).
 
 - 2026-11-13, step 4h (demo backend only): build passes; admin-rules and mock-backend tests pass (27); local PostgreSQL tests pass incl. new 0008 checks; Playwright at 390 px: chips, two windows, a custom day, overlap refused, Save and reload, close-all summary, Cancel discard dialog, preview, Save bar docked on tab bar; no horizontal overflow at 320 px. Not checked: real Supabase (migration 0008 applied by the workflow, real save).
+
+- 2026-11-13, step 4i (demo backend only): build passes; admin-rules and mock-backend tests pass (30); local PostgreSQL tests pass incl. sales_summary checks; Playwright at 390 px: Home strip and empty state, Sales week/month/custom, validation, remembered period, bar labels, hidden table, no overflow at 320 px. Not checked: real Supabase (migration 0009 applied by the workflow).

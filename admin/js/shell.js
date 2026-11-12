@@ -18,7 +18,7 @@ if (user && isExpired()) { // the 30 days are over: sign out and ask again
   const measure = () => { document.body.style.setProperty('--top-h', `${topStack.offsetHeight}px`); document.body.style.setProperty('--bottom-h', `${getComputedStyle(tabbar).position === 'fixed' ? 0 : tabbar.offsetHeight}px`); };
   measure();
   if (window.ResizeObserver) { const ro = new ResizeObserver(measure); ro.observe(topStack); ro.observe(tabbar); }
-  const current = document.body.dataset.page;
+  const current = document.body.dataset.highlight || document.body.dataset.page;
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === current) a.setAttribute('aria-current', 'page'); });
   document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api.logout(); clearLogin(); location.replace('login'); }));
 

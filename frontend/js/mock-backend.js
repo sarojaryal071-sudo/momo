@@ -66,6 +66,20 @@ export function listOrders(state, { from = null, to = null, statuses = null } = 
     .map(clone);
 }
 
+// Sales (D-064): Collected orders only, per day, on the pickup date (or the date placed when there is none). Zero rows for empty days.
+export function salesSummary(state, from, to) {
+  if (!from || !to || from > to) throw new RuleError('range', 'The From date must not be after the To date.');
+  const rows = [];
+  for (let d = new Date(`${from}T12:00:00Z`); d.toISOString().slice(0, 10) <= to; d.setUTCDate(d.getUTCDate() + 1)) rows.push({ day: d.toISOString().slice(0, 10), total_pence: 0, order_count: 0 });
+  const byDay = new Map(rows.map((r) => [r.day, r]));
+  for (const o of state.orders) {
+    if (o.status !== 'collected') continue;
+    const r = byDay.get(o.pickup_date || o.order_date);
+    if (r) { r.total_pence += o.total_pence; r.order_count += 1; }
+  }
+  return rows;
+}
+
 // Totals for the kitchen: per product, per option and the customised lines. Cancelled orders are left out.
 export function prepList(state, from, to) {
   const orders = activeOrders(state).filter((o) => o.pickup_date && o.pickup_date >= from && o.pickup_date <= (to || from));
@@ -480,6 +494,7 @@ export function createMock({ storage = null, loadSeed, now = () => new Date() } 
     publicState: () => query((s) => publicState(s)),
     placeOrder: (input) => change((s, n) => placeOrder(s, input, n)),
     listOrders: (filter) => query((s) => listOrders(s, filter)),
+    salesSummary: (from, to) => query((s) => salesSummary(s, from, to)),
     setOrderStatus: (id, status) => change((s, n) => setOrderStatus(s, id, status, n)),
     getSettings: () => query((s) => settingsWithDefaults(s)),
     saveSettings: (patch) => change((s) => saveSettings(s, patch)),

@@ -237,6 +237,22 @@ select t.chk(t.count('authenticated', :'a', 'select 1 from orders') > 5 and t.co
 select t.chk(t.try('authenticated', :'b', $$select public.create_manual_order('{"items":[{"slug":"chicken-momo","qty":1}]}')$$) = 'denied', 'a non-admin cannot create a manual order');
 select t.chk(t.seq($$select t.try('authenticated', '00000000-0000-0000-0000-00000000000a', $q$select public.create_manual_order('{"items":[{"slug":"chicken-momo","qty":1}],"pickupDate":"2026-11-14","pickupTime":"09:00"}')$q$)$$, $$select (select source from orders order by created_at desc limit 1) = 'manual'$$), 'an admin creates a manual order (source manual, no phone or notice checks)');
 
+-- ===== sales summary (D-064) =====
+select t.chk(t.try('anon', null, $$select * from public.sales_summary('2026-11-01','2026-11-30')$$) = 'denied', 'anon cannot read the sales summary');
+select t.chk(t.try('authenticated', :'b', $$select * from public.sales_summary('2026-11-01','2026-11-30')$$) = 'denied', 'a non-admin cannot read the sales summary');
+select t.chk(t.try('authenticated', :'a', $$select * from public.sales_summary('2026-11-30','2026-11-01')$$) like 'error:22023%', 'a reversed range is refused');
+insert into orders (order_number, order_date, pickup_date, items, total_pence, status) values
+  ('SS-T-1', '2026-03-01', '2026-03-02', '[]', 1000, 'collected'),
+  ('SS-T-2', '2026-03-01', '2026-03-02', '[]', 2050, 'collected'),
+  ('SS-T-3', '2026-03-01', '2026-03-02', '[]', 9999, 'cancelled'),
+  ('SS-T-4', '2026-03-01', '2026-03-02', '[]', 9999, 'confirmed'),
+  ('SS-T-5', '2026-03-04', null, '[]', 500, 'collected');
+select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary('2026-03-01','2026-03-05')$$) = 5, 'one row per day, including days with no sales');
+select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary('2026-03-01','2026-03-05') where day = '2026-03-02' and total_pence = 3050 and order_count = 2$$) = 1, 'only Collected orders count (cancelled and confirmed are left out)');
+select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary('2026-03-01','2026-03-05') where day = '2026-03-04' and total_pence = 500 and order_count = 1$$) = 1, 'an order with no pickup date counts on the day it was placed');
+select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary('2026-03-01','2026-03-05') where day in ('2026-03-01','2026-03-03','2026-03-05') and total_pence = 0 and order_count = 0$$) = 3, 'days with no sales are zero');
+delete from orders where order_number like 'SS-T-%';
+
 -- ===== publish pipeline =====
 update site_status set unpublished = false, state = 'live' where id = 1;
 update product_stock set quantity = quantity;

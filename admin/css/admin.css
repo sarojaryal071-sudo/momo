@@ -425,3 +425,23 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .custom-line { margin: 0 0 var(--space-xs); }
 .custom-add select { min-block-size: var(--tap); flex: 1 1 auto; min-inline-size: 0; padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); }
 .week-summary { margin: var(--space-s) 0 0; padding: var(--space-xs) var(--space-s); background: var(--badge-new); color: var(--emerald); border-radius: var(--r-input); font-weight: 700; }
+
+/* Step 4i: sales */
+.week-strip-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xs); }
+.week-strip-head h2 { margin: 0; }
+.sales-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-s); margin-block-end: var(--space-s); }
+.sales-figure { display: grid; gap: var(--space-3xs); margin: 0; }
+.sales-label { font-weight: 600; font-size: var(--text-small); }
+.sales-value { font-family: var(--font-head); font-size: var(--admin-count); line-height: 1; color: var(--emerald); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.chip[aria-pressed="true"] { background: var(--emerald); color: var(--white); border-color: var(--emerald); }
+.back-link { flex: none; }
+.sales-chart-wrap { overflow-x: auto; }
+.sales-chart { display: block; inline-size: 100%; min-inline-size: 17.5rem; block-size: auto; font-family: inherit; }
+.sales-chart .axis { stroke: var(--line-strong); stroke-width: 1; }
+.sales-chart rect { fill: var(--emerald); }
+.sales-chart .hit { fill: transparent; }
+.sales-chart .val { font-size: 11px; font-weight: 700; fill: var(--charcoal); font-variant-numeric: tabular-nums; }
+.sales-chart .tick { font-size: 11px; fill: var(--charcoal); }
+.sales-chart .bar:focus-visible { outline: none; }
+.sales-chart .bar:focus-visible rect:not(.hit) { stroke: var(--copper); stroke-width: 3; }
+.chip-row[data-periods] { flex-wrap: wrap; overflow: visible; }

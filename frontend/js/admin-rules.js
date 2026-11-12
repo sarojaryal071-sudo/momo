@@ -246,3 +246,35 @@ export function weekSummary(week) {
   for (const d of days) if (week.custom[d]) parts.push(`${DAY_SHORT[d]}, ${windowsText(week.custom[d])}`);
   return `Open ${parts.join('; ')}.`;
 }
+
+// ---------- Sales summary (D-064, Step 4i) ----------
+// Weeks run Monday to Sunday. Dates are ISO strings in UK time.
+const isoAdd = (iso, n) => { const d = new Date(`${iso}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const isoDow = (iso) => new Date(`${iso}T12:00:00Z`).getUTCDay(); // 0 = Sunday
+export const SALES_PERIODS = [['today', 'Today'], ['week', 'This week'], ['month', 'This month'], ['custom', 'Custom']];
+export const SALES_MAX_DAYS = 366;
+export const SALES_WEEKLY_BARS_OVER = 14; // longer periods are shown as weekly bars so the bars stay wide enough to tap
+export const weekStart = (iso) => isoAdd(iso, -((isoDow(iso) + 6) % 7));
+export function salesRange(kind, today, from = '', to = '') {
+  if (kind === 'today') return { from: today, to: today };
+  if (kind === 'week') { const s = weekStart(today); return { from: s, to: isoAdd(s, 6) }; }
+  if (kind === 'month') { const [y, m] = today.split('-'); const last = new Date(Date.UTC(Number(y), Number(m), 0)).getUTCDate(); return { from: `${y}-${m}-01`, to: `${y}-${m}-${String(last).padStart(2, '0')}` }; }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) return { error: 'Choose both dates.' };
+  if (from > to) return { error: 'The From date must not be after the To date.' };
+  if ((new Date(`${to}T12:00:00Z`) - new Date(`${from}T12:00:00Z`)) / 86400000 >= SALES_MAX_DAYS) return { error: 'Choose a range of up to a year.' };
+  return { from, to };
+}
+// rows: [{day, total_pence, order_count}] -> { total, count, bars:[{from,to,total,count}] }. Long periods become Monday-start weekly bars.
+export function salesBars(rows) {
+  const total = rows.reduce((s, r) => s + Number(r.total_pence), 0);
+  const count = rows.reduce((s, r) => s + Number(r.order_count), 0);
+  const day = (r) => ({ from: r.day, to: r.day, total: Number(r.total_pence), count: Number(r.order_count) });
+  if (rows.length <= SALES_WEEKLY_BARS_OVER) return { total, count, bars: rows.map(day), weekly: false };
+  const bars = [];
+  for (const r of rows) {
+    const key = weekStart(r.day); let b = bars[bars.length - 1];
+    if (!b || b.key !== key) { b = { key, from: r.day, to: r.day, total: 0, count: 0 }; bars.push(b); }
+    b.to = r.day; b.total += Number(r.total_pence); b.count += Number(r.order_count);
+  }
+  return { total, count, bars, weekly: true };
+}

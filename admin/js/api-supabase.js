@@ -294,6 +294,12 @@ export const supabaseApi = {
     return data;
   },
 
+  // Sales per day (Collected orders only), computed by an admin-only database function. Totals only: no customer details.
+  async salesSummary(from, to) {
+    const sb = await loadClient();
+    return unwrap(await sb.rpc('sales_summary', { from_date: from, to_date: to })) || [];
+  },
+
   // The totals for the kitchen are computed in the browser with the same function the tests use.
   async prepList(from, to) {
     const rows = await this.listOrders({ from, to, statuses: ['new', 'confirmed', 'ready', 'collected'] });
