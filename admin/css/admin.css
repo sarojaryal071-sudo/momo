@@ -464,3 +464,11 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
   .is-welcome .btn-big { animation: login-pop 0.25s ease-out; }
 }
 .admin-body .is-logging-in .btn-big:disabled { background: var(--emerald); color: var(--white); border-color: var(--emerald-dark); opacity: 1; box-shadow: none; }
+
+/* Wide screens: the brand heads the side panel, level with the top bar, and the bar keeps only the log out button */
+@media (min-width: 48em) {
+  .admin-body:not(.login-body) .tabbar { padding-block-start: 0; gap: var(--space-3xs); }
+  .admin-body:not(.login-body) .tabbar::before { content: "Steam & Spice"; display: flex; align-items: center; box-sizing: border-box; min-block-size: var(--admin-bar); margin-block-end: var(--space-s); padding-inline: calc(var(--space-m) + var(--space-3xs)); font-family: var(--font-head); font-size: var(--brand-size); letter-spacing: var(--tracking-display); text-transform: uppercase; color: var(--emerald); border-block-end: var(--hairline) solid var(--line); }
+  .admin-body:not(.login-body) .admin-bar .admin-brand { display: none; }
+  .admin-body:not(.login-body) .admin-bar { justify-content: flex-end; }
+}
