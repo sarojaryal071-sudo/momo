@@ -15,6 +15,8 @@ const list = $('[data-cart-lines]');
 const form = $('[data-order-form]');
 const errorBox = $('[data-order-error]');
 const confirmBtn = $('[data-confirm]');
+const confirmLabel = confirmBtn.textContent;
+const setBusy = (busy) => { confirmBtn.disabled = busy; confirmBtn.setAttribute('aria-busy', String(busy)); confirmBtn.textContent = busy ? 'Placing order...' : confirmLabel; };
 const dateSel = $('#f-date');
 const hourSel = $('#f-hour');
 const minuteSel = $('#f-minute');
@@ -93,8 +95,7 @@ function render() {
     if (line.unavailable) {
       text.append(el('p', 'error', line.soldOut ? 'Sold out. It will be removed when you confirm.' : 'No longer available. It will be removed when you confirm.'));
     } else {
-      const sample = line.product.placeholder ? ' (sample price)' : '';
-      text.append(el('p', 'menu-meta', `${line.product.unit_label} \u2014 ${formatPrice(line.unitPence)} each${sample}`));
+      text.append(el('p', 'menu-meta', `${line.product.unit_label} \u2014 ${formatPrice(line.unitPence)} each`));
       if (line.customised) {
         const opts = el('p', 'line-options', line.optionText + ' ');
         opts.append(el('span', 'badge', 'Customised'));
@@ -211,7 +212,7 @@ async function confirm(e) {
   const order = readOrder(lines);
   const totalPence = cartTotal(lines);
   const summary = lines.map((l) => ({ qty: l.qty, name: l.product.name, unitLabel: l.product.unit_label, linePence: l.linePence, optionText: l.customised ? l.optionText : '' }));
-  confirmBtn.disabled = true;
+  setBusy(true);
   try {
     const result = await submitOrder({ ...order, totalPenceHint: totalPence });
     try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name, placedAt: new Date().toISOString() })); } catch { /* the done page copes without it */ }
@@ -220,6 +221,7 @@ async function confirm(e) {
   } catch (err) {
     if (err instanceof OrderRejected) { // a rule said no: show why, keep the cart
       errorBox.textContent = err.message;
+      setBusy(false);
       confirmBtn.disabled = err.code === 'paused';
       return;
     }
@@ -229,7 +231,7 @@ async function confirm(e) {
     const fail = $('[data-fail-whatsapp]');
     fail.href = link;
     $('[data-fail-link]').hidden = false;
-    confirmBtn.disabled = false;
+    setBusy(false);
     fail.focus();
   }
 }
@@ -241,7 +243,6 @@ async function init() {
   try {
     products = await loadProducts();
     pickupConfig = await loadPickup();
-    if (!pickupConfig.placeholder) $('#pickup-sample').remove();
     const state = await getOrderingState();
     closedDates = state.fullDates;
     if (!state.orderingOpen) { // ordering is paused: the cart says so and Place order stays off

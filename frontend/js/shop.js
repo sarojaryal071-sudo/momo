@@ -148,12 +148,7 @@ async function updateDialog(dlg) {
   }
   stockLine.replaceChildren();
   if (text) {
-    if (card.dataset.stockSample !== undefined) {
-      const wrap = el('span', '', text + ' ');
-      wrap.dataset.placeholder = '';
-      wrap.append(el('span', 'sample-label', 'sample'));
-      stockLine.append(wrap);
-    } else stockLine.textContent = text;
+    stockLine.textContent = text;
   }
   stockLine.hidden = !text;
   // Customised: longer notice and the earliest pickup date.

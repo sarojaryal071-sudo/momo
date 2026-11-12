@@ -99,7 +99,6 @@ function card(order) {
     el('div', { className: 'order-head' }, el('span', { className: 'order-number' }, order.order_number),
       order.items.some((l) => l.customised) ? el('span', { className: 'tag tag-custom' }, 'Customised') : null,
       order.source === 'manual' ? el('span', { className: 'tag tag-manual' }, 'Manual') : null,
-      order.sample ? el('span', { className: 'tag tag-sample' }, 'Sample') : null,
       el('span', { className: 'order-when' }, when(order))),
     el('p', { className: 'order-who' }, el('strong', {}, order.customer_name), ' · ', el('a', { href: `tel:${order.customer_phone.replace(/[^\d+]/g, '')}` }, order.customer_phone)),
     el('ul', { className: 'order-lines' }, ...order.items.map((l) => el('li', {}, `${l.qty} × ${l.name}`, l.options.length ? el('span', { className: 'opts' }, ` (${l.options.map((o) => o.label).join(', ')})`) : null, l.customised ? ' ' : null, l.customised ? el('span', { className: 'tag tag-custom' }, 'Customised') : null))),
@@ -145,6 +144,7 @@ async function refresh() {
     for (const o of groups.get(key)) section.append(card(o));
     root.append(section);
   }
+  emptyNote.textContent = everything.length ? 'No orders match these filters.' : 'No orders yet. New orders appear here as soon as they are placed.';
   emptyNote.hidden = shown.length > 0;
 }
 

@@ -27,13 +27,12 @@ const mockApi = {
   saveSettings: (patch) => store.saveSettings(patch),
   listProducts: () => store.listProducts(),
   prepList: (from, to) => store.prepList(from, to),
-  resetDemo: () => store.reset(),
-  // Fires when another tab (for example the public shop) changes the demo data.
+  // Fires when another tab (for example the public shop) changes the data.
   onChange(callback) { window.addEventListener('storage', (e) => { if (e.key === STORE_KEY) callback(); }); },
 };
 
 const notConnected = () => { throw new Error('Supabase is not connected yet (Step 3).'); };
-const supabaseApi = Object.fromEntries(['login', 'logout', 'currentUser', 'listOrders', 'setOrderStatus', 'getSettings', 'saveSettings', 'listProducts', 'prepList', 'resetDemo', 'onChange'].map((name) => [name, notConnected]));
+const supabaseApi = Object.fromEntries(['login', 'logout', 'currentUser', 'listOrders', 'setOrderStatus', 'getSettings', 'saveSettings', 'listProducts', 'prepList', 'onChange'].map((name) => [name, notConnected]));
 supabaseApi.backend = 'supabase';
 
 export const api = siteConfig.backend === 'supabase' ? supabaseApi : mockApi;

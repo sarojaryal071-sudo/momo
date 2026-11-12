@@ -5,8 +5,8 @@ import { formatPrice } from '../../frontend/js/cart.js';
 import { HOME_PRODUCT_LIMIT, KIND_LABELS, LOW_STOCK_THRESHOLD, SEARCH_MIN_PRODUCTS, siteConfig } from '../../frontend/js/site-config.js';
 
 export { formatPrice };
-const SAMPLE = '<span class="sample-label">sample</span>';
-const priceHtml = (p) => (p.placeholder ? `<span data-placeholder>${formatPrice(p.price_pence)} ${SAMPLE}</span>` : formatPrice(p.price_pence));
+// D-052: a value the owner has not confirmed shows as a normal value; an invisible data-pending attribute marks it for the launch gate.
+const priceHtml = (p) => (p.pending ? `<span data-pending>${formatPrice(p.price_pence)}</span>` : formatPrice(p.price_pence));
 
 const byOrder = (a, b) => a.sort_order - b.sort_order;
 export const merge = (products, content) =>
@@ -14,7 +14,7 @@ export const merge = (products, content) =>
 
 function productJsonLd(products, siteUrl) {
   const base = siteUrl ? `${siteUrl}/` : '';
-  const items = products.filter((p) => p.price_pence != null && !p.placeholder).map((p) => ({
+  const items = products.filter((p) => p.price_pence != null && !p.pending).map((p) => ({
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
@@ -42,15 +42,14 @@ function mediaHtml(p, sizes = MEDIA_SIZES, cls = '') {
     return `<div class="card-media${cls}${multiply ? ' card-media-multiply' : ''}"><img src="${base}.webp" srcset="${base}-400.webp 400w, ${base}.webp 800w" sizes="${sizes}" width="800" height="800" alt="${multiply ? PACK_ALT : esc(p.name)}" loading="lazy"></div>`;
   }
   const art = p.kind === 'addon' ? 'bowl' : 'momo';
-  return `<div class="card-media${cls} card-art card-art-${art}" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>`;
+  return `<div class="card-media${cls} card-art card-art-${art}" aria-hidden="true"></div>`;
 }
 
 function priceBlock(p) {
-  if (p.price_pence == null) return `<p class="card-price">Price to be confirmed <span data-todo>TODO: price to be confirmed by owner</span></p>`;
+  if (p.price_pence == null) return '';
   return `<p class="card-price">${priceHtml(p)}</p>`;
 }
 
-const SAMPLE_TAG = ' <span class="sample-label">sample</span>';
 const groupsOf = (p) => (p.option_groups || []).filter((g) => (g.options || []).length);
 const hasOptions = (p) => groupsOf(p).length > 0;
 const isSoldOut = (p) => Number.isInteger(p.stock_quantity) && p.stock_quantity === 0;
@@ -60,7 +59,7 @@ function optionGroupHtml(p, g) {
   const single = g.kind === 'single';
   const inputs = g.options.map((o) => `<label class="opt"><input type="${single ? 'radio' : 'checkbox'}" name="opt-${esc(p.slug)}-${esc(g.id)}" value="${esc(o.id)}" data-delta="${o.price_delta_pence || 0}" data-default="${o.is_default ? 'true' : 'false'}"${o.is_default ? ' checked' : ''}> <span>${esc(o.label)}</span>${delta(o)}</label>`).join('\n      ');
   return `<fieldset class="opt-group" data-group="${esc(g.id)}" data-kind="${esc(g.kind)}">
-      <legend>${esc(g.label)}${g.placeholder ? SAMPLE_TAG : ''}</legend>
+      <legend>${esc(g.label)}</legend>
       <div class="opt-list">
       ${inputs}
       </div>
@@ -75,7 +74,7 @@ function dialogHtml(p) {
   const soldOut = isSoldOut(p);
   const lowStock = stock !== null && stock > 0 && stock <= LOW_STOCK_THRESHOLD;
   const stockText = soldOut ? 'Sold out' : lowStock ? `Only ${stock} left` : '';
-  const stockLine = `<p class="stock-line" data-stock-line${stockText ? '' : ' hidden'}>${stockText ? (p.stock_placeholder ? `<span data-placeholder>${stockText}${SAMPLE_TAG}</span>` : stockText) : ''}</p>`;
+  const stockLine = `<p class="stock-line" data-stock-line${stockText ? '' : ' hidden'}>${stockText ? (p.stock_pending ? `<span data-pending>${stockText}</span>` : stockText) : ''}</p>`;
   const buy = priced && p.available && !soldOut
     ? `<div class="dialog-buy">
         <div class="stepper" role="group" aria-label="Quantity of ${esc(p.name)}">
@@ -99,13 +98,7 @@ function dialogHtml(p) {
       <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
     </div>
     <div class="dialog-body" data-options>
-      <section class="dialog-section">
-        <h3>Ingredients and allergens</h3>
-        <p data-todo>TODO: ingredients and allergen information from the owner</p>
-      </section>
       ${groupsOf(p).map((g) => optionGroupHtml(p, g)).join('\n      ')}
-      <!-- TODO: owner and council to approve the allergy wording below -->
-      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
     <div class="dialog-foot">
       <p class="custom-note" data-custom-note hidden></p>
@@ -121,7 +114,7 @@ function card(p) {
   const stock = Number.isInteger(p.stock_quantity) ? p.stock_quantity : null;
   const soldOut = isSoldOut(p);
   const buyable = p.available && priced && !soldOut;
-  const attrs = `id="product-${esc(p.slug)}" data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''} data-kind="${esc(p.kind)}" data-name="${esc(p.name.toLowerCase())}" data-has-options="${hasOptions(p)}"${stock !== null ? ` data-stock="${stock}"` : ''}${stock !== null && p.stock_placeholder ? ' data-stock-sample' : ''}`;
+  const attrs = `id="product-${esc(p.slug)}" data-slug="${esc(p.slug)}"${priced ? ` data-price-pence="${p.price_pence}"` : ''} data-kind="${esc(p.kind)}" data-name="${esc(p.name.toLowerCase())}" data-has-options="${hasOptions(p)}"${stock !== null ? ` data-stock="${stock}"` : ''}${stock !== null && p.stock_pending ? ' data-stock-pending' : ''}`;
   const action = buyable
     ? `<div class="card-action" data-card-action>
       <button type="button" class="btn btn-add" data-add-to-cart>Add to cart<span class="visually-hidden">: ${esc(p.name)}</span></button>

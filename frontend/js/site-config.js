@@ -11,7 +11,7 @@ export const siteConfig = {
   backend: 'mock', // 'mock' or 'supabase' (Step 3)
   whatsappNumber: '447413069241', // also her phone number; the same digits are in the HTML links and scripts/build.mjs
   currency: 'GBP',
-  socialLinks: { instagram: '' }, // the build fills the footer and menu Instagram line from this; empty shows a visible placeholder
+  socialLinks: { instagram: '' }, // the build fills the footer and menu Instagram line from this; empty hides the line
   supabaseUrl: '',
   supabaseAnonKey: '',
   limits: {

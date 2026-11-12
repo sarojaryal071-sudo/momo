@@ -129,6 +129,17 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Ambient layer and extra glass removed (glass only on menu and sheet) — a2d6d55, ambient layer and tokens gone; header, checkout bar, chips, Add and stepper solid; backdrop-filter only on the menu layer and pills, the sheet, its backdrop and its option pills; unused tokens deleted
 - [x] Checked in own screenshots, merged to `main`, deploy confirmed — a2d6d55, see log
 
+## Step 1l — Klandestina typography, density and no visible placeholders (D-050, D-051, D-052)
+
+- [ ] Fonts switched to Bebas Neue and Space Grotesk, old fonts removed (public and admin)
+- [ ] Visible placeholders and demo data removed; `data-pending` gate in place
+- [ ] Audit table and new type and spacing tokens; old `--step-*` removed
+- [ ] All public components switched to the tokens
+- [ ] Hero and sections at the new density
+- [ ] Buttons, inputs, focus rings, loading state per spec
+- [ ] `--muted` token and contrast checked; `overflow-x` hacks removed
+- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+
 ## Step 2 — Cart and order flow (mock)
 
 - [x] `site-config.js` (mock backend, WhatsApp number marked `TODO`) — 746822c, constants for limits, timeouts, mock; WhatsApp number comment `TODO` in code

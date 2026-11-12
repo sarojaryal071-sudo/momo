@@ -1,11 +1,11 @@
-// Demo backend (D-048). The rules the database will enforce in Step 3 live here, in one place, as pure functions over a
+// Demo backend (D-048), developer-facing only. The rules the database will enforce in Step 3 live here, in one place, as pure functions over a
 // plain state object, so tests and Step 3 can compare behaviour. A small store keeps the state in localStorage, shared by
 // the public site and the admin panel in the same browser. It is a demo: nothing here is a security control.
 import { getPickupOptions, noticeText, ukParts } from './pickup.js';
 import { siteConfig } from './site-config.js';
 import { toWhatsAppNumber } from './whatsapp.js';
 
-export const STORE_KEY = 'ss-demo-store-v1';
+export const STORE_KEY = 'ss-store-v2';
 export const STATUSES = ['new', 'confirmed', 'ready', 'collected', 'cancelled'];
 export const ORDER_PREFIX = 'SS';
 export const DEFAULT_CLOSED_MESSAGE = 'We are not taking orders right now. Please check back soon.';
@@ -236,7 +236,7 @@ export function saveSettings(state, patch) {
 }
 
 // ---------- initial state and sample orders ----------
-export function buildInitialState(seed, now = new Date(), { samples = true } = {}) {
+export function buildInitialState(seed, now = new Date(), { samples = false } = {}) {
   const pickup = clone(seed.pickup);
   const state = {
     version: 1,

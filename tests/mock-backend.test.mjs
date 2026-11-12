@@ -120,8 +120,8 @@ test('the honeypot is dropped silently', () => {
   assert.equal(s.orders.length, 0);
 });
 
-test('list and prep list: grouped by date, cancelled left out, options counted', () => {
-  const s = buildInitialState(seed, MONDAY);
+test('a fresh state has no orders; the developer seed: list and prep list grouped by date, cancelled left out, options counted', () => {
+  const s = buildInitialState(seed, MONDAY, { samples: true }); // the developer seed, not reachable from the UI
   const all = listOrders(s);
   assert.equal(all.filter((o) => !o.pickup_date).length, 1);
   assert.ok(all.every((o) => o.sample));
@@ -139,4 +139,9 @@ test('sample orders hold their stock', () => {
   const s = buildInitialState(seed, MONDAY);
   const std = (slug) => s.orders.filter((o) => o.status !== 'cancelled').flatMap((o) => o.items).filter((l) => l.slug === slug && !l.customised).reduce((n, l) => n + l.qty, 0);
   assert.equal(stock(s, 'veg-momo'), 24 - std('veg-momo'));
+});
+
+test('the default state has no orders (D-052); only the developer seed adds them', () => {
+  assert.equal(listOrders(buildInitialState(seed, MONDAY)).length, 0);
+  assert.ok(listOrders(buildInitialState(seed, MONDAY, { samples: true })).length > 0);
 });

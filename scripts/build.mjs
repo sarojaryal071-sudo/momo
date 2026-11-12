@@ -58,8 +58,8 @@ if (useSeed) {
 }
 
 if (products.length) {
-  const slim = products.map(({ slug, name, kind, unit_label, price_pence, available, placeholder, photo, stock_quantity, stock_placeholder, option_groups }) =>
-    ({ slug, name, kind, unit_label, price_pence, available, photo: photo ?? null, stock_quantity: stock_quantity ?? null, option_groups: option_groups ?? [], ...(placeholder ? { placeholder: true } : {}), ...(stock_placeholder ? { stock_placeholder: true } : {}) }));
+  const slim = products.map(({ slug, name, kind, unit_label, price_pence, available, pending, photo, stock_quantity, stock_pending, option_groups }) =>
+    ({ slug, name, kind, unit_label, price_pence, available, photo: photo ?? null, stock_quantity: stock_quantity ?? null, option_groups: option_groups ?? [], ...(pending ? { pending: true } : {}), ...(stock_pending ? { stock_pending: true } : {}) }));
   await writeFile(join(dist, 'data/products.json'), JSON.stringify(slim, null, 2) + '\n');
 }
 
@@ -78,7 +78,7 @@ for (const file of htmlFiles) {
   let html = await readFile(file, 'utf8');
 
   if (!isAdmin) {
-    // Instagram line: a real link once the constant is set, otherwise the visible placeholder already in the HTML.
+    // Instagram line: a real link once the constant is set, otherwise the line stays empty and hidden (D-052).
     const ig = siteConfig.socialLinks.instagram;
     if (ig) html = html.replace(INSTAGRAM_RE, `<!-- build:instagram --><a class="contact-item" href="${escAttr(ig)}" rel="noopener">${INSTAGRAM_GLYPH}Instagram</a><!-- /build:instagram -->`);
     if (useSeed && products.length) html = fillRegion(html, renderRegion(page === 'index' ? 'index' : 'shop', products, siteUrl));
@@ -129,7 +129,7 @@ for (const file of htmlFiles) {
 }
 if (indexable) {
   for (const f of (await walk(join(dist, 'data'))).filter((x) => x.endsWith('.json'))) {
-    if (hasPlaceholderData(await readFile(f, 'utf8'))) errors.push(`${relative(dist, f)}: "placeholder": true remains and SITE_INDEXABLE is true`);
+    if (hasPlaceholderData(await readFile(f, 'utf8'))) errors.push(`${relative(dist, f)}: "pending": true remains and SITE_INDEXABLE is true`);
   }
 }
 

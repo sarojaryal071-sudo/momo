@@ -16,8 +16,8 @@
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/fonts/instrument-serif-latin-400.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/fonts/hanken-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/bebas-neue-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
@@ -51,7 +51,7 @@
         <ul class="menu-contact">
           <li><a class="contact-item" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a></li>
           <li class="menu-extra"><a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></li>
-          <li class="menu-extra"><!-- build:instagram --><span class="contact-item"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7 h.01"/></svg><span data-todo>TODO: Instagram link</span></span><!-- /build:instagram --></li>
+          <li class="menu-extra"><!-- build:instagram --><!-- /build:instagram --></li>
         </ul>
         </div>
         </div>
@@ -97,7 +97,7 @@
         <!-- build:products -->
 <div class="product-wrap">
 <ul class="product-grid">
-<li class="product-card" id="product-chicken-momo" data-slug="chicken-momo" data-price-pence="1000" data-kind="pack" data-name="frozen chicken momo" data-has-options="true" data-stock="24" data-stock-sample>
+<li class="product-card" id="product-chicken-momo" data-slug="chicken-momo" data-price-pence="1000" data-kind="pack" data-name="frozen chicken momo" data-has-options="true" data-stock="24" data-stock-pending>
   <div class="card-media card-media-multiply"><img src="assets/img/pack-chicken.webp" srcset="assets/img/pack-chicken-400.webp 400w, assets/img/pack-chicken.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
   <div class="card-body">
     <h3><a class="card-link" href="shop.html#product-chicken-momo" data-card-open>Frozen chicken momo</a></h3>
@@ -121,27 +121,21 @@
       <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
     </div>
     <div class="dialog-body" data-options>
-      <section class="dialog-section">
-        <h3>Ingredients and allergens</h3>
-        <p data-todo>TODO: ingredients and allergen information from the owner</p>
-      </section>
       <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
-      <legend>Leave out <span class="sample-label">sample</span></legend>
+      <legend>Leave out</legend>
       <div class="opt-list">
       <label class="opt"><input type="checkbox" name="opt-chicken-momo-leave-out" value="no-onion" data-delta="0" data-default="false"> <span>No onion</span></label>
       <label class="opt"><input type="checkbox" name="opt-chicken-momo-leave-out" value="no-coriander" data-delta="0" data-default="false"> <span>No coriander</span></label>
       </div>
     </fieldset>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
-      <legend>Spice level <span class="sample-label">sample</span></legend>
+      <legend>Spice level</legend>
       <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-chicken-momo-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
       </div>
     </fieldset>
-      <!-- TODO: owner and council to approve the allergy wording below -->
-      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
     <div class="dialog-foot">
       <p class="custom-note" data-custom-note hidden></p>
@@ -158,7 +152,7 @@
   </div>
 </dialog>
 </li>
-<li class="product-card" id="product-veg-momo" data-slug="veg-momo" data-price-pence="1000" data-kind="pack" data-name="frozen veg momo" data-has-options="true" data-stock="24" data-stock-sample>
+<li class="product-card" id="product-veg-momo" data-slug="veg-momo" data-price-pence="1000" data-kind="pack" data-name="frozen veg momo" data-has-options="true" data-stock="24" data-stock-pending>
   <div class="card-media card-media-multiply"><img src="assets/img/pack-veg.webp" srcset="assets/img/pack-veg-400.webp 400w, assets/img/pack-veg.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bag of frozen momo tied with twine and a blank paper tag" loading="lazy"></div>
   <div class="card-body">
     <h3><a class="card-link" href="shop.html#product-veg-momo" data-card-open>Frozen veg momo</a></h3>
@@ -182,27 +176,21 @@
       <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
     </div>
     <div class="dialog-body" data-options>
-      <section class="dialog-section">
-        <h3>Ingredients and allergens</h3>
-        <p data-todo>TODO: ingredients and allergen information from the owner</p>
-      </section>
       <fieldset class="opt-group" data-group="leave-out" data-kind="multiple">
-      <legend>Leave out <span class="sample-label">sample</span></legend>
+      <legend>Leave out</legend>
       <div class="opt-list">
       <label class="opt"><input type="checkbox" name="opt-veg-momo-leave-out" value="no-onion" data-delta="0" data-default="false"> <span>No onion</span></label>
       <label class="opt"><input type="checkbox" name="opt-veg-momo-leave-out" value="no-coriander" data-delta="0" data-default="false"> <span>No coriander</span></label>
       </div>
     </fieldset>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
-      <legend>Spice level <span class="sample-label">sample</span></legend>
+      <legend>Spice level</legend>
       <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-veg-momo-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
       </div>
     </fieldset>
-      <!-- TODO: owner and council to approve the allergy wording below -->
-      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
     <div class="dialog-foot">
       <p class="custom-note" data-custom-note hidden></p>
@@ -219,12 +207,12 @@
   </div>
 </dialog>
 </li>
-<li class="product-card" id="product-chutney-pot" data-slug="chutney-pot" data-price-pence="111" data-kind="addon" data-name="chutney pot" data-has-options="true" data-stock="12" data-stock-sample>
-  <div class="card-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+<li class="product-card" id="product-chutney-pot" data-slug="chutney-pot" data-price-pence="111" data-kind="addon" data-name="chutney pot" data-has-options="true" data-stock="12" data-stock-pending>
+  <div class="card-media card-art card-art-bowl" aria-hidden="true"></div>
   <div class="card-body">
     <h3><a class="card-link" href="shop.html#product-chutney-pot" data-card-open>Chutney pot</a></h3>
     <p class="card-meta">1 pot</p>
-    <p class="card-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
+    <p class="card-price"><span data-pending>£1.11</span></p>
     <div class="card-action" data-card-action>
       <button type="button" class="btn btn-add" data-add-to-cart>Add to cart<span class="visually-hidden">: Chutney pot</span></button>
       <p class="added-note" role="status" data-added-note></p>
@@ -234,29 +222,23 @@
   <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
-      <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+      <div class="card-media dialog-media card-art card-art-bowl" aria-hidden="true"></div>
       <div class="dialog-title">
         <h2 id="dlg-chutney-pot-title">Chutney pot</h2>
         <p class="card-meta">1 pot</p>
-        <p class="card-price"><span data-placeholder>£1.11 <span class="sample-label">sample</span></span></p>
+        <p class="card-price"><span data-pending>£1.11</span></p>
       </div>
       <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
     </div>
     <div class="dialog-body" data-options>
-      <section class="dialog-section">
-        <h3>Ingredients and allergens</h3>
-        <p data-todo>TODO: ingredients and allergen information from the owner</p>
-      </section>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
-      <legend>Spice level <span class="sample-label">sample</span></legend>
+      <legend>Spice level</legend>
       <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-chutney-pot-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
       </div>
     </fieldset>
-      <!-- TODO: owner and council to approve the allergy wording below -->
-      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
     <div class="dialog-foot">
       <p class="custom-note" data-custom-note hidden></p>
@@ -273,12 +255,12 @@
   </div>
 </dialog>
 </li>
-<li class="product-card" id="product-hot-sauce-pot" data-slug="hot-sauce-pot" data-price-pence="222" data-kind="addon" data-name="hot sauce pot" data-has-options="true" data-stock="12" data-stock-sample>
-  <div class="card-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+<li class="product-card" id="product-hot-sauce-pot" data-slug="hot-sauce-pot" data-price-pence="222" data-kind="addon" data-name="hot sauce pot" data-has-options="true" data-stock="12" data-stock-pending>
+  <div class="card-media card-art card-art-bowl" aria-hidden="true"></div>
   <div class="card-body">
     <h3><a class="card-link" href="shop.html#product-hot-sauce-pot" data-card-open>Hot sauce pot</a></h3>
     <p class="card-meta">1 pot</p>
-    <p class="card-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
+    <p class="card-price"><span data-pending>£2.22</span></p>
     <div class="card-action" data-card-action>
       <button type="button" class="btn btn-add" data-add-to-cart>Add to cart<span class="visually-hidden">: Hot sauce pot</span></button>
       <p class="added-note" role="status" data-added-note></p>
@@ -288,29 +270,23 @@
   <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
-      <div class="card-media dialog-media card-art card-art-bowl" role="img" aria-label="Photo coming soon"><span class="card-soon">Photo coming soon</span></div>
+      <div class="card-media dialog-media card-art card-art-bowl" aria-hidden="true"></div>
       <div class="dialog-title">
         <h2 id="dlg-hot-sauce-pot-title">Hot sauce pot</h2>
         <p class="card-meta">1 pot</p>
-        <p class="card-price"><span data-placeholder>£2.22 <span class="sample-label">sample</span></span></p>
+        <p class="card-price"><span data-pending>£2.22</span></p>
       </div>
       <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
     </div>
     <div class="dialog-body" data-options>
-      <section class="dialog-section">
-        <h3>Ingredients and allergens</h3>
-        <p data-todo>TODO: ingredients and allergen information from the owner</p>
-      </section>
       <fieldset class="opt-group" data-group="spice" data-kind="single">
-      <legend>Spice level <span class="sample-label">sample</span></legend>
+      <legend>Spice level</legend>
       <div class="opt-list">
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="mild" data-delta="0" data-default="false"> <span>Mild</span></label>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="medium" data-delta="0" data-default="true" checked> <span>Medium</span></label>
       <label class="opt"><input type="radio" name="opt-hot-sauce-pot-spice" value="hot" data-delta="0" data-default="false"> <span>Hot</span></label>
       </div>
     </fieldset>
-      <!-- TODO: owner and council to approve the allergy wording below -->
-      <p class="allergy-line" data-todo>Options are preferences, not an allergy guarantee. Tell us about any allergy before you order.</p>
     </div>
     <div class="dialog-foot">
       <p class="custom-note" data-custom-note hidden></p>
@@ -340,7 +316,6 @@
             <p class="eyebrow">Ordering</p>
             <h2>Pickup only</h2>
             <p>Order online, collect in person, and pay cash when you pick up.</p>
-            <p data-todo>TODO: pickup area and how the location is shared, to be confirmed by owner</p>
             <p><a class="btn btn-secondary" href="shop.html">See the momo</a></p>
           </div>
           <div class="tile tile-peach">
@@ -349,7 +324,6 @@
               <h2>The sauces</h2>
               <p>Momo is traditionally served with a spicy dip.</p>
               <p>Add our chutney or hot sauce to your order.</p>
-              <p data-todo>TODO: her own words describing the flavours</p>
               <p><a class="btn" href="shop.html">See the momo</a></p>
             </div>
             <img class="photo-frame sauce-photo" src="assets/img/photo-sauce.webp" width="335" height="335" alt="A bowl of homemade red-orange sauce" loading="lazy">
@@ -382,7 +356,6 @@
           <li><img src="assets/img/cutout-hero-600.webp" srcset="assets/img/cutout-hero-600.webp 600w, assets/img/cutout-hero.webp 1200w" sizes="(min-width: 48em) 14rem, 40vw" width="1200" height="1200" alt="A bamboo steamer filled with freshly steamed momo" loading="lazy"><p>Steam them at home.</p></li>
           <li><img src="assets/img/cutout-momo-400.webp" srcset="assets/img/cutout-momo-400.webp 400w, assets/img/cutout-momo.webp 800w" sizes="(min-width: 48em) 14rem, 40vw" width="800" height="800" alt="A single pleated momo" loading="lazy"><p>Eat them hot.</p></li>
         </ol>
-        <p data-todo>TODO: confirm the steam time and whether they steam straight from frozen (see How to cook)</p>
       </div>
     </section>
 
@@ -438,7 +411,7 @@
           <ul class="footer-list">
             <li><a class="contact-item" href="tel:+447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3.5h3.5l1.7 4.3-2.2 1.4a11 11 0 0 0 5.8 5.8l1.4-2.2 4.3 1.7V18a2.5 2.5 0 0 1-2.6 2.5A15.5 15.5 0 0 1 2.5 6.1 2.5 2.5 0 0 1 5 3.5z"/></svg>+44 7413 069241</a></li>
             <li><a class="contact-item" href="https://wa.me/447413069241"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 20.5 L5 16 A8.5 8.5 0 1 1 8.2 19 Z"/><path d="M9 9.5 C9 12.5 11.5 15 14.5 15 L15.5 13.8 L13.8 12.8 L13 13.5 C12 13 11 12 10.5 11 L11.2 10.2 L10.2 8.5 Z"/></svg>Message us on WhatsApp</a></li>
-            <li><!-- build:instagram --><span class="contact-item"><svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7 h.01"/></svg><span data-todo>TODO: Instagram link</span></span><!-- /build:instagram --></li>
+            <li><!-- build:instagram --><!-- /build:instagram --></li>
           </ul>
           <p>Pickup only. Pay cash on pickup.</p>
         </div>

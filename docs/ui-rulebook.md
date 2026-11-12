@@ -37,9 +37,9 @@ Do not add colours without asking. No purple or violet anywhere. No gradients: u
 Nothing visual is hard-coded. Everything scales smoothly with the screen and is defined once.
 
 **Tokens, defined once in `frontend/css/theme.css`, used by name everywhere else:**
-- Type scale `--step--1` to `--step-5`, each a `clamp()` between a phone size and a desktop size in `rem` (the body is `--step-0`).
+- Type tokens `--text-body`, `--text-read`, `--text-ui`, `--text-small`, `--text-eyebrow`, `--text-input`, `--text-name`, `--text-price`, `--text-h2`, `--text-h1`, `--text-statement` (D-050, D-051): fixed `rem` for text people read or tap; only the display headings use `clamp()`, each with a hard maximum. Full table: `docs/design/type-and-spacing-spec.md`.
 - Spacing scale `--space-3xs` to `--space-3xl`, each a `clamp()` in `rem` with a small viewport-based part.
-- Layout: `--gutter` (fluid side padding), `--wrap` (max content width, as already exists in `--max`), `--measure` (about `60ch`).
+- Layout: `--gutter` (fluid side padding, 16 to 32px), `--wrap` (max content width, `--max` 73.75rem), `--measure` (42.5rem), `--section-space` (vertical section padding and gaps, 40 to 80px); nothing uses a gap above 5rem.
 - Controls: `--tap` (minimum touch target, about `2.75rem`), `--radius` (small; the brand is not pill-shaped), `--hairline` (border width), `--ring-width` and `--ring-offset` (focus ring).
 - Tune the numbers while building; keep the names stable.
 
@@ -51,13 +51,16 @@ Nothing visual is hard-coded. Everything scales smoothly with the screen and is 
 - Text scales with the user's browser setting: never set font sizes in `px`, and the page must remain usable at 200 percent zoom and at widths from 320 px up.
 - Colours, sizes, radii, shadows (if any), durations and z-indexes: tokens, not literals.
 
-## 3. Typography and texture (D-043, D-044)
+## 3. Typography and texture (D-043 superseded by D-050, D-051)
 
-- **Two families, both self-hosted** (SIL OFL, Latin subsets, `font-display: swap`, size-matched fallbacks, preloaded; licences next to the files): **Instrument Serif** (400, never faux-bold) for h1, h2, large statements and step numerals, never below about 1.6 rem; **Hanken Grotesk** (variable weight) for everything else: body (400, about 1.0625 rem fluid), navigation, buttons (600), labels, h3 and card titles, product names (600) and prices (600, tabular figures), forms. The receipt keeps its monospace face. Tokens: `--font-head`, `--font-body`, `--font-mono`. Young Serif is retired.
-- **Display sizes are large and tight** (fluid tokens): hero h1 `--display-1`, page h1 `--display-page`, h2 `--display-2`; line-height 0.95 to 1, letter-spacing about -0.01em; headings use `text-wrap: balance`, paragraphs `text-wrap: pretty`, measure about 60ch.
-- **Section labels:** a small uppercase Hanken 600 label (letter-spacing about 0.18em, not below 0.8 rem) above each section heading, emerald on white and tints, peach on emerald; never copper, mid-green or sage for small text. Only words already on the page or in `docs/brand-direction.md`.
-- No paper grain, no ambient background, no decorative extras that fight the type. Glass only on the full-screen menu and the product sheet (with its backdrop and option pills); the header, checkout bar, chips and card controls are solid.
-- Large, confident headings; short lines; generous spacing.
+**The source of truth for sizes, weights, spacing and component rules is `docs/design/type-and-spacing-spec.md`.** Summary:
+
+- **Two families, both self-hosted** (SIL OFL, Latin, `font-display: swap`, metric-matched fallbacks, preloaded; licences next to the files): **Bebas Neue** 400, uppercase (h1 to h3, product names, prices, step numerals, never below 1.375rem) and **Space Grotesk** 300 to 700 variable (everything else, including the whole admin). Instrument Serif and Hanken Grotesk are removed.
+- Body is a fixed 1rem (reading text 1.0625rem, 42.5rem measure); buttons 0.9375rem 600; labels and functional text at least 0.875rem; inputs 1rem; eyebrows and tags 0.75rem. h1 `clamp(3rem, 1.6rem + 6vw, 6rem)`, h2 `clamp(2.375rem, 5vw, 3.75rem)`. Heading `text-wrap: balance`, paragraphs `text-wrap: pretty`.
+- Secondary text uses the single `--muted` token (at least 4.5:1, no opacity tricks). Form errors carry an "Error:" prefix, never colour alone. Focus ring is 2px with an offset on every control.
+- **Section labels:** a small uppercase Space Grotesk 600 eyebrow (about 0.2em tracking) above each section heading, emerald on white and tints, peach on emerald; never copper, mid-green or sage for small text. Only words already on the page or in `brand-direction.md`.
+- No visible placeholder, sample, demo or TODO wording anywhere (D-052). A fact we do not have is not rendered; an unconfirmed value carries the invisible `data-pending` attribute (or `"pending": true` in seed data), which the launch gate checks.
+- No paper grain, no ambient background, no decorative extras that fight the type. Glass only on the full-screen menu and the product sheet; the header, checkout bar, chips and card controls are solid.
 
 ## 4. Layout
 

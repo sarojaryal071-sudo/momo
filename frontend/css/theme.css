@@ -1,34 +1,33 @@
-/* Fonts (D-043), SIL OFL, Latin subsets, self-hosted. Instrument Serif for large headings only; Hanken Grotesk (variable
-   weight) for everything else. Each has a size-matched fallback (Times New Roman and Arial metrics, measured in a browser)
-   so the layout does not jump when the real font loads. */
+/* Fonts (D-051), SIL OFL, Latin subsets, self-hosted. Bebas Neue (400, uppercase) for headings, product names and prices;
+   Space Grotesk (variable 300 to 700) for everything else. Each has a metric-matched fallback so the layout does not jump. */
 @font-face {
-  font-family: "Instrument Serif";
-  src: url("../assets/fonts/instrument-serif-latin-400.woff2") format("woff2");
+  font-family: "Bebas Neue";
+  src: url("../assets/fonts/bebas-neue-latin-400.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Instrument Serif Fallback";
-  src: local("Times New Roman"), local("Liberation Serif"), local("Times");
-  size-adjust: 81.6%;
-  ascent-override: 121.3%;
-  descent-override: 38%;
+  font-family: "Bebas Neue Fallback";
+  src: local("Arial Narrow"), local("Liberation Sans Narrow"), local("Arial");
+  size-adjust: 86%;
+  ascent-override: 117%;
+  descent-override: 43%;
   line-gap-override: 0%;
 }
 @font-face {
-  font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/hanken-grotesk-latin-variable.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: "Space Grotesk";
+  src: url("../assets/fonts/space-grotesk-latin-variable.woff2") format("woff2");
+  font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Hanken Grotesk Fallback";
+  font-family: "Space Grotesk Fallback";
   src: local("Arial"), local("Liberation Sans"), local("Helvetica");
-  size-adjust: 99.7%;
-  ascent-override: 100.3%;
-  descent-override: 30.4%;
+  size-adjust: 103%;
+  ascent-override: 98%;
+  descent-override: 29%;
   line-gap-override: 0%;
 }
 
@@ -48,25 +47,35 @@
 
   --emerald-dark: color-mix(in srgb, var(--emerald) 80%, var(--charcoal));
   --line: color-mix(in srgb, var(--charcoal) 20%, transparent);
+  --line-strong: color-mix(in srgb, var(--charcoal) 55%, var(--white)); /* control borders: at least 3:1 on white */
   --line-on-dark: color-mix(in srgb, var(--white) 25%, transparent);
 
-  --font-head: "Instrument Serif", "Instrument Serif Fallback", Georgia, serif;
+  --font-head: "Bebas Neue", "Bebas Neue Fallback", Impact, "Arial Narrow", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; /* receipt */
-  --font-body: "Hanken Grotesk", "Hanken Grotesk Fallback", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Space Grotesk", "Space Grotesk Fallback", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --max: 70rem;
+  --max: 73.75rem;
 
-  /* Fluid type scale: phone size to desktop size, in rem. Body is --step-0. */
-  --step--1: clamp(0.8rem, 0.77rem + 0.15vw, 0.9rem);
-  --step-0: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem);
-  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
-  --step-2: clamp(1.45rem, 1.25rem + 1vw, 1.9rem);
-  --step-3: clamp(1.75rem, 1.4rem + 1.75vw, 2.5rem);
-  --step-4: clamp(2.1rem, 1.5rem + 3vw, 3.4rem);
-  --step-5: clamp(2.5rem, 1.5rem + 5vw, 4.5rem);
-  --display-1: clamp(3.5rem, 2rem + 8vw, 8rem);       /* hero h1 */
-  --display-page: clamp(3rem, 1.8rem + 5.5vw, 6rem);   /* page h1: shop, cart, how to cook */
-  --display-2: clamp(2.4rem, 1.6rem + 3.6vw, 4.5rem);  /* h2 */
+  /* Type (D-050, D-051; spec: docs/design/type-and-spacing-spec.md). Text people read or tap is fixed; only display headings
+     are fluid, always with a hard maximum. Bebas Neue is never below 1.375rem. */
+  --text-body: 1rem;
+  --text-read: 1.0625rem;      /* reading paragraphs and lead text */
+  --text-ui: 0.9375rem;        /* buttons, nav, chips */
+  --text-small: 0.875rem;      /* totals, errors, help, meta, labels: nothing functional is smaller */
+  --text-eyebrow: 0.75rem;     /* eyebrows and tags only */
+  --text-input: 1rem;          /* stops iPhone zoom on focus */
+  --text-name: 1.5rem;         /* product names (Bebas) */
+  --text-price: 1.375rem;      /* prices and totals (Bebas) */
+  --text-panel: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem); /* panel and tile headings (Bebas) */
+  --text-modal: clamp(1.75rem, 1.6rem + 0.6vw, 2rem);    /* product sheet title (Bebas) */
+  --text-numeral: 2.75rem;     /* step numerals (Bebas) */
+  --text-h2: clamp(2.375rem, 5vw, 3.75rem);              /* 38 to 60px */
+  --text-h1: clamp(3rem, 1.6rem + 6vw, 6rem);            /* 48 to 96px */
+  --text-statement: clamp(2.25rem, 1.4rem + 3vw, 3.5rem);
+  --muted: #5B5751;            /* secondary text: 7.2:1 on white, 6.3:1 on the tints */
+  --section-space: clamp(2.5rem, 1.5rem + 3.5vw, 5rem);  /* vertical section padding and gaps: 40 to 80px */
+  --hero-pad: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+  --section-head-gap: clamp(1.25rem, 1rem + 1vw, 2rem);
 
   /* Fluid spacing scale */
   --space-3xs: clamp(0.15rem, 0.12rem + 0.15vw, 0.25rem);
@@ -76,20 +85,18 @@
   --space-m: clamp(1rem, 0.8rem + 1vw, 1.6rem);
   --space-l: clamp(1.5rem, 1.1rem + 2vw, 2.4rem);
   --space-xl: clamp(2rem, 1.4rem + 3vw, 3.6rem);
-  --space-2xl: clamp(3rem, 2rem + 5vw, 5.4rem);
-  --space-3xl: clamp(4rem, 2.6rem + 7vw, 8rem);
+  --space-2xl: clamp(2.5rem, 1.8rem + 2.5vw, 4rem);
+  --space-3xl: clamp(3rem, 2rem + 3.5vw, 5rem);
 
   /* Layout */
-  --gutter: clamp(1.25rem, 0.8rem + 2.25vw, 2.5rem);
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
   --wrap: var(--max);
-  --measure: 60ch;
-  --band-pad: clamp(3rem, 1.8rem + 5vw, 6rem);
+  --measure: 42.5rem;
   --card-min: 14rem;
   --card-max: 16rem;
   --card-thumb: clamp(5.5rem, 24vw, 7.5rem);
   --dialog-max: 34rem;
   --photo-small: 16rem;
-  --section-gap: clamp(4rem, 2.5rem + 6vw, 8rem);
   --z-menu: 20;
   --z-bar: 30;
   --checkout-bar-space: 5rem;
@@ -104,7 +111,7 @@
   --radius-lg: 1.25rem;
   --radius-pill: 62rem;
   --hairline: 1px;
-  --ring-width: 3px;
+  --ring-width: 2px;
   --ring-offset: 3px;
   --ring-color: var(--emerald);
   --ring-color-on-dark: var(--peach);
@@ -112,11 +119,12 @@
   --shadow-cutout: drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--charcoal) 20%, transparent));
   --shadow-pressed: inset 0 0.125rem 0.25rem color-mix(in srgb, var(--charcoal) 25%, transparent);
   --press: 0.125rem;
+  --press-down: 1px;
   --line-height-body: 1.6;
   --line-height-head: 1.15;
   --line-height-display: 0.95;
   --line-height-h2: 1;
-  --tracking-display: -0.01em;
+  --tracking-display: 0.015em;
   --tracking-label: 0.18em;
 
   /* Glass (D-039): only the modal and its backdrop, the sticky header, the menu panel, the checkout bar and notice strips.
@@ -129,7 +137,7 @@
   --glass-shadow: 0 0.5rem 2rem color-mix(in srgb, var(--charcoal) 16%, transparent), inset 0 0 0 var(--hairline) var(--glass-edge);
 
   /* Motion */
-  --dur-fast: 120ms;
+  --dur-fast: 180ms;
   --dur-base: 240ms;
   --dur-slow: 700ms;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -184,8 +192,8 @@
   --icon: 1.6rem;
   --icon-trust: 2.25rem;
   --brand-mark: 2rem;
-  --brand-size: 1.75rem;
-  --step-art: clamp(7rem, 4rem + 14vw, 13rem);
+  --brand-size: 1.5rem;
+  --fold-art: clamp(6rem, 4rem + 10vw, 10rem);
   --reveal-distance: 1.5rem;
   --drift-distance: 2rem;
   --drift-duration: 10s;
@@ -202,3 +210,18 @@
    people who ask for less motion; base.css stops animations and transitions for (prefers-reduced-motion: reduce).
    (print) lets the receipt print on its own. (hover: hover) adds the card hover shadow for pointer devices only.
    The cart page switches to two columns with a container query at 52rem of page width. */
+
+/* Admin tokens (D-050 spec section 3): denser than the public site, scoped to the admin root. Same palette and fonts. */
+.admin-body {
+  --text-body: 0.9375rem;
+  --line-height-body: 1.5;
+  --admin-title: 1.5rem;       /* page title, Bebas Neue */
+  --admin-heading: 1rem;       /* card headings, Space Grotesk 600 */
+  --admin-pickup: 1.0625rem;   /* the most prominent line on an order */
+  --admin-count: 3.5rem;       /* the new-orders count, Bebas Neue */
+  --admin-tab: 0.75rem;        /* tab bar labels */
+  --space-s: 0.75rem;
+  --space-m: 1rem;
+  --space-l: 1.5rem;
+  --gutter: 1rem;
+}
