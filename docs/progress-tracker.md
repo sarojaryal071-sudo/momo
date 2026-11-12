@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4f, coding agent)
+- Last updated: 2026-11-13 (Step 4g, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 5 (SEO, hardening, launch).
 
@@ -239,6 +239,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
 
+## Step 4g — Editable allergens and ingredients, and the Save bar (D-062)
+
+- [x] Save bar bug: the scrolling area already had bottom padding that clears the tab bar and sticky offsets are measured inside that padding, so adding the tab bar height again lifted the bar; while editing, the padding is exactly the tab bar height and the offset is 0 (measured gap 0 at the top and at the end of the form at 390 px)
+- [x] Migration `0007_allergens_and_ingredients.sql`: tables `allergens`, `product_allergens`, `product_ingredients`, column `products.allergens_checked_at`; RLS, grants, unpublished-change triggers; the 14 UK allergens seeded as ordinary rows; existing `products.allergens` and `ingredients_text` moved by name and by splitting on commas (checked on a local database); old columns kept
+- [x] Admin: allergens from the database as tick boxes (2 columns on phones), "Manage allergens" in the editor and under Settings (add, rename, reorder, delete with usage count), permanent legal reminder, ingredients as removable tags with suggestions, "I have checked the allergen and ingredient information" safeguard (Active cannot be switched on without it; changing allergens or ingredients clears it)
+- [x] Build reads allergens and ingredients from the tables in her order; nothing shown when none; the hard-coded allergen list is gone from the admin and the build
+- [ ] Owner checks after the deploy workflow applies 0007: create a product, add and delete an allergen, tick allergens, add ingredient tags, try Active without the check, Save bar at the bottom
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
@@ -354,6 +362,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, Products tab blank on the owner's iPhone: could not reproduce on the built site under `/momo/` (demo data) nor with a faked Supabase client; added `admin/js/boot-guard.js` (a failing admin page now shows the error and a Reload link instead of staying blank) and a visible error if the product list cannot load. Cause unconfirmed; ask the owner for the message it shows.
 
 - 2026-11-13, step 4f (demo backend only): build passes; Playwright at 390 px (mobile profile): login, Home, Orders, Products list, Edit product (top, bottom, unsaved dialog, invalid price, save, add with a group), Pickup, Settings; no page errors; Confirm and More on one row; Save and Cancel sticky above the tab bar. Contrast: badges 4.87 to 12.85, muted text on the strongest single patch 4.85. Not checked: real Supabase product save and photo upload, real iPhone scroll smoothness with the blurred layers, desktop width by eye.
+
+- 2026-11-13, step 4g (demo backend only): build passes; admin-rules, mock-backend (25), build-supabase and regions tests pass; database tests 189 checks pass on a local PostgreSQL (new tables, policies, 14 seeded allergens, unpublished marker); migration 0007 data move checked on a local database with sample rows; Playwright at 390 px: Save bar gap 0 at the top and end of the form, tags, allergen grid, manager add and delete confirmation, safeguard, save round trip, Settings list. Not checked: real Supabase (migration applied by the workflow, product save, allergen delete), desktop width by eye.
 
 ## Known issues
 
