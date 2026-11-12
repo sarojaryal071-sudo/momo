@@ -4,7 +4,7 @@ The coding agent updates this file at the end of every phase (see `docs/usage-ru
 
 - Last updated: 2026-11-12 (Step 4d, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
-- Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 5 (SEO, hardening, launch).
+- Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4e (admin tactile look, one-row buttons, clean URLs, D-060), then Step 5 (SEO, hardening, launch).
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
