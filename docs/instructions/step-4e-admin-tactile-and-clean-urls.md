@@ -25,10 +25,14 @@ Use the existing glass tokens from the customer site (translucent surface, blur,
 - If someone opens an old `.html` or `index.html` address, a tiny shared script strips it with `history.replaceState` so the address bar shows the clean form (no redirect loop, no flash).
 - Make sure local preview and the tests serve the clean URLs the same way (extensionless), and that the 404 page still works.
 
+## 5. Bottom tab bar must stay fixed (bug seen on the owner's iPhone, Settings page)
+
+On the Settings page, scrolling to the end leaves the tab bar floating in the middle of the screen with blank white space underneath (the bar is `position: fixed; inset: auto 0 0 0` in `admin.css`, so the cause is likely an ancestor with `transform`, `filter`, `backdrop-filter`, `contain` or `will-change`, a `100vh` height mismatch with the iOS browser toolbar, or content shorter than the screen). Find the real cause on every admin page, fix it, and say what it was. The robust fix to use if the cause is not obvious: on phones make the admin page a fixed-height column (`min-height: 100dvh`, `display: grid; grid-template-rows: auto 1fr auto`, or `height: 100dvh` flex column) where the content area scrolls and the tab bar is the last item, so it can never move; keep the sidebar on wide screens; keep the safe-area padding at the bottom; make sure the tab bar is glass (section 3) without creating a new containing block for fixed children. Check Home, Orders, Products, Pickup and Settings at 390 px, with the page both short and long, and with the iOS toolbar collapsing (emulate a mobile Safari viewport if possible; say if you could not).
+
 ## Do not
 
 Change the public site's look (D-044 stays), add libraries or gradients, touch the database, or start Step 5.
 
 ## Report
 
-Under 25 lines: what changed, files changed, what was and was not checked, and anything the owner should test (Pickup page buttons on one row; toggles and buttons feel raised and press down; glass bars and menu; open `/momo/`, `/momo/shop`, `/momo/admin/`, `/momo/admin/orders` and an old `.html` address).
+Under 25 lines: what changed, files changed, what was and was not checked, and anything the owner should test (tab bar stays at the bottom on every admin page while scrolling, on the iPhone; Pickup page buttons on one row; toggles and buttons feel raised and press down; glass bars and menu; open `/momo/`, `/momo/shop`, `/momo/admin/`, `/momo/admin/orders` and an old `.html` address).
