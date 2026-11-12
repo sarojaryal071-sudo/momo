@@ -445,3 +445,22 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .sales-chart .bar:focus-visible { outline: none; }
 .sales-chart .bar:focus-visible rect:not(.hit) { stroke: var(--copper); stroke-width: 3; }
 .chip-row[data-periods] { flex-wrap: wrap; overflow: visible; }
+
+/* Login: wrong details (shake and marked fields) and the logging-in state */
+.login-card input[aria-invalid="true"] { border-color: var(--chutney); box-shadow: 0 0 0 var(--ring-width) color-mix(in srgb, var(--chutney) 22%, transparent); background: color-mix(in srgb, var(--chutney) 5%, var(--white)); }
+.login-card .error:not(:empty) { margin-block-start: var(--space-xs); padding: var(--space-xs) var(--space-s); border-inline-start: var(--space-3xs) solid var(--chutney); background: color-mix(in srgb, var(--chutney) 8%, var(--white)); border-radius: var(--radius); }
+.login-card form { transition: opacity 0.2s ease; }
+.is-logging-in .field, .is-logging-in .login-links { opacity: 0.55; pointer-events: none; }
+.is-logging-in .btn-big { position: relative; overflow: hidden; }
+.is-welcome .field, .is-welcome .login-links { opacity: 0.55; pointer-events: none; }
+.is-welcome .btn-big { background: var(--emerald); }
+.is-welcome .btn-big::before { content: "\2713"; margin-inline-end: var(--space-xs); font-weight: 700; }
+@keyframes login-shake { 0%, 100% { translate: 0; } 15% { translate: -0.6rem; } 30% { translate: 0.5rem; } 45% { translate: -0.4rem; } 60% { translate: 0.3rem; } 75% { translate: -0.15rem; } }
+@keyframes login-sweep { from { translate: -100%; } to { translate: 300%; } }
+@keyframes login-pop { from { scale: 0.96; opacity: 0.6; } to { scale: 1; opacity: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+  .login-card.shake { animation: login-shake 0.45s ease-in-out; }
+  .is-logging-in .btn-big::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 35%; background: color-mix(in srgb, var(--white) 16%, transparent); animation: login-sweep 1.1s ease-in-out infinite; }
+  .is-welcome .btn-big { animation: login-pop 0.25s ease-out; }
+}
+.admin-body .is-logging-in .btn-big:disabled { background: var(--emerald); color: var(--white); border-color: var(--emerald-dark); opacity: 1; box-shadow: none; }
