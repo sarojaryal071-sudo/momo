@@ -6,13 +6,13 @@ Prerequisite: Step 2 done. Read `CLAUDE.md`, `docs/architecture-rulebook.md` sec
 
 ## Goal
 
-Real orders: the site saves each order in a database, assigns the order number (`SS-DDMM-NN`, D-032) and emails the owner (D-037). The order is placed on the site; the customer does not have to send a WhatsApp message (D-036). The shop reads real products at build time and real pickup rules at runtime.
+Real orders: the site saves each order in a database, assigns the order number (`SS-DDMM-NN`, D-032) (no email is sent, D-056). The order is placed on the site; the customer does not have to send a WhatsApp message (D-036). The shop reads real products at build time and real pickup rules at runtime.
 
 ## Owner actions first (list them clearly in your first message to the owner, then wait)
 
 1. Create a Supabase project (free tier) and note the project URL and anon key.
 2. In Authentication settings, **disable public sign-ups**. Create **one** admin user now (the owner, strong password); add it to `admins` by a documented SQL statement. **Update 12 Nov 2026:** the second admin (her) is added later with the same documented statement; build and test the code for two admins, but only one exists now. The Supabase project URL is `https://mohkrxpdqtwnhzzmcxdw.supabase.co`.
-3. Choose the email provider and create an API key (suggestion: Resend free tier). The owner's email address goes only into a Supabase function secret.
+3. ~~Email provider~~ **Not needed (D-056): no email service, no Resend, no owner email anywhere.**
 4. Create a fine-grained GitHub token limited to this repository with permission to run workflows. It goes only into a Supabase function secret.
 5. Add repository variables `SUPABASE_URL` and `SUPABASE_ANON_KEY` (public values) in GitHub.
 
@@ -36,7 +36,7 @@ Write `backend/README.md` as a step-by-step guide for these actions in plain lan
 ## Changes from decisions D-032 to D-039
 
 - The order is placed on the site (D-036): the function requires name and phone (UK format) and rejects an order without them; the cart and done pages follow `docs/technical-rulebook.md` section 3. Remove the automatic WhatsApp opening on the done page; keep the WhatsApp message builder for the failure backup and for the admin panel (Step 4).
-- Email alert to the owner (D-037) through the chosen provider; owner email and API key only in function secrets.
+- **No email (D-056).** New orders reach her through the admin (it refreshes every minute; see D-056 for the in-app alert built in Step 4bc). Skip every email line elsewhere in this file and in the architecture rulebook.
 - `pickup.js` and the checks use the time step from each rule's `slot_minutes` (default 1): any minute inside her windows is valid (D-038); a time outside every window, off the step or earlier than the lead time is rejected by the function.
 - Keep `mock` selectable.
 
