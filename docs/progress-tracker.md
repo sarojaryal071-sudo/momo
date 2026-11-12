@@ -326,6 +326,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 - 2026-11-12, steps 4b and 4c: build passes; `admin-rules`, `mock-backend`, `gateway`, `whatsapp` tests pass (38) and the migration guard test passes. One Playwright pass on the demo backend at 390 px over products, pickup, settings, new order and orders (23 checks, no page errors). Not checked: anything against Supabase, real photo upload to the bucket, Realtime, the Publish button's GitHub dispatch, real WhatsApp, installing the app on a phone.
 
+- 2026-11-12, step 4d refinement (plate photo alt text, peach tagline between hairlines, field icons and eye toggle per the approved mockup, no logo mark): build passes; login re-checked at 390 and 1440 px on the demo backend.
 - 2026-11-12, step 4d (demo backend only): build passes; `admin-session` tests pass. One Playwright run at 390 and 1440 px: login (overflow, only the patches blur, 16px and 44px inputs, show password, neutral error, forgot message, invalid reset link), Home tiles and links, five tabs on every page, pause from Home, 30-day sign-out, signed-in user on the login page. Not checked: Supabase login, the real reset email and link, Realtime on Home.
 
 ## Known issues

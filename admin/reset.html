@@ -23,20 +23,21 @@
   <div class="login-patches" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="login-layout">
     <aside class="login-brand">
-      <img src="../assets/img/photo-plate-800.webp" alt="">
+      <img src="../assets/img/photo-plate-800.webp" alt="A plate of steamed momo with a small bowl of red sauce" loading="eager">
       <div class="login-brand-text">
         <p class="login-wordmark">Steam &amp; Spice</p>
-        <p>Taste like Nepal.</p>
+        <p class="login-tagline"><span>Taste like Nepal</span></p>
       </div>
     </aside>
     <main class="login-main" id="main">
       <div class="login-card">
         <p class="admin-brand login-mark">Steam &amp; Spice</p>
+        <p class="login-tagline login-tagline-card"><span>Taste like Nepal</span></p>
         <h1>New password</h1>
         <p class="login-note" role="status" data-message></p>
         <form data-reset-form hidden novalidate>
           <div class="field"><label for="new-password">New password</label>
-            <div class="password-wrap"><input id="new-password" name="password" type="password" autocomplete="new-password" minlength="10" required><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" data-toggle-password>Show</button></div>
+            <div class="password-wrap icon-field"><svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg><input id="new-password" name="password" type="password" autocomplete="new-password" minlength="10" required><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" data-toggle-password><svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5c1.6 0 3 .5 4.3 1.2M21.5 12S18 18.5 12 18.5c-1.6 0-3-.5-4.3-1.2"/><path d="M4 4l16 16"/></svg></button></div>
             <p class="hint">At least 10 characters.</p></div>
           <div class="field"><label for="confirm-password">Repeat the new password</label><input id="confirm-password" name="confirm" type="password" autocomplete="new-password" required></div>
           <button class="btn btn-big" type="submit" data-submit>Save new password</button>

@@ -88,9 +88,20 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .link-button { min-block-size: var(--tap); padding-inline: var(--space-xs); font: inherit; font-weight: 600; color: var(--emerald); background: none; border: 0; text-decoration: underline; text-underline-offset: var(--space-3xs); cursor: pointer; }
 .login-card .btn-big { inline-size: 100%; }
 .password-wrap { position: relative; display: grid; }
-.password-wrap input { padding-inline-end: calc(var(--tap) * 1.6); }
-.password-toggle { position: absolute; inset-block: 0; inset-inline-end: 0; min-inline-size: calc(var(--tap) * 1.5); padding-inline: var(--space-s); font: inherit; font-size: var(--text-small); font-weight: 700; color: var(--emerald); background: none; border: 0; cursor: pointer; }
+.password-wrap input { padding-inline-end: calc(var(--tap) * 1.2); }
+.password-toggle { position: absolute; inset-block: 0; inset-inline-end: 0; min-inline-size: var(--tap); padding-inline: var(--space-xs); display: grid; place-items: center; font: inherit; color: var(--emerald); background: none; border: 0; cursor: pointer; }
 .login-brand { display: none; }
+.login-tagline-card { display: flex; align-items: center; gap: var(--space-xs); margin: 0 0 var(--space-s); font-size: var(--text-small); color: var(--muted); }
+.login-tagline-card::before, .login-tagline-card::after { content: ""; flex: 1; block-size: var(--hairline); background: currentColor; }
+.login-mark { text-align: center; }
+.login-card h1 { text-align: center; }
+.icon-field { position: relative; display: grid; }
+.icon-field .field-icon { position: absolute; inset-block: 0; inset-inline-start: var(--space-xs); margin-block: auto; inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: var(--emerald); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.icon-field input { padding-inline-start: calc(var(--space-xs) * 2 + var(--icon)); }
+.password-toggle svg { inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.password-toggle .eye-off { display: none; }
+.password-toggle.is-shown .eye-open { display: none; }
+.password-toggle.is-shown .eye-off { display: inline; }
 /* phone only: three large soft patches, fixed behind everything, no gradient, no movement */
 .login-patches { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
 .login-patches i { position: absolute; display: block; border-radius: 50%; filter: blur(var(--patch-blur)); }
@@ -103,7 +114,12 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
   .login-brand { display: flex; flex-direction: column; gap: var(--space-m); padding: var(--space-xl); background: var(--emerald); color: var(--white); }
   .login-brand img { flex: 1; min-block-size: 0; inline-size: 100%; object-fit: cover; border-radius: var(--radius-lg); }
   .login-wordmark { margin: 0; font-family: var(--font-head); font-size: var(--text-h2); line-height: 1; letter-spacing: var(--tracking-display); text-transform: uppercase; }
-  .login-brand-text p:last-child { margin: var(--space-2xs) 0 0; font-size: var(--text-read); }
+  .login-tagline { display: flex; align-items: center; gap: var(--space-xs); margin: var(--space-2xs) 0 0; font-size: var(--text-read); color: var(--peach); }
+  .login-tagline::before, .login-tagline::after { content: ""; flex: 1; block-size: var(--hairline); background: currentColor; }
+  .login-brand { justify-content: center; }
+  .login-brand img { flex: none; block-size: 55%; }
+  .login-card h1 { text-align: center; }
+  .login-tagline-card { display: none; }
   .login-card { padding: var(--space-l); border: 0; box-shadow: none; }
   .login-mark { display: none; }
 }

@@ -6,7 +6,7 @@ export function wirePasswordToggle(root) {
   toggle.addEventListener('click', () => {
     const show = input.type === 'password';
     input.type = show ? 'text' : 'password';
-    toggle.textContent = show ? 'Hide' : 'Show';
+    toggle.classList.toggle('is-shown', show);
     toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
     toggle.setAttribute('aria-pressed', String(show));
   });
