@@ -14,9 +14,13 @@
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="admin-body" data-auth data-page="orders">
+  <div class="paused-strip" data-paused hidden role="status"><span><strong>Ordering is paused.</strong> Customers cannot place orders.</span><button type="button" class="btn btn-small btn-secondary" data-resume>Resume</button></div>
   <header class="admin-bar">
-    <span class="admin-title">Steam &amp; Spice admin</span>
-    <button type="button" class="btn btn-secondary btn-small" data-logout>Log out</button>
+    <a class="admin-brand" href="index.html">Steam &amp; Spice</a>
+    <div class="admin-menu-wrap">
+      <button type="button" class="icon-btn" aria-expanded="false" aria-controls="admin-menu" data-menu-btn><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="visually-hidden">Menu</span></button>
+      <div class="admin-menu" id="admin-menu" hidden><button type="button" class="menu-item" data-logout>Log out</button></div>
+    </div>
   </header>
   <nav class="tabbar" aria-label="Admin">
     <a href="index.html" data-tab="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Orders</a>
@@ -26,17 +30,36 @@
     <a href="settings.html" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>Settings</a>
   </nav>
   <main class="admin-main" id="main">
-    <h1>Orders</h1>
-    <div class="new-count" data-new-count><strong data-new-number>0</strong><span>new orders waiting</span></div>
-    <form class="filters no-print" data-filters>
-      <div class="field"><label for="f-from">From</label><input id="f-from" type="date" data-from></div>
-      <div class="field"><label for="f-to">To</label><input id="f-to" type="date" data-to></div>
-      <div class="field"><label for="f-status">Status</label>
-        <select id="f-status" data-status><option value="active">Open orders</option><option value="all">All</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="ready">Ready</option><option value="collected">Collected</option><option value="cancelled">Cancelled</option></select></div>
-    </form>
-    <p class="btn-row"><a class="btn btn-secondary btn-small" href="prep.html">Prep list</a><button type="button" class="btn btn-secondary btn-small" data-all-dates>Show past orders too</button></p>
+    <div class="title-row">
+      <h1>Orders</h1>
+      <span class="new-badge" data-new-count hidden><span data-new-number>0</span> new</span>
+      <a class="btn btn-secondary btn-small" href="prep.html">Prep list</a>
+    </div>
+    <div class="chip-row" role="group" aria-label="Status" data-status-chips>
+      <button type="button" class="chip" data-status="active" aria-pressed="true">Open</button>
+      <button type="button" class="chip" data-status="new" aria-pressed="false">New</button>
+      <button type="button" class="chip" data-status="confirmed" aria-pressed="false">Confirmed</button>
+      <button type="button" class="chip" data-status="ready" aria-pressed="false">Ready</button>
+      <button type="button" class="chip" data-status="collected" aria-pressed="false">Collected</button>
+      <button type="button" class="chip" data-status="cancelled" aria-pressed="false">Cancelled</button>
+      <button type="button" class="chip" data-status="all" aria-pressed="false">All</button>
+    </div>
+    <div class="chip-row" role="group" aria-label="Pickup day" data-range-chips>
+      <button type="button" class="chip" data-range="today" aria-pressed="false">Today</button>
+      <button type="button" class="chip" data-range="tomorrow" aria-pressed="false">Tomorrow</button>
+      <button type="button" class="chip" data-range="week" aria-pressed="false">This week</button>
+      <button type="button" class="chip" data-range="upcoming" aria-pressed="true">All upcoming</button>
+    </div>
+    <details class="date-range no-print">
+      <summary>Date range</summary>
+      <div class="form-grid">
+        <div class="field"><label for="f-from">From</label><input id="f-from" type="date" data-from></div>
+        <div class="field"><label for="f-to">To</label><input id="f-to" type="date" data-to></div>
+      </div>
+      <div class="switch-row"><span id="past-label">Include past orders</span><button type="button" class="switch" role="switch" aria-checked="false" aria-labelledby="past-label" data-past><span class="switch-track" aria-hidden="true"></span><span class="switch-text">Off</span></button></div>
+    </details>
     <div data-orders aria-live="polite"></div>
-    <p class="muted" data-empty hidden>No orders yet.</p>
+    <p class="muted empty-state" data-empty hidden>No orders yet.</p>
   </main>
   <script type="module" src="js/orders.js"></script>
 </body>

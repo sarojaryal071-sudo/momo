@@ -220,6 +220,14 @@
   --admin-pickup: 1.0625rem;   /* the most prominent line on an order */
   --admin-count: 3.5rem;       /* the new-orders count, Bebas Neue */
   --admin-tab: 0.75rem;        /* tab bar labels */
+  --admin-bar: 3.5rem;         /* slim top bar */
+  --tabbar-h: 4rem;            /* bottom tab bar on phones */
+  --sidebar: 12rem;
+  --content-admin: 48rem;      /* maximum content width on wide screens */
+  --field-min: 9rem;           /* two side-by-side fields collapse to one below twice this width */
+  --switch-w: 3.25rem;
+  --switch-h: 1.75rem;
+  --tab-icon: 1.5rem;
   --space-s: 0.75rem;
   --space-m: 1rem;
   --space-l: 1.5rem;

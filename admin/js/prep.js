@@ -1,50 +1,73 @@
 import { api } from './shell.js';
-import { PREP_DEFAULT_OFFSET_DAYS } from './admin-config.js';
-import { dateLabel } from '../../js/pickup.js';
+import { PREP_DAY_CHIPS, PREP_DEFAULT_OFFSET_DAYS } from './admin-config.js';
+import { addDays, shortDate } from './dates.js';
 import { ukToday } from '../../js/mock-backend.js';
 
 const out = document.querySelector('[data-prep]');
+const chips = document.querySelector('[data-day-chips]');
 const from = document.querySelector('[data-from]');
 const to = document.querySelector('[data-to]');
 const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); n.append(...kids.filter((k) => k != null)); return n; };
 
-function addDays(iso, n) {
-  const d = new Date(`${iso}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + n);
-  return d.toISOString().slice(0, 10);
-}
-from.value = addDays(ukToday(), PREP_DEFAULT_OFFSET_DAYS);
+let start = null;
+let end = null;
 
-function table(caption, rows) {
-  const t = el('table', { className: 'prep-table' }, el('caption', { className: 'visually-hidden' }, caption));
-  t.append(el('tbody', {}, ...rows.map(([a, b]) => el('tr', {}, el('td', {}, a), el('td', {}, String(b))))));
-  return t;
+async function ordersByDay() {
+  const counts = new Map();
+  for (const o of await api.listOrders({})) if (o.pickup_date && o.status !== 'cancelled') counts.set(o.pickup_date, (counts.get(o.pickup_date) || 0) + 1);
+  return counts;
 }
 
-async function render() {
-  const start = from.value;
-  const end = to.value && to.value >= start ? to.value : start;
-  out.replaceChildren();
-  if (!start) { out.append(el('p', {}, 'Pick a pickup date.')); return; }
-  const prep = await api.prepList(start, end);
-  const range = end === start ? dateLabel(start) : `${dateLabel(start)} to ${dateLabel(end)}`;
-  out.append(el('h2', {}, range));
-  if (!prep.orders) { out.append(el('p', {}, 'No orders to prepare for this date. Cancelled orders are left out.')); return; }
-  out.append(el('p', {}, `${prep.orders} order${prep.orders === 1 ? '' : 's'} to prepare. Cancelled orders are left out.`));
-  const custom = prep.products.reduce((n, p) => n + p.customisedQty, 0);
-  const options = prep.options.map((o) => `${o.label} ×${o.qty}`).join(', ');
-  const summary = [...prep.products.map((p) => `${p.name} ×${p.qty}`), custom ? `Customised ×${custom}${options ? `: ${options}` : ''}` : null].filter(Boolean).join(', ');
-  out.append(el('p', { className: 'prep-summary' }, summary));
-  out.append(el('h3', {}, 'Totals per product'), table('Totals per product', prep.products.map((p) => [`${p.name}${p.unit_label ? ` (${p.unit_label})` : ''}${p.customisedQty ? ` · ${p.customisedQty} customised` : ''}`, p.qty])));
-  if (prep.options.length) out.append(el('h3', {}, 'Totals per option'), table('Totals per option', prep.options.map((o) => [`${o.label} (${o.product})`, o.qty])));
-  if (prep.customised.length) {
-    out.append(el('h3', {}, 'Customised lines'));
-    out.append(el('ul', {}, ...prep.customised.map((c) => el('li', {}, `${c.order_number}, ${c.name}: ${c.qty} × ${c.product}${c.options.length ? ` (${c.options.join(', ')})` : ''}${c.pickup_date !== start || end !== start ? `, ${dateLabel(c.pickup_date)}${c.pickup_time ? ` ${c.pickup_time}` : ''}` : c.pickup_time ? `, ${c.pickup_time}` : ''}`))));
+async function drawChips(counts) {
+  const today = ukToday();
+  chips.replaceChildren();
+  for (let i = 0; i < PREP_DAY_CHIPS; i++) {
+    const day = addDays(today, i);
+    const n = counts.get(day) || 0;
+    const b = el('button', { type: 'button', className: 'chip' }, i === 0 ? 'Today' : shortDate(day).replace(/ [A-Z][a-z]+$/, ''), n ? el('small', {}, ` · ${n}`) : null);
+    b.dataset.day = day;
+    b.setAttribute('aria-pressed', String(!to.value && start === day && end === day));
+    b.setAttribute('aria-label', `${shortDate(day, true)}, ${n} order${n === 1 ? '' : 's'}`);
+    b.addEventListener('click', () => { start = end = day; from.value = day; to.value = ''; render(); });
+    chips.append(b);
   }
 }
 
-from.addEventListener('change', render);
-to.addEventListener('change', render);
+async function render() {
+  const counts = await ordersByDay();
+  await drawChips(counts);
+  out.replaceChildren();
+  if (!start) { out.append(el('p', { className: 'muted' }, 'Pick a pickup day.')); return; }
+  const prep = await api.prepList(start, end);
+  const range = end === start ? shortDate(start, true) : `${shortDate(start, true)} to ${shortDate(end, true)}`;
+  out.append(el('h2', { className: 'prep-day' }, range));
+  if (!prep.orders) {
+    const next = [...counts.keys()].filter((d) => d > end).sort()[0];
+    out.append(el('p', { className: 'muted empty-state' }, next ? `Nothing to prepare for this day. The next day with orders is ${shortDate(next, true)}.` : 'Nothing to prepare for this day, and no later orders yet.'));
+    return;
+  }
+  out.append(el('p', { className: 'muted' }, `${prep.orders} order${prep.orders === 1 ? '' : 's'}. Cancelled orders are left out.`));
+  for (const p of prep.products) {
+    out.append(el('div', { className: 'prep-product' }, el('strong', {}, p.name, p.unit_label ? el('span', { className: 'muted' }, ` (${p.unit_label})`) : null), el('span', { className: 'prep-qty' }, `×${p.qty}`)));
+    const opts = prep.options.filter((o) => o.slug === p.slug);
+    if (opts.length) out.append(el('ul', { className: 'prep-options' }, ...opts.map((o) => el('li', {}, el('span', {}, o.label), el('span', {}, `×${o.qty}`)))));
+  }
+  if (prep.customised.length) {
+    out.append(el('h3', { className: 'prep-day' }, 'Customised orders'));
+    out.append(el('ul', { className: 'prep-custom' }, ...prep.customised.map((c) => el('li', {}, `${c.order_number}, ${c.name}: ${c.qty} × ${c.product}${c.options.length ? ` (${c.options.join(', ')})` : ''}${end !== start ? `, ${shortDate(c.pickup_date)}` : ''}${c.pickup_time ? ` ${c.pickup_time}` : ''}`))));
+  }
+}
+
+function fromFields() { start = from.value || null; end = to.value && to.value >= start ? to.value : start; render(); }
+from.addEventListener('change', fromFields);
+to.addEventListener('change', fromFields);
 document.querySelector('[data-print]').addEventListener('click', () => window.print());
 api.onChange(render);
+
+// Opens on the first of the next days that has orders, otherwise tomorrow.
+const counts = await ordersByDay();
+const today = ukToday();
+let first = addDays(today, PREP_DEFAULT_OFFSET_DAYS);
+for (let i = 0; i < PREP_DAY_CHIPS; i++) { const d = addDays(today, i); if (counts.get(d)) { first = d; break; } }
+start = end = first; from.value = first;
 await render();

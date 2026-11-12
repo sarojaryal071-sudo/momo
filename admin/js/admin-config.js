@@ -13,3 +13,5 @@ export const SAVED_MESSAGE_SECONDS = 4;
 export const STATUS_LABELS = { new: 'New', confirmed: 'Confirmed', ready: 'Ready', collected: 'Collected', cancelled: 'Cancelled' };
 export const TEMPLATE_BY_STATUS = { new: 'confirmed', confirmed: 'confirmed', ready: 'ready', collected: 'ready', cancelled: 'cancelled' };
 export const TEMPLATE_PLACEHOLDERS = ['{name}', '{order_number}', '{pickup}', '{items}', '{address}'];
+export const NEXT_STATUS = { new: { status: 'confirmed', label: 'Confirm' }, confirmed: { status: 'ready', label: 'Mark ready' }, ready: { status: 'collected', label: 'Mark collected' } }; // the one main button on an order
+export const PREP_DAY_CHIPS = 8; // today and the next 7 days

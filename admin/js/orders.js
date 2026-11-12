@@ -1,23 +1,23 @@
 import { api } from './shell.js';
-import { ORDERS_REFRESH_SECONDS, SEEN_KEY, STATUS_LABELS, TEMPLATE_BY_STATUS } from './admin-config.js';
+import { ORDERS_REFRESH_SECONDS, SEEN_KEY, STATUS_LABELS, TEMPLATE_BY_STATUS, NEXT_STATUS } from './admin-config.js';
 import { formatPrice } from '../../js/cart.js';
-import { dateLabel, ukParts } from '../../js/pickup.js';
 import { ukToday } from '../../js/mock-backend.js';
+import { addDays, endOfWeek, shortDate } from './dates.js';
 import { buildLink, describeItems, fillTemplate, toWhatsAppNumber } from '../../js/whatsapp.js';
 
 const root = document.querySelector('[data-orders]');
 const emptyNote = document.querySelector('[data-empty]');
 const fromInput = document.querySelector('[data-from]');
 const toInput = document.querySelector('[data-to]');
-const statusSelect = document.querySelector('[data-status]');
-const countBox = document.querySelector('[data-new-count]');
+const pastSwitch = document.querySelector('[data-past]');
+const countBadge = document.querySelector('[data-new-count]');
 const countNumber = document.querySelector('[data-new-number]');
 const baseTitle = 'Orders | Admin';
 
 const seen = (() => { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); } })();
 const markSeen = (id) => { seen.add(id); try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seen])); } catch { /* ignore */ } };
 
-fromInput.value = ukToday();
+const view = { status: 'active', range: 'upcoming', past: false };
 let settings = await api.getSettings();
 let busy = false; // do not redraw while a confirmation or message box is open
 
@@ -27,13 +27,22 @@ const el = (tag, props = {}, ...kids) => {
   node.append(...kids.filter((k) => k !== null && k !== undefined));
   return node;
 };
-const when = (o) => (o.pickup_date ? `${dateLabel(o.pickup_date)}${o.pickup_time ? `, ${o.pickup_time}` : ''}` : 'No pickup date');
+const when = (o) => (o.pickup_date ? `${shortDate(o.pickup_date)}${o.pickup_time ? `, ${o.pickup_time}` : ''}` : 'No pickup date');
 const statusOk = (o) => {
-  const f = statusSelect.value;
-  if (f === 'all') return true;
-  if (f === 'active') return o.status !== 'collected' && o.status !== 'cancelled';
-  return o.status === f;
+  if (view.status === 'all') return true;
+  if (view.status === 'active') return o.status !== 'collected' && o.status !== 'cancelled';
+  return o.status === view.status;
 };
+
+// The date window for the list. Orders without a pickup date are always listed (the rules module keeps them).
+function window_() {
+  const today = ukToday();
+  if (view.range === 'today') return { from: today, to: today };
+  if (view.range === 'tomorrow') { const d = addDays(today, 1); return { from: d, to: d }; }
+  if (view.range === 'week') return { from: today, to: endOfWeek(today) };
+  if (view.range === 'custom') return { from: fromInput.value || null, to: toInput.value || null };
+  return { from: view.past ? null : today, to: null };
+}
 
 function messageText(order, status) {
   const key = `wa_template_${TEMPLATE_BY_STATUS[status]}`;
@@ -47,8 +56,9 @@ function messageBox(order, card) {
   busy = true;
   const phone = toWhatsAppNumber(order.customer_phone);
   const box = el('div', { className: 'message-box' });
+  const close = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { box.remove(); busy = false; } }, 'Close');
   if (!phone) {
-    box.append(el('p', { className: 'error' }, 'This phone number does not look valid, so WhatsApp cannot be opened. Check the number the customer gave.'), el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { box.remove(); busy = false; } }, 'Close'));
+    box.append(el('p', { className: 'error' }, 'This phone number does not look valid, so WhatsApp cannot be opened. Check the number the customer gave.'), close);
     card.append(box);
     return;
   }
@@ -58,16 +68,15 @@ function messageBox(order, card) {
   const send = el('a', { className: 'btn btn-small', target: '_blank', rel: 'noopener noreferrer' }, 'Open WhatsApp');
   const sync = () => { send.href = buildLink(phone, area.value); };
   area.addEventListener('input', sync); sync();
-  box.append(el('label', { htmlFor: area.id }, 'Edit the message if you like'), area, el('p', { className: 'hint' }, 'You tap send in WhatsApp.'),
-    el('div', { className: 'btn-row' }, send, el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { box.remove(); busy = false; } }, 'Close')));
+  box.append(el('label', { htmlFor: area.id }, 'Edit the message if you like'), area, el('p', { className: 'hint' }, 'You tap send in WhatsApp.'), el('div', { className: 'btn-row' }, send, close));
   card.append(box);
   area.focus();
 }
 
 function confirmCancel(order, card, showError) {
   busy = true;
-  const box = el('div', { className: 'confirm-box', role: 'alertdialog' }, el('p', {}, `Cancel ${order.order_number}? Its stock goes back on the shelf.`));
-  const yes = el('button', { type: 'button', className: 'btn btn-danger btn-small', onclick: async () => { await changeStatus(order, 'cancelled', showError); } }, 'Yes, cancel this order');
+  const box = el('div', { className: 'confirm-box', role: 'alertdialog', 'aria-label': 'Cancel this order' }, el('p', {}, `Cancel ${order.order_number}? Its stock goes back on the shelf.`));
+  const yes = el('button', { type: 'button', className: 'btn btn-danger btn-small', onclick: () => changeStatus(order, 'cancelled', showError) }, 'Yes, cancel this order');
   const no = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { box.remove(); busy = false; } }, 'Keep it');
   box.append(el('div', { className: 'btn-row' }, yes, no));
   card.append(box);
@@ -94,44 +103,51 @@ function card(order) {
   const err = el('p', { className: 'order-error', role: 'alert' });
   const showError = (m) => { err.textContent = m; };
   const phone = toWhatsAppNumber(order.customer_phone);
+  const customised = order.items.some((l) => l.customised);
 
-  article.append(...[
-    el('div', { className: 'order-head' }, el('span', { className: 'order-number' }, order.order_number),
-      order.items.some((l) => l.customised) ? el('span', { className: 'tag tag-custom' }, 'Customised') : null,
-      order.source === 'manual' ? el('span', { className: 'tag tag-manual' }, 'Manual') : null,
-      el('span', { className: 'order-when' }, when(order))),
+  const badge = el('span', { className: 'status-badge' }, STATUS_LABELS[order.status]);
+  badge.dataset.status = order.status;
+  article.append(
+    el('div', { className: 'order-top' }, el('span', { className: 'order-number' }, order.order_number),
+      order.source === 'manual' ? el('span', { className: 'tag tag-manual' }, 'Manual') : null, badge),
+    el('p', { className: 'pickup-line' }, when(order), customised ? el('span', { className: 'tag tag-custom' }, 'Customised') : null),
     el('p', { className: 'order-who' }, el('strong', {}, order.customer_name), ' · ', el('a', { href: `tel:${order.customer_phone.replace(/[^\d+]/g, '')}` }, order.customer_phone)),
-    el('ul', { className: 'order-lines' }, ...order.items.map((l) => el('li', {}, `${l.qty} × ${l.name}`, l.options.length ? el('span', { className: 'opts' }, ` (${l.options.map((o) => o.label).join(', ')})`) : null, l.customised ? ' ' : null, l.customised ? el('span', { className: 'tag tag-custom' }, 'Customised') : null))),
-    order.notes ? el('p', { className: 'order-notes' }, `Note: ${order.notes}`) : null,
-    el('div', { className: 'order-foot' }, el('span', { className: 'order-total' }, formatPrice(order.total_pence)), el('span', { className: 'badge' }, STATUS_LABELS[order.status])),
-  ].filter(Boolean));
-  const buttons = el('div', { className: 'status-buttons', role: 'group', 'aria-label': `Change status of ${order.order_number}` });
-  for (const status of Object.keys(STATUS_LABELS)) {
-    const b = el('button', { type: 'button', className: 'btn btn-secondary btn-small' }, STATUS_LABELS[status]);
-    b.setAttribute('aria-pressed', String(order.status === status));
-    b.addEventListener('click', () => {
-      if (order.status === status) return;
-      err.textContent = '';
-      if (status === 'cancelled') confirmCancel(order, article, showError);
-      else changeStatus(order, status, showError);
-    });
-    buttons.append(b);
+    el('ul', { className: 'order-lines' }, ...order.items.map((l) => el('li', {}, `${l.qty} × ${l.name}`, l.options.length ? el('span', { className: 'opts' }, l.options.map((o) => o.label).join(', ')) : null))),
+  );
+  if (order.notes) article.append(el('p', { className: 'order-notes' }, `Note: ${order.notes}`));
+
+  const open = () => { markSeen(order.id); article.removeAttribute('data-fresh'); };
+  const actions = el('div', { className: 'order-actions' });
+  const next = NEXT_STATUS[order.status];
+  if (next) actions.append(el('button', { type: 'button', className: 'btn btn-small', onclick: () => { err.textContent = ''; changeStatus(order, next.status, showError); } }, next.label));
+  actions.append(el('button', { type: 'button', className: 'btn btn-secondary btn-small', disabled: !phone, onclick: () => { open(); messageBox(order, article); } }, 'Message'));
+
+  const more = el('details', { className: 'more' }, el('summary', { 'aria-label': `More actions for ${order.order_number}` }, 'More'));
+  const list = el('div', { className: 'more-list' });
+  for (const status of ['new', 'confirmed', 'ready', 'collected']) {
+    if (status === order.status || status === next?.status) continue;
+    list.append(el('button', { type: 'button', className: 'menu-item', onclick: () => { more.open = false; err.textContent = ''; changeStatus(order, status, showError); } }, `Set to ${STATUS_LABELS[status]}`));
   }
-  const msg = el('button', { type: 'button', className: 'btn btn-small', disabled: !phone, onclick: () => { markSeen(order.id); article.removeAttribute('data-fresh'); messageBox(order, article); } }, 'Message customer');
-  const msgRow = el('div', { className: 'btn-row' }, msg, !phone ? el('span', { className: 'hint error' }, 'The phone number is not valid, so WhatsApp is switched off.') : null);
-  article.append(buttons, msgRow, err);
-  article.addEventListener('click', () => { if (fresh) { markSeen(order.id); article.removeAttribute('data-fresh'); } }, { once: true });
+  if (order.status !== 'cancelled') list.append(el('button', { type: 'button', className: 'menu-item danger', onclick: () => { more.open = false; err.textContent = ''; confirmCancel(order, article, showError); } }, 'Cancel order'));
+  more.append(list);
+  actions.append(more);
+
+  article.append(el('div', { className: 'order-foot' }, el('span', { className: 'order-total' }, formatPrice(order.total_pence)), actions));
+  if (!phone) article.append(el('p', { className: 'hint error' }, 'The phone number is not valid, so Message is switched off.'));
+  article.append(err);
+  article.addEventListener('click', () => { if (fresh) open(); }, { once: true });
   return article;
 }
 
 async function refresh() {
   if (busy) return;
   settings = await api.getSettings();
-  const all = await api.listOrders({ from: fromInput.value || null, to: toInput.value || null });
+  const { from, to } = window_();
+  const all = await api.listOrders({ from, to });
   const everything = await api.listOrders({});
   const newCount = everything.filter((o) => o.status === 'new').length;
   countNumber.textContent = String(newCount);
-  if (newCount) countBox.setAttribute('data-has-new', ''); else countBox.removeAttribute('data-has-new');
+  countBadge.hidden = newCount === 0;
   document.title = newCount ? `(${newCount}) ${baseTitle}` : baseTitle;
 
   const shown = all.filter(statusOk);
@@ -140,16 +156,30 @@ async function refresh() {
   for (const o of shown) { const key = o.pickup_date || ''; if (!groups.has(key)) groups.set(key, []); groups.get(key).push(o); }
   const keys = [...groups.keys()].sort((a, b) => (a === '' ? 1 : b === '' ? -1 : a.localeCompare(b)));
   for (const key of keys) {
-    const section = el('section', {}, el('h2', { className: 'order-day' }, key ? dateLabel(key) : 'No pickup date'));
-    for (const o of groups.get(key)) section.append(card(o));
+    const orders = groups.get(key);
+    const section = el('section', {}, el('h2', { className: 'order-day' }, key ? shortDate(key, true) : 'No pickup date', el('span', {}, `${orders.length} order${orders.length === 1 ? '' : 's'}`)));
+    for (const o of orders) section.append(card(o));
     root.append(section);
   }
   emptyNote.textContent = everything.length ? 'No orders match these filters.' : 'No orders yet. New orders appear here as soon as they are placed.';
   emptyNote.hidden = shown.length > 0;
 }
 
-for (const input of [fromInput, toInput, statusSelect]) input.addEventListener('change', () => { busy = false; refresh(); });
-document.querySelector('[data-all-dates]').addEventListener('click', () => { fromInput.value = ''; toInput.value = ''; busy = false; refresh(); });
+function press(group, attr, value) {
+  group.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset[attr] === value)));
+}
+const statusGroup = document.querySelector('[data-status-chips]');
+const rangeGroup = document.querySelector('[data-range-chips]');
+statusGroup.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c) return; view.status = c.dataset.status; press(statusGroup, 'status', view.status); busy = false; refresh(); });
+rangeGroup.addEventListener('click', (e) => { const c = e.target.closest('.chip'); if (!c) return; view.range = c.dataset.range; press(rangeGroup, 'range', view.range); busy = false; refresh(); });
+for (const input of [fromInput, toInput]) input.addEventListener('change', () => { view.range = 'custom'; press(rangeGroup, 'range', ''); busy = false; refresh(); });
+pastSwitch.addEventListener('click', () => {
+  view.past = pastSwitch.getAttribute('aria-checked') !== 'true';
+  pastSwitch.setAttribute('aria-checked', String(view.past));
+  pastSwitch.querySelector('.switch-text').textContent = view.past ? 'On' : 'Off';
+  busy = false; refresh();
+});
+document.addEventListener('click', (e) => { document.querySelectorAll('.more[open]').forEach((d) => { if (!d.contains(e.target)) d.open = false; }); });
 api.onChange(() => refresh());
 setInterval(refresh, ORDERS_REFRESH_SECONDS * 1000);
 await refresh();

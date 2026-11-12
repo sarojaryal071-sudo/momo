@@ -189,6 +189,15 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Tests for the mock rules — 5f8da99, `npm test` 49 pass (12 mock rules, gateway, whatsapp templates)
 - [x] Checked in own screenshots, merged to `main`, deploy confirmed — 5f8da99, screenshots at 390 and 1440 px opened and checked; merge/deploy recorded in the log
 
+## Step 4a2 — Admin UI polish (D-049, D-050)
+
+- [ ] Slim top bar, menu with Log out, paused strip, bottom padding (no Demo pill: D-052 removes demo wording)
+- [ ] Form controls: no overflow, aligned fields, toggle switch
+- [ ] Orders: compact filters, new card layout with primary next action and More menu
+- [ ] Prep list: day chips, clear result layout, print
+- [ ] Settings: toggle, readable card headings
+- [ ] Checked in own screenshots, merged to `main`, deploy confirmed
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
