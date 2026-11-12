@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Step 3, coding agent)
+- Last updated: 2026-11-12 (Step 3b, coding agent)
 - Current step: **Step 3 code built and merged; waiting for the owner actions in `backend/README.md` section 2 to 4. The site still runs on demo data (`SITE_BACKEND` unset)**
-- Next action: when the owner has done `backend/README.md` sections 2 to 4: run the live checks (a real order, the email, Publish), then set `SITE_BACKEND=supabase`. Then Step 4bc.
+- Next action: owner follows `backend/README.md` section 3 (a to g), then the live checks and `SITE_BACKEND=supabase`; then Step 4bc.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -169,9 +169,9 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 3b — Backend deploys itself (D-058)
 
-- [ ] `.github/workflows/backend-deploy.yml` (push to main on `backend/supabase/**` and by hand; environment `production`; pinned CLI 2.122.0; link, guard, `db push`, functions deploy; skips cleanly without secrets)
-- [ ] `scripts/check-migrations.mjs` guard and `tests/check-migrations.test.mjs` (4 tests; the real migrations pass)
-- [ ] `backend/README.md` rewritten for the owner steps (access token, database password, three secrets, environment, first run, function secrets, admin SQL, `SITE_BACKEND`)
+- [x] `.github/workflows/backend-deploy.yml` (push to main on `backend/supabase/**` and by hand; environment `production`; pinned CLI 2.122.0; link, guard, `db push`, functions deploy; skips cleanly without secrets) — fcfcbf0, YAML parses; the run itself happens when the owner adds the secrets (not testable here)
+- [x] `scripts/check-migrations.mjs` guard and `tests/check-migrations.test.mjs` (4 tests; the real migrations pass) — fcfcbf0, 4 tests pass; migrations 0001 to 0005 contain nothing destructive
+- [x] `backend/README.md` rewritten for the owner steps (access token, database password, three secrets, environment, first run, function secrets, admin SQL, `SITE_BACKEND`) — fcfcbf0, done; manual SQL route kept as a fallback
 - [ ] First real run (needs the owner's three secrets; cannot be done from the agent's sandbox)
 
 ## Step 4 — Admin panel
@@ -260,6 +260,7 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `frontend/js/shop.js`, `cart-page.js`, `done.js`, `data.js` | Page scripts and data loading (products.json, seed fallback) | 2 |
 | `frontend/js/pickup.js`, `data/pickup.seed.json` | Pickup dates and times; sample hours | 2 |
 | `frontend/assets/fonts/` | Bebas Neue 400 and Space Grotesk variable woff2 with OFL texts (D-051) | 1l |
+| `.github/workflows/backend-deploy.yml`, `scripts/check-migrations.mjs` | Backend auto-deploy and the destructive-change guard (D-058) | 3b |
 | `backend/` | `supabase/migrations` (4 files), `supabase/functions` (place-order, trigger-rebuild, build-status, _shared), `config.toml`, `tests/` (local PostgreSQL tests), `README.md` (owner guide) | 3 |
 | `frontend/js/supabase-rest.js`, `notice.js` | Public REST and function calls with the publishable key; site notice strip | 3 |
 | `admin/js/api.js`, `api-supabase.js`, `api-mock.js`, `vendor/` | Admin data layer picks Supabase or mock; pinned supabase-js | 3 |
