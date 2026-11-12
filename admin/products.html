@@ -3,11 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; form-action 'self'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; form-action 'self'; base-uri 'self'">
   <meta name="robots" content="noindex, nofollow">
   <title>Products | Admin</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#004D3B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="S&amp;S Admin">
   <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="../assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/components.css">
@@ -33,9 +38,14 @@
     <a href="settings.html" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>Settings</a>
   </nav>
   <main class="admin-main" id="main">
-    <h1>Products</h1>
-    <div class="todo-page"><p>Not available yet.</p></div>
+    <div class="title-row">
+      <h1>Products</h1>
+      <button type="button" class="btn btn-small" data-add>Add product</button>
+    </div>
+    <section class="panel" data-publish hidden aria-live="polite"></section>
+    <div data-list aria-live="polite"></div>
+    <div data-editor hidden></div>
   </main>
-  <script type="module" src="js/shell.js"></script>
+  <script type="module" src="js/products.js"></script>
 </body>
 </html>

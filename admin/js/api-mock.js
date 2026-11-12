@@ -34,6 +34,34 @@ export const mockApi = {
   prepList: (from, to) => store.prepList(from, to),
   // Fires when another tab (for example the public shop) changes the data.
   onChange(callback) { window.addEventListener('storage', (e) => { if (e.key === STORE_KEY) callback(); }); },
-  async getSiteStatus() { return { state: 'live', unpublished: false, detail: null }; },
-  async publish() { return { state: 'live' }; },
+  saveProduct: (p) => store.saveProduct(p),
+  reorderProducts: (ids) => store.reorderProducts(ids),
+  setStock: (id, q) => store.setStock(id, q),
+  saveOptionGroup: (pid, g) => store.saveOptionGroup(pid, g),
+  deleteOptionGroup: (pid, gid) => store.deleteOptionGroup(pid, gid),
+  // The demo keeps no image files: the name is remembered so the screen can be tried end to end.
+  async uploadPhoto(productId, blob, filename) { return `${productId}-${Date.now()}.webp`; },
+  photoUrl: () => null,
+  getPickup: () => store.getPickup(),
+  saveRule: (r) => store.saveRule(r),
+  deleteRule: (id) => store.deleteRule(id),
+  setSlotMinutes: (m) => store.setSlotMinutes(m),
+  saveException: (e) => store.saveException(e),
+  deleteException: (id) => store.deleteException(id),
+  fullDates: (from, to) => store.fullDates(from, to),
+  getNotice: () => store.getNotice(),
+  saveNotice: (n) => store.saveNotice(n),
+  async createManualOrder(order) { // the same call the database function answers
+    const r = await store.placeOrder({ ...order, source: 'manual' });
+    return { order_number: r.orderNumber, total_pence: r.totalPence };
+  },
+  getSiteStatus: () => store.getSiteStatus(),
+  publish: () => store.publish(),
+  // Live feed: in the demo, another tab changing the data is the "event". Status is always connected.
+  subscribeOrders(onEvent, onStatus) {
+    const handler = (e) => { if (e.key === STORE_KEY) onEvent({ kind: 'change' }); };
+    window.addEventListener('storage', handler);
+    onStatus?.('live');
+    return () => window.removeEventListener('storage', handler);
+  },
 };

@@ -1,0 +1,151 @@
+// Admin rules shared by the screens, the demo backend and the tests (D-021, D-046, D-047). Pure functions, no DOM.
+// Money is integer pence; the screens show and accept pounds.
+
+export const ALLERGENS = [
+  { key: 'celery', label: 'Celery' }, { key: 'gluten', label: 'Cereals containing gluten' }, { key: 'crustaceans', label: 'Crustaceans' },
+  { key: 'eggs', label: 'Eggs' }, { key: 'fish', label: 'Fish' }, { key: 'lupin', label: 'Lupin' }, { key: 'milk', label: 'Milk' },
+  { key: 'molluscs', label: 'Molluscs' }, { key: 'mustard', label: 'Mustard' }, { key: 'tree_nuts', label: 'Tree nuts' },
+  { key: 'peanuts', label: 'Peanuts' }, { key: 'sesame', label: 'Sesame' }, { key: 'soya', label: 'Soya' }, { key: 'sulphites', label: 'Sulphites' },
+];
+export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+export const LIMITS = { nameMax: 120, unitMax: 60, labelMax: 60, textMax: 2000, noteMax: 500, altMax: 200, maxPence: 100000, slotMax: 240 };
+
+// "10", "10.5", "£10.50" -> 1000, 1050. Anything else (empty, negative, letters, 3 decimals) -> null.
+export function poundsToPence(text) {
+  const t = String(text ?? '').trim().replace(/^£/, '');
+  if (!/^\d+(\.\d{1,2})?$/.test(t)) return null;
+  const pence = Math.round(parseFloat(t) * 100);
+  return pence <= LIMITS.maxPence ? pence : null;
+}
+export const penceToPounds = (p) => (p == null ? '' : p % 100 === 0 ? String(p / 100) : (p / 100).toFixed(2));
+export const formatMoney = (p) => (p % 100 === 0 ? `£${p / 100}` : `£${(p / 100).toFixed(2)}`);
+
+const text = (v) => String(v ?? '').trim();
+
+export function validateProduct(p) {
+  if (!text(p.name)) return 'Enter a name.';
+  if (text(p.name).length > LIMITS.nameMax) return `The name can be at most ${LIMITS.nameMax} characters.`;
+  if (p.kind !== 'pack' && p.kind !== 'addon') return 'Choose what kind of item it is.';
+  if (text(p.unit_label).length > LIMITS.unitMax) return `The size or pack label can be at most ${LIMITS.unitMax} characters.`;
+  if (p.price_pence != null && !(Number.isInteger(p.price_pence) && p.price_pence >= 0 && p.price_pence <= LIMITS.maxPence)) return 'Enter a price of £0 or more.';
+  if ((p.available || p.active) && p.price_pence == null) return 'Set a price before the item can be shown or ordered.';
+  return null;
+}
+export function slugify(name) { return text(name).toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60); }
+
+// Photo: an uploaded photo (a file name with an image extension) needs alt text; the build refuses one without it. A name without an
+// extension is a picture that ships with the site and already has its description in the page.
+export const isUploadedPhoto = (path) => /\.(jpe?g|png|webp)$/i.test(path || '');
+export function validatePhoto({ photo_path, photo_alt }) {
+  if (isUploadedPhoto(photo_path) && !text(photo_alt)) return 'Describe the photo for people who cannot see it (alt text).';
+  if (text(photo_alt).length > LIMITS.altMax) return `The description can be at most ${LIMITS.altMax} characters.`;
+  return null;
+}
+export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+export const PHOTO_MAX_BYTES = 5 * 1024 * 1024; // same limit as the storage bucket
+export const PHOTO_MAX_EDGE = 1600; // pixels: the photo is shrunk to this before upload
+export function validatePhotoFile(file) {
+  if (!file) return 'Choose a photo.';
+  if (!PHOTO_TYPES.includes(file.type)) return 'Use a JPEG, PNG or WebP photo.';
+  if (file.size > PHOTO_MAX_BYTES * 4) return 'That photo is too large. Choose one under 20 MB.'; // the real limit applies after resizing
+  return null;
+}
+
+export function validateIngredients({ ingredients_text, allergens, allergen_note }) {
+  const known = new Set(ALLERGENS.map((a) => a.key));
+  if (!Array.isArray(allergens) || allergens.some((a) => !known.has(a))) return 'Unknown allergen.';
+  if (text(ingredients_text).length > LIMITS.textMax) return `Ingredients can be at most ${LIMITS.textMax} characters.`;
+  if (text(allergen_note).length > LIMITS.noteMax) return `The note can be at most ${LIMITS.noteMax} characters.`;
+  return null;
+}
+
+// An option group and its options. A single-choice group with active options needs exactly one default.
+export function validateGroup(group, options) {
+  if (!text(group.label)) return 'Give the group a name, for example "Spice level".';
+  if (text(group.label).length > LIMITS.labelMax) return `The group name can be at most ${LIMITS.labelMax} characters.`;
+  if (group.kind !== 'single' && group.kind !== 'multiple') return 'Choose one choice or several choices.';
+  const seen = new Set();
+  for (const o of options) {
+    if (!text(o.label)) return 'Every option needs a name.';
+    if (seen.has(text(o.label).toLowerCase())) return `"${text(o.label)}" is listed twice.`;
+    seen.add(text(o.label).toLowerCase());
+    if (!(Number.isInteger(o.price_delta_pence) && o.price_delta_pence >= 0 && o.price_delta_pence <= LIMITS.maxPence)) return `Set the price change for "${text(o.label)}" to £0 or more.`;
+  }
+  const active = options.filter((o) => o.active !== false);
+  const defaults = active.filter((o) => o.is_default).length;
+  if (group.kind === 'single' && active.length && defaults !== 1) return 'A one-choice group needs exactly one default option.';
+  if (group.kind === 'multiple' && defaults > 1) return 'Only one option can be the default.';
+  return null;
+}
+
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+export const minutesOf = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+export function validateRule(r) {
+  if (!(Number.isInteger(r.weekday) && r.weekday >= 0 && r.weekday <= 6)) return 'Choose a day of the week.';
+  if (!HHMM.test(r.start_time || '') || !HHMM.test(r.end_time || '')) return 'Enter the start and end time, for example 10:00.';
+  if (minutesOf(r.end_time) <= minutesOf(r.start_time)) return 'The end time must be after the start time.';
+  return null;
+}
+export function validateSlot(minutes) {
+  return Number.isInteger(minutes) && minutes >= 1 && minutes <= LIMITS.slotMax ? null : `The time step must be a whole number of minutes from 1 to ${LIMITS.slotMax}.`;
+}
+export function validateException(e) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date || '')) return 'Choose a date.';
+  if (e.kind !== 'closed' && e.kind !== 'extra') return 'Choose closed or extra.';
+  if (e.kind === 'extra' || e.start_time || e.end_time) {
+    if (!HHMM.test(e.start_time || '') || !HHMM.test(e.end_time || '')) return e.kind === 'extra' ? 'An extra day needs a start and end time.' : 'Enter both times, or leave both empty to close the whole day.';
+    if (minutesOf(e.end_time) <= minutesOf(e.start_time)) return 'The end time must be after the start time.';
+  }
+  if (text(e.note).length > LIMITS.noteMax) return `The note can be at most ${LIMITS.noteMax} characters.`;
+  return null;
+}
+
+// The settings form. Returns { ok, patch } or { ok: false, errors: { field: message } }. Empty daily limit = no limit.
+export const SETTING_FIELDS = {
+  min_lead_hours: { label: 'Minimum notice (hours)', min: 0, max: 720 },
+  custom_min_lead_hours: { label: 'Notice for customised orders (hours)', min: 0, max: 720 },
+  max_days_ahead: { label: 'How many days ahead customers can choose', min: 1, max: 365 },
+  max_qty_per_item: { label: 'Most of one item per order', min: 1, max: 100 },
+  low_stock_threshold: { label: 'Show "Only N left" at or below', min: 0, max: 1000 },
+  max_orders_per_day: { label: 'Daily order limit', min: 1, max: 1000, optional: true },
+};
+export function parseSettings(values) {
+  const patch = {}; const errors = {};
+  for (const [key, spec] of Object.entries(SETTING_FIELDS)) {
+    const raw = text(values[key]);
+    if (raw === '' && spec.optional) { patch[key] = null; continue; }
+    if (!/^\d+$/.test(raw)) { errors[key] = `${spec.label}: enter a whole number${spec.optional ? ' or leave it empty' : ''}.`; continue; }
+    const n = Number(raw);
+    if (n < spec.min || n > spec.max) { errors[key] = `${spec.label}: enter a number from ${spec.min} to ${spec.max}.`; continue; }
+    patch[key] = n;
+  }
+  const prefix = text(values.order_prefix).toUpperCase();
+  if (!/^[A-Z]{1,6}$/.test(prefix)) errors.order_prefix = 'Order prefix: 1 to 6 capital letters.';
+  else patch.order_prefix = prefix;
+  if (!errors.custom_min_lead_hours && !errors.min_lead_hours && patch.custom_min_lead_hours < patch.min_lead_hours) errors.custom_min_lead_hours = 'Customised orders cannot need less notice than normal orders.';
+  return Object.keys(errors).length ? { ok: false, errors } : { ok: true, patch };
+}
+
+// "48 = 2 days" style hint for a number of hours.
+export function hoursHint(h) {
+  const n = Number(h);
+  if (!Number.isFinite(n) || n < 0) return '';
+  if (n >= 24 && n % 24 === 0) return `${n} hours = ${n / 24} ${n / 24 === 1 ? 'day' : 'days'}`;
+  return `${n} hours`;
+}
+
+// ---- export (CSV) ----
+const csvCell = (v) => {
+  let s = String(v ?? '');
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`; // a spreadsheet must never run customer text as a formula
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+export const CSV_HEADER = ['Order number', 'Status', 'Source', 'Placed on', 'Pickup date', 'Pickup time', 'Name', 'Phone', 'Items', 'Customised', 'Notes', 'Total (GBP)'];
+export function ordersToCsv(orders) {
+  const rows = orders.map((o) => [
+    o.order_number, o.status, o.source, o.order_date, o.pickup_date || '', o.pickup_time || '', o.customer_name || '', o.customer_phone || '',
+    (o.items || []).map((l) => `${l.qty} x ${l.name}${l.options?.length ? ` [${l.options.map((x) => x.label).join(', ')}]` : ''}${l.customised ? ' (customised)' : ''}`).join('; '),
+    (o.items || []).some((l) => l.customised) ? 'yes' : 'no', o.notes || '', (o.total_pence / 100).toFixed(2),
+  ]);
+  return `﻿${[CSV_HEADER, ...rows].map((r) => r.map(csvCell).join(',')).join('\r\n')}\r\n`;
+}

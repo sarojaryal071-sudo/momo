@@ -4,6 +4,7 @@
 import { getPickupOptions, noticeText, ukParts } from './pickup.js';
 import { siteConfig } from './site-config.js';
 import { toWhatsAppNumber } from './whatsapp.js';
+import { SETTING_FIELDS, slugify, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from './admin-rules.js';
 
 export const STORE_KEY = 'ss-store-v2';
 export const STATUSES = ['new', 'confirmed', 'ready', 'collected', 'cancelled'];
@@ -13,6 +14,7 @@ export const DEFAULT_TEMPLATES = {
   confirmed: 'Hi {name}, your order {order_number} is confirmed.\n{items}\nPickup: {pickup}\nAddress: {address}\nPay cash when you pick up. Thank you!',
   ready: 'Hi {name}, your order {order_number} is ready for pickup.\n{items}\nAddress: {address}\nPay cash when you pick up.',
   cancelled: 'Hi {name}, sorry, we had to cancel your order {order_number}. Please message us if you would like to order again.',
+  collected: 'Hi {name}, thank you for collecting your order {order_number}. We hope you enjoy your momo!',
 };
 
 export class RuleError extends Error {
@@ -112,20 +114,20 @@ function returnStock(state, order) {
 function nextNumber(state, orderDate) {
   const [, m, d] = orderDate.split('-');
   state.counters[orderDate] = (state.counters[orderDate] || 0) + 1;
-  return `${ORDER_PREFIX}-${d}${m}-${pad2(state.counters[orderDate])}`;
+  return `${state.settings.order_prefix || ORDER_PREFIX}-${d}${m}-${pad2(state.counters[orderDate])}`;
 }
 
 function buildLine(state, raw) {
   const { limits } = siteConfig;
   const product = productOf(state, raw.slug);
-  if (!product || !product.available || product.price_pence == null) throw new RuleError('product', 'One of the items is no longer available.');
+  if (!product || !product.available || product.active === false || product.price_pence == null) throw new RuleError('product', 'One of the items is no longer available.');
   const qty = Math.floor(Number(raw.qty));
   if (!(qty >= 1 && qty <= limits.maxQtyPerItem)) throw new RuleError('quantity', `Choose between 1 and ${limits.maxQtyPerItem} of each item.`);
   const ids = [...new Set(raw.options || [])];
   const chosen = [];
   const perGroup = new Map();
   for (const id of ids) {
-    const group = (product.option_groups || []).find((g) => (g.options || []).some((o) => o.id === id));
+    const group = (product.option_groups || []).find((g) => g.active !== false && (g.options || []).some((o) => o.id === id && o.active !== false));
     if (!group) throw new RuleError('option', 'One of the options is not valid for that item.');
     const option = group.options.find((o) => o.id === id);
     perGroup.set(group.id, (perGroup.get(group.id) || 0) + 1);
@@ -225,11 +227,19 @@ export function setOrderStatus(state, id, status, now = new Date()) {
 }
 
 // ---------- settings ----------
-const SETTING_LIMITS = { ordering_closed_message: 300, wa_template_confirmed: 1000, wa_template_ready: 1000, wa_template_cancelled: 1000, pickup_address_text: 500 };
+const SETTING_LIMITS = { ordering_closed_message: 300, wa_template_confirmed: 1000, wa_template_ready: 1000, wa_template_cancelled: 1000, wa_template_collected: 1000, pickup_address_text: 500 };
 export function saveSettings(state, patch) {
   for (const [key, value] of Object.entries(patch)) {
     if (key === 'ordering_open') state.settings.ordering_open = Boolean(value);
-    else if (key in SETTING_LIMITS) state.settings[key] = String(value ?? '').slice(0, SETTING_LIMITS[key]);
+    else if (key === 'order_prefix') {
+      if (!/^[A-Z]{1,6}$/.test(String(value))) throw new RuleError('setting', 'Order prefix: 1 to 6 capital letters.');
+      state.settings.order_prefix = value;
+    } else if (key in SETTING_FIELDS) {
+      const spec = SETTING_FIELDS[key];
+      if (value === null && spec.optional) state.settings[key] = null;
+      else if (Number.isInteger(value) && value >= spec.min && value <= spec.max) state.settings[key] = value;
+      else throw new RuleError('setting', `${spec.label}: enter a number from ${spec.min} to ${spec.max}.`);
+    } else if (key in SETTING_LIMITS) state.settings[key] = String(value ?? '').slice(0, SETTING_LIMITS[key]);
     else throw new RuleError('setting', `Unknown setting: ${key}`);
   }
   return clone(state.settings);
@@ -281,6 +291,134 @@ export async function fetchSeed(base) {
   return { products, pickup };
 }
 
+// ---------- admin: products, options, stock, pickup, notice, publishing (Steps 4b and 4c) ----------
+// The same operations the real backend offers through api-supabase.js. Product records keep the shape of the seed file; ids are the slugs.
+const RANDOM_ID = () => Math.random().toString(36).slice(2, 10);
+const fail = (message, code = 'invalid') => { throw new RuleError(code, message); };
+const touched = (state) => { state.site = { ...(state.site || {}), unpublished: true }; };
+
+export function settingsWithDefaults(state) {
+  return { order_prefix: ORDER_PREFIX, max_qty_per_item: siteConfig.limits.maxQtyPerItem, wa_template_collected: DEFAULT_TEMPLATES.collected, ...clone(state.settings) };
+}
+
+export function adminProducts(state) {
+  return state.products.map((p, i) => ({
+    id: p.slug, slug: p.slug, name: p.name, kind: p.kind, category: p.category ?? null, unit_label: p.unit_label || '',
+    price_pence: p.price_pence ?? null, available: p.available !== false, active: p.active !== false, sort_order: p.sort_order ?? i + 1,
+    photo_path: p.photo_path ?? p.photo ?? null, photo_alt: p.photo_alt ?? '', ingredients_text: p.ingredients_text ?? '', allergens: [...(p.allergens || [])], allergen_note: p.allergen_note ?? '',
+    stock_quantity: p.stock_quantity ?? null,
+    option_groups: (p.option_groups || []).map((g, gi) => ({
+      id: g.id, label: g.label, kind: g.kind, sort_order: g.sort_order ?? gi + 1, active: g.active !== false,
+      options: (g.options || []).map((o, oi) => ({ id: o.id, label: o.label, price_delta_pence: o.price_delta_pence || 0, is_default: Boolean(o.is_default), sort_order: o.sort_order ?? oi + 1, active: o.active !== false })),
+    })).sort((a, b) => a.sort_order - b.sort_order),
+  })).sort((a, b) => a.sort_order - b.sort_order);
+}
+
+const findProduct = (state, id) => state.products.find((p) => p.slug === id) || fail('That product was not found.', 'not_found');
+
+// Creates (no id) or updates one product. Products are never deleted: switch active off instead.
+export function saveProduct(state, input) {
+  const price = input.price_pence ?? null;
+  const merged = { ...input, price_pence: price };
+  const error = validateProduct(merged) || validatePhoto(merged) || validateIngredients({ ingredients_text: input.ingredients_text, allergens: input.allergens || [], allergen_note: input.allergen_note });
+  if (error) fail(error);
+  let p;
+  if (input.id) p = findProduct(state, input.id);
+  else {
+    let slug = slugify(input.name) || 'item';
+    const base = slug; let n = 2;
+    while (state.products.some((x) => x.slug === slug)) slug = `${base}-${n++}`;
+    p = { slug, option_groups: [], stock_quantity: null, sort_order: Math.max(0, ...state.products.map((x) => x.sort_order ?? 0)) + 1 };
+    state.products.push(p);
+  }
+  Object.assign(p, {
+    name: String(input.name).trim(), kind: input.kind, unit_label: String(input.unit_label || '').trim(), price_pence: price,
+    available: Boolean(input.available), active: Boolean(input.active), photo_path: input.photo_path || null, photo_alt: String(input.photo_alt || '').trim(),
+    ingredients_text: String(input.ingredients_text || '').trim(), allergens: [...(input.allergens || [])], allergen_note: String(input.allergen_note || '').trim(),
+  });
+  if (p.photo_path) p.photo = p.photo_path;
+  touched(state);
+  return adminProducts(state).find((x) => x.id === p.slug);
+}
+
+export function reorderProducts(state, ids) {
+  ids.forEach((id, i) => { findProduct(state, id).sort_order = i + 1; });
+  touched(state);
+}
+
+// Stock is not part of a product edit: it never marks the site as having unpublished changes.
+export function setStock(state, id, quantity) {
+  const p = findProduct(state, id);
+  if (quantity === null) p.stock_quantity = null;
+  else if (Number.isInteger(quantity) && quantity >= 0 && quantity <= 100000) p.stock_quantity = quantity;
+  else fail('Stock must be a whole number, 0 or more. Leave it empty if you do not count stock.');
+  return p.stock_quantity;
+}
+
+// One option group with all of its options, replaced as a whole.
+export function saveOptionGroup(state, productId, group) {
+  const p = findProduct(state, productId);
+  const options = (group.options || []).map((o, i) => ({ ...o, price_delta_pence: o.price_delta_pence ?? 0, active: o.active !== false, sort_order: i + 1 }));
+  const error = validateGroup(group, options);
+  if (error) fail(error);
+  p.option_groups ??= [];
+  let g = group.id ? p.option_groups.find((x) => x.id === group.id) : null;
+  if (!g) { g = { id: `g-${RANDOM_ID()}` }; p.option_groups.push(g); }
+  Object.assign(g, { label: String(group.label).trim(), kind: group.kind, active: group.active !== false, sort_order: group.sort_order ?? p.option_groups.length,
+    options: options.map((o) => ({ id: o.id || `o-${RANDOM_ID()}`, label: String(o.label).trim(), price_delta_pence: o.price_delta_pence, is_default: Boolean(o.is_default), active: o.active, sort_order: o.sort_order })) });
+  touched(state);
+  return adminProducts(state).find((x) => x.id === p.slug).option_groups.find((x) => x.id === g.id);
+}
+export function deleteOptionGroup(state, productId, groupId) {
+  const p = findProduct(state, productId);
+  p.option_groups = (p.option_groups || []).filter((g) => g.id !== groupId);
+  touched(state);
+}
+
+// Pickup rules and exceptions (D-038). Rows get ids the first time the admin reads them.
+const withIds = (rows) => { rows.forEach((r) => { r.id ??= `r-${RANDOM_ID()}`; }); return rows; };
+export const adminPickup = (state) => clone({ rules: withIds(state.pickup.rules), exceptions: withIds(state.pickup.exceptions) });
+export function saveRule(state, rule) {
+  const error = validateRule(rule) || validateSlot(rule.slot_minutes ?? 1);
+  if (error) fail(error);
+  const row = { weekday: rule.weekday, start_time: rule.start_time, end_time: rule.end_time, slot_minutes: rule.slot_minutes ?? 1, active: rule.active !== false };
+  const existing = rule.id && withIds(state.pickup.rules).find((r) => r.id === rule.id);
+  if (existing) Object.assign(existing, row); else state.pickup.rules.push({ id: `r-${RANDOM_ID()}`, ...row });
+}
+export function deleteRule(state, id) { state.pickup.rules = state.pickup.rules.filter((r) => r.id !== id); }
+export function setSlotMinutes(state, minutes) {
+  const error = validateSlot(minutes);
+  if (error) fail(error);
+  state.pickup.rules.forEach((r) => { r.slot_minutes = minutes; });
+  state.pickup.exceptions.forEach((e) => { if (e.kind === 'extra') e.slot_minutes = minutes; });
+}
+export function saveException(state, ex) {
+  const error = validateException(ex);
+  if (error) fail(error);
+  const row = { date: ex.date, kind: ex.kind, start_time: ex.start_time || null, end_time: ex.end_time || null, slot_minutes: ex.slot_minutes ?? 1, note: String(ex.note || '').trim() };
+  const existing = ex.id && withIds(state.pickup.exceptions).find((e) => e.id === ex.id);
+  if (existing) Object.assign(existing, row); else state.pickup.exceptions.push({ id: `e-${RANDOM_ID()}`, ...row });
+}
+export function deleteException(state, id) { state.pickup.exceptions = state.pickup.exceptions.filter((e) => e.id !== id); }
+
+// Notice banner (live on the public site without a rebuild)
+export const getNotice = (state) => ({ message: '', active: false, ...(state.notice || {}) });
+export function saveNotice(state, { message, active }) {
+  const text = String(message || '').trim();
+  if (text.length > 300) fail('The notice can be at most 300 characters.');
+  if (active && !text) fail('Write the notice before switching it on.');
+  state.notice = { message: text, active: Boolean(active) };
+}
+
+// Publishing: product, option and photo edits set "unpublished changes"; Publish starts a build that takes a moment.
+const PUBLISH_SECONDS = 1.5;
+export function getSiteStatus(state, now = new Date()) {
+  const site = state.site || {};
+  const busy = site.publishing_since && now.getTime() - site.publishing_since < PUBLISH_SECONDS * 1000;
+  return { state: busy ? 'publishing' : 'live', unpublished: Boolean(site.unpublished), detail: null };
+}
+export function publish(state, now = new Date()) { state.site = { publishing_since: now.getTime(), unpublished: false }; return { state: 'publishing' }; }
+
 // storage: anything with getItem/setItem/removeItem; without one, the state lives in memory (tests, private windows).
 export function createMock({ storage = null, loadSeed, now = () => new Date() } = {}) {
   let memory = null;
@@ -307,9 +445,25 @@ export function createMock({ storage = null, loadSeed, now = () => new Date() } 
     placeOrder: (input) => change((s, n) => placeOrder(s, input, n)),
     listOrders: (filter) => query((s) => listOrders(s, filter)),
     setOrderStatus: (id, status) => change((s, n) => setOrderStatus(s, id, status, n)),
-    getSettings: () => query((s) => clone(s.settings)),
+    getSettings: () => query((s) => settingsWithDefaults(s)),
     saveSettings: (patch) => change((s) => saveSettings(s, patch)),
-    listProducts: () => query((s) => clone(s.products)),
+    listProducts: () => query((s) => adminProducts(s)),
+    saveProduct: (p) => change((s) => saveProduct(s, p)),
+    reorderProducts: (ids) => change((s) => reorderProducts(s, ids)),
+    setStock: (id, q) => change((s) => setStock(s, id, q)),
+    saveOptionGroup: (pid, g) => change((s) => saveOptionGroup(s, pid, g)),
+    deleteOptionGroup: (pid, gid) => change((s) => deleteOptionGroup(s, pid, gid)),
+    getPickup: () => change((s) => adminPickup(s)),
+    saveRule: (r) => change((s) => saveRule(s, r)),
+    deleteRule: (id) => change((s) => deleteRule(s, id)),
+    setSlotMinutes: (m) => change((s) => setSlotMinutes(s, m)),
+    saveException: (e) => change((s) => saveException(s, e)),
+    deleteException: (id) => change((s) => deleteException(s, id)),
+    getNotice: () => query((s) => getNotice(s)),
+    saveNotice: (n) => change((s) => saveNotice(s, n)),
+    getSiteStatus: () => query((s, now) => getSiteStatus(s, now)),
+    publish: () => change((s, now) => publish(s, now)),
+    fullDates: (from, to) => query((s) => fullPickupDates(s, from, to)),
     prepList: (from, to) => query((s) => prepList(s, from, to)),
     pickupConfig: () => query((s) => pickupConfig(s)),
   };

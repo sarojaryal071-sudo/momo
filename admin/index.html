@@ -3,9 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; form-action 'self'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; form-action 'self'; base-uri 'self'">
   <meta name="robots" content="noindex, nofollow">
   <title>Orders | Admin</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#004D3B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="S&amp;S Admin">
   <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../css/theme.css">
@@ -36,8 +42,10 @@
     <div class="title-row">
       <h1>Orders</h1>
       <span class="new-badge" data-new-count hidden><span data-new-number>0</span> new</span>
+      <span class="live-status" data-live hidden>Reconnecting…</span>
       <a class="btn btn-secondary btn-small" href="prep.html">Prep list</a>
     </div>
+    <div class="btn-row no-print"><a class="btn btn-small" href="new-order.html">New order</a></div>
     <form class="filters no-print" data-filters>
       <div class="field"><label for="f-status">Status</label>
         <select id="f-status" data-status><option value="active">Open</option><option value="new">New</option><option value="confirmed">Confirmed</option><option value="ready">Ready</option><option value="collected">Collected</option><option value="cancelled">Cancelled</option><option value="all">All</option></select></div>
@@ -48,6 +56,15 @@
       <div class="field"><label for="f-from">From</label><input id="f-from" type="date" data-from></div>
       <div class="field"><label for="f-to">To</label><input id="f-to" type="date" data-to></div>
     </div>
+    <details class="date-range no-print">
+      <summary>Export orders (CSV)</summary>
+      <p class="hint">Download a spreadsheet file of your orders. Keep one each week as your backup.</p>
+      <div class="form-grid">
+        <div class="field"><label for="x-from">Pickup from</label><input id="x-from" type="date" data-export-from></div>
+        <div class="field"><label for="x-to">Pickup to</label><input id="x-to" type="date" data-export-to></div>
+      </div>
+      <div class="btn-row"><button type="button" class="btn btn-secondary btn-small" data-export>Download CSV</button><span class="saved" role="status" data-export-msg></span></div>
+    </details>
     <div data-orders aria-live="polite"></div>
     <p class="muted empty-state" data-empty hidden>No orders yet.</p>
   </main>

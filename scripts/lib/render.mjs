@@ -18,7 +18,7 @@ function productJsonLd(products, siteUrl) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
-    description: p.description || p.summary || `${p.name}, ${p.unit_label}`,
+    description: [p.description || p.summary || `${p.name}, ${p.unit_label}`, p.ingredients_text && `Ingredients: ${p.ingredients_text}.`, (p.allergens || []).length && `Contains: ${(p.allergens || []).map((a) => ALLERGEN_LABELS[a] || a).join(', ')}.`, p.allergen_note].filter(Boolean).join(' '),
     offers: {
       '@type': 'Offer',
       priceCurrency: 'GBP',

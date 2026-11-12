@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Step 3b, coding agent)
-- Current step: **Step 3 code built and merged; waiting for the owner actions in `backend/README.md` section 2 to 4. The site still runs on demo data (`SITE_BACKEND` unset)**
-- Next action: owner follows `backend/README.md` section 3 (a to g), then the live checks and `SITE_BACKEND=supabase`; then Step 4bc.
+- Last updated: 2026-11-12 (Steps 4b and 4c, coding agent)
+- Current step: **Steps 4b and 4c built and merged. Waiting for the owner: backend secrets (`backend/README.md` section 3), then live checks and `SITE_BACKEND=supabase`**
+- Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 5 (SEO, hardening, launch).
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -205,6 +205,15 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Settings: toggle, readable card headings — 8063e98, switch, 1rem card headings, "Saved. Ordering is paused now." and the strip appears at once
 - [x] Checked in own screenshots, merged to `main`, deploy confirmed — 8063e98, own screenshots at 390 and 1440 checked; merge and deploy recorded in the log
 
+## Steps 4b and 4c — Admin: products, pickup, settings, alerts (one session, D-054, D-056, D-057)
+
+- [x] Products: list, add, edit, order, hide (never delete), photo with alt text (shrunk in the browser, bucket `product-images`), stock (+/-, not a rebuild), options (single default rule, preview), ingredients and the 14 allergens, Publish with Publishing/Live/Failed
+- [x] Pickup: weekly pattern, time step, special dates, 14-day preview with closed and full days
+- [x] Settings: pause, notice banner (live, no rebuild), ordering rules and daily limit, prefix, address, four WhatsApp templates (new `wa_template_collected`, migration 0006), alerts, home-screen help, backup and privacy note
+- [x] Orders: Confirm / Mark ready / Mark collected / Cancel save first, then open WhatsApp with the matching template; CSV export; New order (manual); Realtime feed with toast, title count, optional sound, browser notification, one-minute fallback
+- [x] Manifest and icons for `/admin/` (no service worker); shared rules and 9 tests in `frontend/js/admin-rules.js`, `tests/admin-rules.test.mjs`
+- [ ] Live checks on Supabase (owner): see the report; the agent checked every screen once on the demo backend only
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
@@ -261,6 +270,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `frontend/js/pickup.js`, `data/pickup.seed.json` | Pickup dates and times; sample hours | 2 |
 | `frontend/assets/fonts/` | Bebas Neue 400 and Space Grotesk variable woff2 with OFL texts (D-051) | 1l |
 | `.github/workflows/backend-deploy.yml`, `scripts/check-migrations.mjs` | Backend auto-deploy and the destructive-change guard (D-058) | 3b |
+| `admin/js/products.js`, `pickup.js`, `new-order.js`, `alerts.js`, `dom.js`; `admin/*.html`; `admin/manifest.webmanifest`, `admin/assets/` | Products, pickup, manual orders, alerts, shared DOM helpers, home-screen app files | 4b, 4c |
+| `frontend/js/admin-rules.js` | Admin validation, money, CSV (shared by screens, demo backend, tests) | 4b, 4c |
 | `backend/` | `supabase/migrations` (4 files), `supabase/functions` (place-order, trigger-rebuild, build-status, _shared), `config.toml`, `tests/` (local PostgreSQL tests), `README.md` (owner guide) | 3 |
 | `frontend/js/supabase-rest.js`, `notice.js` | Public REST and function calls with the publishable key; site notice strip | 3 |
 | `admin/js/api.js`, `api-supabase.js`, `api-mock.js`, `vendor/` | Admin data layer picks Supabase or mock; pinned supabase-js | 3 |
@@ -305,6 +316,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, step 4a2 update for D-053 (0fae91d): `npm test` 50 pass; build passes. Playwright 390 and 1440: Log out icon 44x44, confirm opens with focus on Cancel, Escape closes, Log out leads to login; Status and When selects 16px and 44px high side by side; Custom range reveals From and To (stacked at 390, no overflow), shows the 15 Nov orders; choices survived a reload; first order action button ends at 472 px at 390x844.
 
 - 2026-11-12, step 3 (code only; the Supabase project is not reachable from the agent's sandbox): `backend/tests/run-local.sh` on a local PostgreSQL 16: migrations apply, seed re-runs, 158 checks pass (RLS for every table, order rules, stock, status changes, simultaneous orders). Fast tests `functions` and `gateway` pass (16). The build tests against a fake Supabase were written but not run in the final session at the owner's request; the default demo build passes. Not tested: real email, GitHub dispatch, Supabase Auth, the deployed functions.
+
+- 2026-11-12, steps 4b and 4c: build passes; `admin-rules`, `mock-backend`, `gateway`, `whatsapp` tests pass (38) and the migration guard test passes. One Playwright pass on the demo backend at 390 px over products, pickup, settings, new order and orders (23 checks, no page errors). Not checked: anything against Supabase, real photo upload to the bucket, Realtime, the Publish button's GitHub dispatch, real WhatsApp, installing the app on a phone.
 
 ## Known issues
 

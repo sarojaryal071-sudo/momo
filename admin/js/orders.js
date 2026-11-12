@@ -1,9 +1,12 @@
 import { api } from './shell.js';
-import { FILTER_KEY, ORDERS_REFRESH_SECONDS, SEEN_KEY, STATUS_LABELS, TEMPLATE_BY_STATUS, NEXT_STATUS } from './admin-config.js';
+import { FILTER_KEY, ORDERS_REFRESH_SECONDS, SEEN_KEY, TOAST_SECONDS, STATUS_LABELS, TEMPLATE_BY_STATUS, NEXT_STATUS } from './admin-config.js';
 import { formatPrice } from '../../js/cart.js';
 import { ukToday } from '../../js/mock-backend.js';
 import { addDays, endOfWeek, shortDate } from './dates.js';
 import { buildLink, describeItems, fillTemplate, toWhatsAppNumber } from '../../js/whatsapp.js';
+import { ordersToCsv } from '../../js/admin-rules.js';
+import { notifyNewOrder, playSoftSound, soundOn } from './alerts.js';
+import { toast } from './dom.js';
 
 const root = document.querySelector('[data-orders]');
 const emptyNote = document.querySelector('[data-empty]');
@@ -14,6 +17,7 @@ const whenSelect = document.querySelector('[data-when]');
 const customBox = document.querySelector('[data-custom]');
 const countBadge = document.querySelector('[data-new-count]');
 const countNumber = document.querySelector('[data-new-number]');
+const liveStatus = document.querySelector('[data-live]');
 const baseTitle = 'Orders | Admin';
 
 const seen = (() => { try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]')); } catch { return new Set(); } })();
@@ -21,6 +25,7 @@ const markSeen = (id) => { seen.add(id); try { localStorage.setItem(SEEN_KEY, JS
 
 const view = { status: 'active', range: 'upcoming' };
 let settings = await api.getSettings();
+let known = null; // ids of the orders at the last look
 let busy = false; // do not redraw while a confirmation or message box is open
 
 const el = (tag, props = {}, ...kids) => {
@@ -79,29 +84,47 @@ function messageBox(order, card) {
 function confirmCancel(order, card, showError) {
   busy = true;
   const box = el('div', { className: 'confirm-box', role: 'alertdialog', 'aria-label': 'Cancel this order' }, el('p', {}, `Cancel ${order.order_number}? Its stock goes back on the shelf.`));
-  const yes = el('button', { type: 'button', className: 'btn btn-danger btn-small', onclick: () => changeStatus(order, 'cancelled', showError) }, 'Yes, cancel this order');
+  const yes = el('button', { type: 'button', className: 'btn btn-danger btn-small', onclick: () => changeStatus(order, 'cancelled', showError, { message: true }) }, 'Yes, cancel this order');
   const no = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { box.remove(); busy = false; } }, 'Keep it');
   box.append(el('div', { className: 'btn-row' }, yes, no));
   card.append(box);
   no.focus();
 }
 
-async function changeStatus(order, status, showError) {
+// Saves the status first. With { message: true } WhatsApp then opens with the matching message for that customer (D-056).
+// The blank window is opened inside the tap, because browsers only allow a new window straight from a tap; it is pointed at
+// WhatsApp once the status is saved. If the browser blocks it, the message box opens on the order instead.
+async function changeStatus(order, status, showError, { message = false } = {}) {
+  const phone = toWhatsAppNumber(order.customer_phone);
+  let win = null;
+  if (message && phone) { try { win = window.open('', '_blank'); } catch { win = null; } }
   try {
     await api.setOrderStatus(order.id, status);
-    busy = false;
-    markSeen(order.id);
-    await refresh();
   } catch (err) {
+    if (win) win.close();
     busy = false;
     showError(err.message);
+    return;
   }
+  busy = false;
+  markSeen(order.id);
+  const updated = { ...order, status };
+  if (message && phone) {
+    const link = buildLink(phone, messageText(updated, status));
+    if (win) win.location.href = link;
+    if (!settings.pickup_address_text && /\{address\}/.test(settings[`wa_template_${TEMPLATE_BY_STATUS[status]}`] || '')) toast('Add your pickup address in Settings so your messages include it.', { href: 'settings.html' });
+  } else if (message && !phone) {
+    toast(`${order.order_number} is ${STATUS_LABELS[status].toLowerCase()}. The phone number is not valid, so WhatsApp was not opened.`);
+  }
+  await refresh();
+  if (message && phone && !win) { const a = root.querySelector(`[data-id="${order.id}"]`); if (a) { busy = true; messageBox(updated, a); } }
 }
 
 function card(order) {
   const fresh = order.status === 'new' && !seen.has(order.id);
   const article = el('article', { className: 'order' });
   article.dataset.status = order.status;
+  article.dataset.id = order.id;
   if (fresh) article.dataset.fresh = '';
   const err = el('p', { className: 'order-error', role: 'alert' });
   const showError = (m) => { err.textContent = m; };
@@ -114,7 +137,7 @@ function card(order) {
     el('div', { className: 'order-top' }, el('span', { className: 'order-number' }, order.order_number),
       order.source === 'manual' ? el('span', { className: 'tag tag-manual' }, 'Manual') : null, badge),
     el('p', { className: 'pickup-line' }, when(order), customised ? el('span', { className: 'tag tag-custom' }, 'Customised') : null),
-    el('p', { className: 'order-who' }, el('strong', {}, order.customer_name), ' · ', el('a', { href: `tel:${order.customer_phone.replace(/[^\d+]/g, '')}` }, order.customer_phone)),
+    el('p', { className: 'order-who' }, el('strong', {}, order.customer_name || 'No name'), order.customer_phone ? ' · ' : null, order.customer_phone ? el('a', { href: `tel:${order.customer_phone.replace(/[^\d+]/g, '')}` }, order.customer_phone) : null),
     el('ul', { className: 'order-lines' }, ...order.items.map((l) => el('li', {}, `${l.qty} × ${l.name}`, l.options.length ? el('span', { className: 'opts' }, l.options.map((o) => o.label).join(', ')) : null))),
   );
   if (order.notes) article.append(el('p', { className: 'order-notes' }, `Note: ${order.notes}`));
@@ -122,7 +145,7 @@ function card(order) {
   const open = () => { markSeen(order.id); article.removeAttribute('data-fresh'); };
   const actions = el('div', { className: 'order-actions' });
   const next = NEXT_STATUS[order.status];
-  if (next) actions.append(el('button', { type: 'button', className: 'btn btn-small', onclick: () => { err.textContent = ''; changeStatus(order, next.status, showError); } }, next.label));
+  if (next) actions.append(el('button', { type: 'button', className: 'btn btn-small', onclick: () => { err.textContent = ''; changeStatus(order, next.status, showError, { message: true }); } }, next.label));
   actions.append(el('button', { type: 'button', className: 'btn btn-secondary btn-small', disabled: !phone, onclick: () => { open(); messageBox(order, article); } }, 'Message'));
 
   const more = el('details', { className: 'more' }, el('summary', { 'aria-label': `More actions for ${order.order_number}` }, 'More'));
@@ -136,7 +159,7 @@ function card(order) {
   actions.append(more);
 
   article.append(el('div', { className: 'order-foot' }, el('span', { className: 'order-total' }, formatPrice(order.total_pence)), actions));
-  if (!phone) article.append(el('p', { className: 'hint error' }, 'The phone number is not valid, so Message is switched off.'));
+  if (!phone) article.append(el('p', { className: 'hint error' }, order.customer_phone ? 'The phone number is not valid, so Message is switched off.' : 'There is no phone number, so Message is switched off.'));
   article.append(err);
   article.addEventListener('click', () => { if (fresh) open(); }, { once: true });
   return article;
@@ -148,6 +171,15 @@ async function refresh() {
   const { from, to } = window_();
   const all = await api.listOrders({ from, to });
   const everything = await api.listOrders({});
+  if (known) { // orders that were not there on the last look: tell her (toast, optional sound, browser notification)
+    const added = everything.filter((o) => !known.has(o.id) && o.status === 'new');
+    if (added.length) {
+      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS });
+      notifyNewOrder(added[0]);
+      if (soundOn()) playSoftSound();
+    }
+  }
+  known = new Set(everything.map((o) => o.id));
   const newCount = everything.filter((o) => o.status === 'new').length;
   countNumber.textContent = String(newCount);
   countBadge.hidden = newCount === 0;
@@ -185,6 +217,23 @@ statusSelect.addEventListener('change', onFilter);
 whenSelect.addEventListener('change', onFilter);
 for (const input of [fromInput, toInput]) input.addEventListener('change', onFilter);
 document.addEventListener('click', (e) => { document.querySelectorAll('.more[open]').forEach((d) => { if (!d.contains(e.target)) d.open = false; }); });
-api.onChange(() => refresh());
+// Live feed (D-057): new and changed orders arrive at once. The refresh every minute stays as the fallback if the connection drops.
+api.subscribeOrders(() => refresh(), (state) => { liveStatus.hidden = state === 'live'; });
 setInterval(refresh, ORDERS_REFRESH_SECONDS * 1000);
+
+// Export (CSV) for a chosen range of pickup dates; no dates means everything.
+{
+  const from = document.querySelector('[data-export-from]'); const to = document.querySelector('[data-export-to]');
+  const message = document.querySelector('[data-export-msg]');
+  document.querySelector('[data-export]').addEventListener('click', async () => {
+    message.textContent = '';
+    try {
+      const rows = await api.listOrders({ from: from.value || null, to: to.value || null });
+      const url = URL.createObjectURL(new Blob([ordersToCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+      const a = Object.assign(document.createElement('a'), { href: url, download: `orders-${from.value || 'all'}${to.value ? `-to-${to.value}` : ''}.csv` });
+      document.body.append(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      message.textContent = `Downloaded ${rows.length} order${rows.length === 1 ? '' : 's'}.`;
+    } catch (e) { message.textContent = e.message; }
+  });
+}
 await refresh();

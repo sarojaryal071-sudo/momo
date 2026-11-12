@@ -3,9 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; form-action 'self'; base-uri 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; font-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; form-action 'self'; base-uri 'self'">
   <meta name="robots" content="noindex, nofollow">
   <title>Settings | Admin</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#004D3B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="S&amp;S Admin">
   <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="../assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../css/theme.css">
@@ -55,14 +61,27 @@
     </section>
     <section class="panel" aria-labelledby="tpl-h">
       <h2 id="tpl-h">WhatsApp messages</h2>
-      <p>You can use these words, which are filled in for each order: <code>{name}</code> <code>{order_number}</code> <code>{pickup}</code> <code>{items}</code> <code>{address}</code>. You can edit the text again before each message, and you tap send in WhatsApp.</p>
+      <p>You can use these words, which are filled in for each order: <code>{name}</code> <code>{order_number}</code> <code>{pickup}</code> <code>{items}</code> <code>{address}</code>. When you press Confirm, Mark ready, Mark collected or Cancel on an order, the status is saved first and then WhatsApp opens with the matching message for that customer. You can edit it in WhatsApp, and you tap send.</p>
       <form data-form="templates">
         <div class="field"><label for="t-confirmed">When confirmed</label><textarea id="t-confirmed" rows="4" maxlength="1000" data-field="wa_template_confirmed"></textarea></div>
         <div class="field"><label for="t-ready">When ready</label><textarea id="t-ready" rows="4" maxlength="1000" data-field="wa_template_ready"></textarea></div>
         <div class="field"><label for="t-cancelled">When cancelled</label><textarea id="t-cancelled" rows="4" maxlength="1000" data-field="wa_template_cancelled"></textarea></div>
+        <div class="field"><label for="t-collected">When collected</label><textarea id="t-collected" rows="3" maxlength="1000" data-field="wa_template_collected"></textarea></div>
         <div class="btn-row"><button class="btn" type="submit">Save</button><span class="saved" role="status" data-saved></span></div>
         <p class="error" role="alert" data-error></p>
       </form>
+    </section>
+    <div data-extra></div>
+    <section class="panel" aria-labelledby="home-h">
+      <h2 id="home-h">Add to home screen</h2>
+      <p><strong>iPhone (Safari):</strong> open this page in Safari, tap the Share button, choose <em>Add to Home Screen</em>, then <em>Add</em>.</p>
+      <p><strong>Android (Chrome):</strong> tap the three dots, choose <em>Add to Home screen</em> (or <em>Install app</em>), then <em>Add</em>.</p>
+      <p>It then opens like an app, full screen, as "Steam &amp; Spice Admin". You stay logged in.</p>
+    </section>
+    <section class="panel" aria-labelledby="backup-h">
+      <h2 id="backup-h">Backup and privacy</h2>
+      <p>Export your orders as a CSV file every week (Orders, Export). The free plan has no automatic backups, so this file is your backup.</p>
+      <p>Customer names and phone numbers are personal data. Old customer details should be removed once the period you and the council decide has passed. A tool to remove details from old orders is planned; until then, do not share the exported files.</p>
     </section>
   </main>
   <script type="module" src="js/settings.js"></script>
