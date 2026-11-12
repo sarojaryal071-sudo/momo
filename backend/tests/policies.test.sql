@@ -122,6 +122,23 @@ select t.chk((select count(*) from pg_publication_tables where pubname = 'supaba
 select t.chk((select count(*) from pg_publication_tables where pubname = 'supabase_realtime' and tablename not in ('orders')) = 0, 'no other table is published to Realtime');
 select t.chk(not has_table_privilege('anon', 'public.orders', 'select') and not exists (select 1 from pg_policies where tablename = 'orders' and 'anon' = any (roles)), 'an anonymous client can read no orders, so Realtime sends it no events');
 
+-- ===== allergens and ingredients as data (D-062) =====
+select t.chk((select count(*) from allergens) = 14, 'the 14 UK allergens are seeded as ordinary rows');
+select t.chk(t.count('anon', null, 'select 1 from allergens') = 14, 'anon can read the allergen names');
+select t.table_policy('allergens', $$insert into allergens (name, sort_order) values ('TP allergen', 99)$$, $$update allergens set sort_order = 98 where name = 'TP allergen'$$, $$delete from allergens where name = 'TP allergen'$$);
+select t.table_policy('product_allergens', $$insert into product_allergens (product_id, allergen_id) select p.id, a.id from products p, allergens a where p.slug = 'chicken-momo' and a.name = 'Milk'$$, $$update product_allergens set created_at = now() where allergen_id = (select id from allergens where name = 'Milk')$$, $$delete from product_allergens where allergen_id = (select id from allergens where name = 'Milk')$$);
+select t.table_policy('product_ingredients', $$insert into product_ingredients (product_id, name, sort_order) select id, 'TP tag', 1 from products where slug = 'chicken-momo'$$, $$update product_ingredients set sort_order = 2 where name = 'TP tag'$$, $$delete from product_ingredients where name = 'TP tag'$$);
+select t.chk(t.try('anon', null, 'insert into allergens (name) values (''x'')') = 'denied', 'anon cannot add an allergen');
+select t.chk(t.try('authenticated', '00000000-0000-0000-0000-00000000000a', 'insert into allergens (name) values (''celery'')') like 'error:23505%', 'an allergen name cannot be added twice (any capitals)');
+select t.chk((select count(*) from information_schema.columns where table_name = 'products' and column_name = 'allergens_checked_at') = 1, 'products.allergens_checked_at exists');
+insert into product_allergens (product_id, allergen_id) select p.id, a.id from products p, allergens a where p.slug = 'chicken-momo' and a.name = 'Milk';
+select t.chk(t.count('anon', null, 'select 1 from product_allergens') = 1, 'anon can read the allergens of an active product');
+delete from product_allergens;
+update site_status set unpublished = false;
+insert into allergens (name, sort_order) values ('Marker allergen', 50);
+select t.chk((select unpublished from site_status), 'adding an allergen marks unpublished changes');
+delete from allergens where name = 'Marker allergen';
+
 -- ===== placing orders =====
 select t.chk(t.seq($$select t.place(t.order_json('chicken-momo', 1))$$, $$select (select order_number from orders order by created_at desc limit 1) = 'SS-1311-01'$$), 'an order with every optional field empty succeeds, number SS-DDMM-NN');
 select t.chk((select total_pence from orders where order_number = 'SS-1311-01') = 1000 and (select pickup_date from orders where order_number = 'SS-1311-01') is null, 'no pickup date is allowed and the price comes from the table');

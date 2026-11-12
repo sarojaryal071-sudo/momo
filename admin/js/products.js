@@ -3,7 +3,8 @@
 import { api } from './shell.js';
 import { PHOTO_QUALITY, PUBLISH_POLL_SECONDS } from './admin-config.js';
 import { confirmDialog, el, field, makeSwitch, toast } from './dom.js';
-import { ALLERGENS, formatMoney, isUploadedPhoto, PHOTO_MAX_BYTES, PHOTO_MAX_EDGE, penceToPounds, poundsToPence, slugify, validateGroup, validateIngredients, validatePhoto, validatePhotoFile, validateProduct } from '../../js/admin-rules.js';
+import { mountAllergenManager, LEGAL_REMINDER } from './allergens.js';
+import { cleanTag, formatMoney, PHOTO_MAX_BYTES, PHOTO_MAX_EDGE, penceToPounds, poundsToPence, slugify, validateChecked, validateGroup, validateIngredients, validatePhoto, validatePhotoFile, validateProduct } from '../../js/admin-rules.js';
 
 const listBox = document.querySelector('[data-list]');
 const editorBox = document.querySelector('[data-editor]');
@@ -54,6 +55,7 @@ function drawList() {
     const off = !p.active || unpriced;
     const pic = pictureOf(p);
     const sw = makeSwitch('Active', p.active && !unpriced, async (on) => {
+      if (on && !p.allergens_checked_at) { sw.set(false); toast(`Open ${p.name} and tick "I have checked the allergen and ingredient information" before it can be shown.`, { seconds: 6 }); return; }
       try { await api.saveProduct({ ...p, active: on }); p.active = on; toast(on ? `${p.name} is shown in the shop.` : `${p.name} is hidden.`, { seconds: 3 }); await load(); drawList(); drawPublish(); }
       catch (e) { sw.set(!on); toast(e.message); }
     });
@@ -128,7 +130,8 @@ async function edit(id) {
   const draft = {
     name: product?.name ?? '', kind: product?.kind ?? 'pack', unit_label: product?.unit_label ?? '', price: penceToPounds(product?.price_pence ?? null),
     active: product ? product.active : true, available: product ? product.available : true,
-    photo_path: product?.photo_path ?? null, photo_alt: product?.photo_alt ?? '', ingredients_text: product?.ingredients_text ?? '', allergens: [...(product?.allergens ?? [])], allergen_note: product?.allergen_note ?? '',
+    photo_path: product?.photo_path ?? null, photo_alt: product?.photo_alt ?? '', ingredients: [...(product?.ingredients ?? [])], allergen_ids: [...(product?.allergen_ids ?? [])], allergen_note: product?.allergen_note ?? '',
+    checked: Boolean(product?.allergens_checked_at), checkedAt: product?.allergens_checked_at ?? null, infoChanged: false,
     tracked: product ? product.stock_quantity != null : false, stock: product?.stock_quantity ?? 0,
   };
   let pending = null; // { blob, name } a new photo not uploaded yet
@@ -226,18 +229,49 @@ async function edit(id) {
   }
   drawChips(); drawGroup();
 
-  // ----- Ingredients -----
-  const ingredients = field('Ingredients', 'textarea', { value: draft.ingredients_text, rows: 4, maxLength: 2000 });
-  ingredients.control.addEventListener('input', () => { draft.ingredients_text = ingredients.control.value; markDirty(); });
-  editorBox.append(card('Ingredients', ingredients.wrap));
+  // ----- the safeguard: changing allergens or ingredients clears "I have checked" and asks again -----
+  let checkBox = null; let checkNote = null;
+  const infoChanged = () => { draft.infoChanged = true; markDirty(); if (draft.checked) { draft.checked = false; if (checkBox) checkBox.checked = false; if (checkNote) checkNote.textContent = 'You changed the allergen or ingredient information, so please tick the check again.'; } };
 
-  // ----- Allergens -----
-  const note = field('May contain note (optional)', 'textarea', { value: draft.allergen_note, rows: 2, maxLength: 500, hint: 'For example "Made in a kitchen that also handles nuts."' });
-  note.control.addEventListener('input', () => { draft.allergen_note = note.control.value; markDirty(); });
+  // ----- Ingredients: tags, one at a time, in her order -----
+  errors.ingredients = errorLine();
+  const tagList = el('div', { className: 'tag-list', 'aria-label': 'Ingredients' });
+  const tagInput = el('input', { type: 'text', maxLength: 60, list: 'ingredient-suggestions', placeholder: 'Add an ingredient', 'aria-label': 'Ingredient to add', autocomplete: 'off' });
+  const suggestions = el('datalist', { id: 'ingredient-suggestions' });
+  api.ingredientNames().then((names) => suggestions.replaceChildren(...names.map((n) => el('option', { value: n })))).catch(() => {});
+  const drawTags = () => {
+    tagList.replaceChildren(...draft.ingredients.map((t, i) => el('span', { className: 'tag-chip' }, t,
+      el('button', { type: 'button', className: 'tag-remove', 'aria-label': `Remove ${t}`, onclick: () => { draft.ingredients.splice(i, 1); infoChanged(); drawTags(); } }, '×'))));
+    if (!draft.ingredients.length) tagList.append(el('span', { className: 'muted' }, 'No ingredients added yet. Nothing is shown on the site.'));
+  };
+  const addTag = () => {
+    const tag = cleanTag(tagInput.value);
+    if (!tag) return;
+    const problem = validateIngredients({ ingredients: [...draft.ingredients, tag], allergen_ids: [], allergen_note: '' });
+    if (problem) { showError('ingredients', problem); return; }
+    showError('ingredients', ''); draft.ingredients.push(tag); tagInput.value = ''; infoChanged(); drawTags(); tagInput.focus();
+  };
+  tagInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
+  editorBox.append(card('Ingredients', el('div', { className: 'tag-add' }, tagInput, el('button', { type: 'button', className: 'btn btn-small', onclick: addTag }, 'Add')), suggestions, errors.ingredients, tagList));
+  drawTags();
+
+  // ----- Allergens: the list is data in the database -----
   errors.allergens = errorLine();
-  const boxes = ALLERGENS.map((a) => el('label', { className: 'check' }, el('input', { type: 'checkbox', checked: draft.allergens.includes(a.key), onchange: (e) => { draft.allergens = e.target.checked ? [...draft.allergens, a.key] : draft.allergens.filter((k) => k !== a.key); markDirty(); } }), ` ${a.label}`));
-  editorBox.append(card('Allergens', el('p', { className: 'warning' }, 'This information must be accurate and checked. Wording for legal statements comes from you and the council. If you are not sure, leave it empty: nothing is shown on the site.'),
-    el('fieldset', { className: 'allergens' }, el('legend', {}, 'Contains (tick all that apply)'), ...boxes), note.wrap, errors.allergens));
+  const note = field('May contain note (optional)', 'textarea', { value: draft.allergen_note, rows: 2, maxLength: 500, hint: 'For example "Made in a kitchen that also handles nuts."' });
+  note.control.addEventListener('input', () => { draft.allergen_note = note.control.value; infoChanged(); });
+  const grid = el('fieldset', { className: 'allergens' }, el('legend', {}, 'Contains (tick all that apply)'));
+  const manager = el('div', { className: 'allergen-manager' });
+  const drawGrid = async () => {
+    const list = await api.listAllergens();
+    draft.allergen_ids = draft.allergen_ids.filter((id) => list.some((a) => a.id === id)); // a deleted allergen disappears from the ticks
+    grid.replaceChildren(el('legend', {}, 'Contains (tick all that apply)'), ...list.map((a) => el('label', { className: 'check' },
+      el('input', { type: 'checkbox', checked: draft.allergen_ids.includes(a.id), onchange: (e) => { draft.allergen_ids = e.target.checked ? [...draft.allergen_ids, a.id] : draft.allergen_ids.filter((x) => x !== a.id); infoChanged(); } }), ` ${a.name}`)));
+  };
+  await drawGrid();
+  const manage = el('details', { className: 'manage-allergens' }, el('summary', {}, 'Manage allergens'), el('p', { className: 'muted' }, 'Add, rename, reorder or delete the allergens in this list. It is the same list for every product.'), manager);
+  let managerLoaded = false;
+  manage.addEventListener('toggle', async () => { if (manage.open && !managerLoaded) { managerLoaded = true; await mountAllergenManager(manager, { onChange: drawGrid }); } });
+  editorBox.append(card('Allergens', el('p', { className: 'reminder' }, LEGAL_REMINDER), grid, manage, note.wrap, errors.allergens));
 
   // ----- Stock -----
   const tracked = makeSwitch('Count stock for this product', draft.tracked, (on) => { draft.tracked = on; stockBox.hidden = !on; markDirty(); });
@@ -248,10 +282,18 @@ async function edit(id) {
   const stockBox = el('div', { hidden: !draft.tracked }, qty.wrap, el('div', { className: 'btn-row' }, el('button', { type: 'button', className: 'btn btn-secondary', 'aria-label': 'One less in stock', onclick: stepStock(-1) }, '−'), el('button', { type: 'button', className: 'btn btn-secondary', 'aria-label': 'One more in stock', onclick: stepStock(1) }, '+')), errors.stock);
   editorBox.append(card('Stock', el('p', {}, 'Stock counts packs already frozen and ready. Customised orders are made to order and do not use stock. Stock changes are live at once and do not need Publish.'), tracked.row, stockBox));
 
-  // ----- Availability -----
-  const active = makeSwitch('Shown in the shop', draft.active, (on) => { draft.active = on; markDirty(); });
+  // ----- Availability, with the safeguard -----
+  errors.checked = errorLine();
+  checkBox = el('input', { type: 'checkbox', checked: draft.checked, onchange: () => { draft.checked = checkBox.checked; if (draft.checked) { draft.checkedAt = null; if (checkNote) checkNote.textContent = ''; } markDirty(); } });
+  checkNote = el('p', { className: 'muted' });
+  const active = makeSwitch('Shown in the shop', draft.active, (on) => {
+    if (on && !draft.checked) { active.set(false); showError('checked', 'Tick "I have checked the allergen and ingredient information" first. A product cannot be shown without it.'); return; }
+    showError('checked', ''); draft.active = on; markDirty();
+  });
   const available = makeSwitch('Available to order', draft.available, (on) => { draft.available = on; markDirty(); });
-  editorBox.append(card('Availability', active.row, available.row, el('p', { className: 'muted' }, `Customised orders need ${settings.custom_min_lead_hours ?? 48} hours' notice. You can change that in `, el('a', { href: 'settings' }, 'Settings'), '.')));
+  editorBox.append(card('Availability',
+    el('label', { className: 'check check-required' }, checkBox, ' I have checked the allergen and ingredient information'), checkNote, errors.checked,
+    active.row, available.row, el('p', { className: 'muted' }, `Customised orders need ${settings.custom_min_lead_hours ?? 48} hours' notice. You can change that in `, el('a', { href: 'settings' }, 'Settings'), '.')));
 
   // ----- sticky Save and Cancel -----
   const saveBtn = el('button', { type: 'button', className: 'btn' }, 'Save');
@@ -264,13 +306,15 @@ async function edit(id) {
     const priceText = draft.price.trim();
     const pence = priceText === '' ? null : poundsToPence(priceText);
     const fields = { id: product?.id, name: draft.name, kind: draft.kind, unit_label: draft.unit_label, price_pence: pence, active: draft.active, available: draft.available,
-      photo_path: pending ? 'pending.webp' : draft.photo_path, photo_alt: draft.photo_alt, ingredients_text: draft.ingredients_text, allergens: draft.allergens, allergen_note: draft.allergen_note };
+      photo_path: pending ? 'pending.webp' : draft.photo_path, photo_alt: draft.photo_alt, ingredients: draft.ingredients, allergen_ids: draft.allergen_ids, allergen_note: draft.allergen_note,
+      allergens_checked_at: draft.checked ? (draft.infoChanged || !draft.checkedAt ? new Date().toISOString() : draft.checkedAt) : null };
     let first = null;
     const fail = (key, text) => { showError(key, text); first ||= errors[key]; };
     if (priceText !== '' && pence === null) fail('price', 'Enter a price of £0 or more, for example 10 or 10.50.');
     else { const e = validateProduct(fields); if (e) fail(/price/i.test(e) ? 'price' : 'name', e); }
     const pe = validatePhoto({ photo_path: fields.photo_path, photo_alt: draft.photo_alt }); if (pe) fail('photo', pe);
-    const ie = validateIngredients({ ingredients_text: draft.ingredients_text, allergens: draft.allergens, allergen_note: draft.allergen_note }); if (ie) fail('allergens', ie);
+    const ie = validateIngredients({ ingredients: draft.ingredients, allergen_ids: draft.allergen_ids, allergen_note: draft.allergen_note }); if (ie) fail('allergens', ie);
+    const ce = validateChecked({ active: draft.active, checked: draft.checked }); if (ce) fail('checked', ce);
     for (const g of groups) { const ge = validateGroup(g, g.options); if (ge) { fail('options', `${g.label || 'New group'}: ${ge}`); break; } }
     let stockValue = null;
     if (draft.tracked) { const n = Number(String(draft.stock).trim()); if (String(draft.stock).trim() === '' || !Number.isInteger(n) || n < 0) fail('stock', 'Enter a whole number, 0 or more.'); else stockValue = n; }

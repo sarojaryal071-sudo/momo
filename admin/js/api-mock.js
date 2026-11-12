@@ -51,6 +51,12 @@ export const mockApi = {
   saveException: (e) => store.saveException(e),
   deleteException: (id) => store.deleteException(id),
   fullDates: (from, to) => store.fullDates(from, to),
+  listAllergens: () => store.listAllergens(),
+  saveAllergen: (a) => store.saveAllergen(a),
+  reorderAllergens: (ids) => store.reorderAllergens(ids),
+  allergenUsage: (id) => store.allergenUsage(id),
+  deleteAllergen: (id) => store.deleteAllergen(id),
+  ingredientNames: () => store.ingredientNames(),
   getNotice: () => store.getNotice(),
   saveNotice: (n) => store.saveNotice(n),
   async createManualOrder(order) { // the same call the database function answers

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildInitialState, fullPickupDates, listOrders, placeOrder, prepList, RuleError, saveSettings, setOrderStatus } from '../frontend/js/mock-backend.js';
+import { adminProducts, allergenUsage, buildInitialState, deleteAllergen, fullPickupDates, ingredientNames, listAllergens, listOrders, placeOrder, prepList, RuleError, saveAllergen, saveProduct, saveSettings, setOrderStatus } from '../frontend/js/mock-backend.js';
 
 const read = (p) => JSON.parse(readFileSync(new URL(`../frontend/data/${p}`, import.meta.url), 'utf8'));
 const seed = { products: read('products.seed.json'), pickup: read('pickup.seed.json') };
@@ -144,4 +144,26 @@ test('sample orders hold their stock', () => {
 test('the default state has no orders (D-052); only the developer seed adds them', () => {
   assert.equal(listOrders(buildInitialState(seed, MONDAY)).length, 0);
   assert.ok(listOrders(buildInitialState(seed, MONDAY, { samples: true })).length > 0);
+});
+
+test('allergens are an editable list: usage, rename, delete removes it from products, and the check safeguard', () => {
+  const s = fresh();
+  const list = listAllergens(s);
+  assert.equal(list.length, 14);
+  const milk = list.find((a) => a.name === 'Milk');
+  saveProduct(s, { id: 'chicken-momo', name: 'Frozen chicken momo', kind: 'pack', unit_label: '40 pieces', price_pence: 1000, active: true, available: true, allergen_ids: [milk.id], ingredients: ['Chicken', 'Onion'], allergens_checked_at: '2026-11-13T10:00:00Z' });
+  assert.equal(allergenUsage(s, milk.id), 1);
+  assert.deepEqual(adminProducts(s).find((p) => p.id === 'chicken-momo').ingredients, ['Chicken', 'Onion']);
+  assert.deepEqual(ingredientNames(s), ['Chicken', 'Onion']);
+  assert.throws(() => saveAllergen(s, { name: 'MILK' }), /already in the list/);
+  saveAllergen(s, { id: milk.id, name: 'Dairy milk' });
+  assert.equal(listAllergens(s).find((a) => a.id === milk.id).name, 'Dairy milk');
+  saveAllergen(s, { name: 'Kiwi' });
+  assert.equal(listAllergens(s).length, 15);
+  deleteAllergen(s, milk.id);
+  assert.equal(listAllergens(s).length, 14);
+  assert.deepEqual(adminProducts(s).find((p) => p.id === 'chicken-momo').allergen_ids, []);
+  // not checked: it cannot be shown
+  assert.throws(() => saveProduct(s, { id: 'veg-momo', name: 'Frozen veg momo', kind: 'pack', price_pence: 1000, active: true, available: true, allergen_ids: [], ingredients: [] }), /I have checked/);
+  assert.ok(saveProduct(s, { id: 'veg-momo', name: 'Frozen veg momo', kind: 'pack', price_pence: 1000, active: false, available: true, allergen_ids: [], ingredients: [] }));
 });

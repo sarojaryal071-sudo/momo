@@ -38,6 +38,7 @@ document.addEventListener('settings-changed', async () => {
 // ---------- notice banner, ordering rules, notifications (Steps 4c and 4 alerts) ----------
 import { el, feedback, field, makeSwitch, saving } from './dom.js';
 import { SETTING_FIELDS, hoursHint, parseSettings } from '../../js/admin-rules.js';
+import { mountAllergenManager, LEGAL_REMINDER } from './allergens.js';
 import { askNotificationPermission, notificationState, playSoftSound, setSound, soundOn } from './alerts.js';
 
 const extra = document.querySelector('[data-extra]');
@@ -95,4 +96,11 @@ const submitRow = (label, work) => {
   const ask = el('button', { type: 'button', className: 'btn btn-secondary', onclick: async () => { await askNotificationPermission(); draw(); } }, 'Turn on notifications');
   const sound = makeSwitch('Soft sound for a new order', soundOn(), (on) => { setSound(on); if (on) playSoftSound(); });
   extra.append(panel('New order alerts', el('p', {}, 'New orders appear on the Orders page by themselves, with a badge, a number in the page title and a message at the top. Notifications and the sound work while the admin is open, even in the background.'), status, el('div', { className: 'btn-row' }, ask), sound.row));
+}
+
+// Allergens: the list products tick from (D-062). The same editor as in the product screen.
+{
+  const manager = el('div', { className: 'allergen-manager' });
+  extra.append(panel('Allergens', el('p', { className: 'reminder' }, LEGAL_REMINDER), manager));
+  await mountAllergenManager(manager);
 }

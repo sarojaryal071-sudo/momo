@@ -18,7 +18,7 @@ function productJsonLd(products, siteUrl) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: p.name,
-    description: [p.description || p.summary || `${p.name}, ${p.unit_label}`, p.ingredients_text && `Ingredients: ${p.ingredients_text}.`, (p.allergens || []).length && `Contains: ${(p.allergens || []).map((a) => ALLERGEN_LABELS[a] || a).join(', ')}.`, p.allergen_note].filter(Boolean).join(' '),
+    description: [p.description || p.summary || `${p.name}, ${p.unit_label}`, (p.ingredients || []).length && `Ingredients: ${p.ingredients.join(', ')}.`, (p.allergens || []).length && `Contains: ${p.allergens.join(', ')}.`, p.allergen_note].filter(Boolean).join(' '),
     offers: {
       '@type': 'Offer',
       priceCurrency: 'GBP',
@@ -68,16 +68,16 @@ function optionGroupHtml(p, g) {
 
 // The details window: one native dialog per product, with its text in the page source.
 // Three zones: header (thumbnail, name, price, close), scrolling middle, footer (notes, stepper, add).
-const ALLERGEN_LABELS = { celery: 'Celery', gluten: 'Gluten', crustaceans: 'Crustaceans', eggs: 'Eggs', fish: 'Fish', lupin: 'Lupin', milk: 'Milk',
-  molluscs: 'Molluscs', mustard: 'Mustard', tree_nuts: 'Tree nuts', peanuts: 'Peanuts', sesame: 'Sesame', soya: 'Soya', sulphites: 'Sulphites' };
-// Ingredients and allergens come from the admin. With no data the whole block is left out (D-052): nothing is invented.
+// Ingredients and allergens come from the admin's data (D-062): a clean list in her order, and the allergen names she ticked.
+// With none of them the whole block is left out (D-052): nothing is invented.
 export function ingredientsHtml(p) {
-  const allergens = (p.allergens || []).filter((a) => ALLERGEN_LABELS[a]);
-  if (!p.ingredients_text && !allergens.length && !p.allergen_note) return '';
+  const ingredients = p.ingredients || [];
+  const allergens = p.allergens || [];
+  if (!ingredients.length && !allergens.length && !p.allergen_note) return '';
   return `<section class="dialog-section">
         <h3>Ingredients and allergens</h3>
-        ${p.ingredients_text ? `<p>${esc(p.ingredients_text)}</p>` : ''}
-        ${allergens.length ? `<p class="allergy-line"><strong>Contains:</strong> ${allergens.map((a) => esc(ALLERGEN_LABELS[a])).join(', ')}</p>` : ''}
+        ${ingredients.length ? `<ul class="ingredient-list">${ingredients.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+        ${allergens.length ? `<p class="allergy-line"><strong>Contains:</strong> ${allergens.map((a) => esc(a)).join(', ')}</p>` : ''}
         ${p.allergen_note ? `<p class="allergy-line">${esc(p.allergen_note)}</p>` : ''}
       </section>`;
 }

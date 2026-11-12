@@ -2,7 +2,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const SELECT = 'slug,name,kind,category,unit_label,price_pence,available,photo_path,photo_alt,sort_order,ingredients_text,allergens,allergen_note,'
+const SELECT = 'slug,name,kind,category,unit_label,price_pence,available,photo_path,photo_alt,sort_order,allergen_note,allergens_checked_at,'
+  + 'product_allergens(allergens(name,sort_order)),product_ingredients(name,sort_order),'
   + 'product_option_groups(id,label,kind,sort_order,active,product_options(id,label,price_delta_pence,is_default,sort_order,active)),product_stock(quantity)';
 export const PHOTO_SIZES = [400, 800]; // widths written for each photo (the -400 file and the full size)
 const BUCKET = 'product-images';
@@ -29,7 +30,10 @@ export function mapProducts(rows) {
     return {
       slug: r.slug, name: r.name, kind: r.kind, category: r.category ?? undefined, unit_label: r.unit_label, price_pence: r.price_pence,
       available: r.available, photo_path: r.photo_path, photo_alt: r.photo_alt ?? undefined, sort_order: r.sort_order,
-      ingredients_text: r.ingredients_text ?? undefined, allergens: r.allergens || [], allergen_note: r.allergen_note ?? undefined,
+      // allergens and ingredients come from the tables the admin edits (D-062), in her order; nothing is invented when there are none
+      ingredients: (r.product_ingredients || []).slice().sort((a, b) => a.sort_order - b.sort_order).map((i) => i.name),
+      allergens: (r.product_allergens || []).map((x) => x.allergens).filter(Boolean).sort((a, b) => a.sort_order - b.sort_order).map((a) => a.name),
+      allergen_note: r.allergen_note ?? undefined,
       stock_quantity: stock ? stock.quantity : null, option_groups: groups,
     };
   }).filter((p) => p.price_pence != null);

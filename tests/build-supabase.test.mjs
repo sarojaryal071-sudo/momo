@@ -12,7 +12,9 @@ import { mapProducts } from '../scripts/lib/supabase.mjs';
 const OPT = (id, label, is_default = false, price = 0) => ({ id, label, price_delta_pence: price, is_default, sort_order: 1, active: true });
 const rows = (extra = {}) => [{
   slug: 'chicken-momo', name: 'Frozen chicken momo', kind: 'pack', category: null, unit_label: '40 pieces', price_pence: 1050, available: true, photo_path: 'chicken.jpg', photo_alt: 'A bag of chicken momo',
-  sort_order: 1, ingredients_text: 'Chicken, onion', allergens: ['gluten'], allergen_note: null,
+  sort_order: 1, allergens_checked_at: '2026-11-13T10:00:00Z', allergen_note: null,
+  product_allergens: [{ allergens: { name: 'Sulphur dioxide and sulphites', sort_order: 13 } }, { allergens: { name: 'Cereals containing gluten', sort_order: 2 } }],
+  product_ingredients: [{ name: 'Onion', sort_order: 2 }, { name: 'Chicken', sort_order: 1 }],
   product_option_groups: [{ id: 'g1', label: 'Spice level', kind: 'single', sort_order: 1, active: true, product_options: [OPT('o1', 'Mild'), OPT('o2', 'Hot', false, 50)] }],
   product_stock: { quantity: 7 }, ...extra,
 }, { slug: 'unpriced', name: 'No price yet', kind: 'addon', unit_label: '', price_pence: null, available: false, sort_order: 2, product_option_groups: [], product_stock: null }];
@@ -58,7 +60,8 @@ test('a live build writes products.json, the product cards, the photos and the p
     assert.match(shop, /Frozen chicken momo/);
     assert.match(shop, /alt="A bag of chicken momo"/);
     assert.match(shop, /Ingredients and allergens/);
-    assert.match(shop, /Gluten/);
+    assert.match(shop, /Contains:<\/strong> Cereals containing gluten, Sulphur dioxide and sulphites/);
+    assert.match(shop, /<ul class="ingredient-list"><li>Chicken<\/li><li>Onion<\/li><\/ul>/);
     const cfg = readFileSync(join(r.out, 'js/site-config.js'), 'utf8');
     assert.match(cfg, /backend: 'supabase'/);
     assert.match(cfg, /supabaseAnonKey: 'sb_publishable_test'/);

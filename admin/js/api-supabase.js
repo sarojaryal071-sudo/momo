@@ -3,7 +3,7 @@
 // and the signed-in admin's own session; the database checks is_admin() on every request.
 import { siteConfig } from '../../js/site-config.js';
 import { prepList as computePrep } from '../../js/mock-backend.js';
-import { SETTING_FIELDS, slugify, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from '../../js/admin-rules.js';
+import { SETTING_FIELDS, slugify, validateAllergenName, validateChecked, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from '../../js/admin-rules.js';
 
 const SCRIPT = 'js/vendor/supabase.js'; // vendored, version pinned (see js/vendor/README.md); relative to the admin page
 const SETTING_LIMITS = { ordering_closed_message: 300, wa_template_confirmed: 1000, wa_template_ready: 1000, wa_template_cancelled: 1000, wa_template_collected: 1000, pickup_address_text: 500 };
@@ -37,7 +37,7 @@ const productRow = (r) => {
   const stock = Array.isArray(r.product_stock) ? r.product_stock[0] : r.product_stock;
   return {
     id: r.id, slug: r.slug, name: r.name, kind: r.kind, category: r.category, unit_label: r.unit_label || '', price_pence: r.price_pence, available: r.available, active: r.active,
-    sort_order: r.sort_order, photo_path: r.photo_path, photo_alt: r.photo_alt || '', ingredients_text: r.ingredients_text || '', allergens: r.allergens || [], allergen_note: r.allergen_note || '',
+    sort_order: r.sort_order, photo_path: r.photo_path, photo_alt: r.photo_alt || '', ingredients: (r.product_ingredients || []).slice().sort((a, b) => a.sort_order - b.sort_order).map((i) => i.name), allergen_ids: (r.product_allergens || []).map((x) => x.allergen_id), allergen_note: r.allergen_note || '', allergens_checked_at: r.allergens_checked_at || null,
     stock_quantity: stock ? stock.quantity : null,
     option_groups: (r.product_option_groups || []).map((g) => ({
       id: g.id, label: g.label, kind: g.kind, sort_order: g.sort_order, active: g.active,
@@ -134,7 +134,7 @@ export const supabaseApi = {
 
   async listProducts() {
     const sb = await loadClient();
-    const rows = unwrap(await sb.from('products').select('*,product_stock(quantity),product_option_groups(*,product_options(*))').order('sort_order'));
+    const rows = unwrap(await sb.from('products').select('*,product_stock(quantity),product_option_groups(*,product_options(*)),product_allergens(allergen_id),product_ingredients(name,sort_order)').order('sort_order'));
     return rows.map(productRow);
   },
 
@@ -142,19 +142,29 @@ export const supabaseApi = {
   async saveProduct(input) {
     const sb = await loadClient();
     const merged = { ...input, price_pence: input.price_pence ?? null };
-    const error = validateProduct(merged) || validatePhoto(merged) || validateIngredients({ ingredients_text: input.ingredients_text, allergens: input.allergens || [], allergen_note: input.allergen_note });
+    const error = validateProduct(merged) || validatePhoto(merged) || validateIngredients({ ingredients: input.ingredients || [], allergen_ids: input.allergen_ids || [], allergen_note: input.allergen_note }) || validateChecked({ active: Boolean(input.active), checked: Boolean(input.allergens_checked_at) });
     if (error) refuse(error);
     const fields = {
       name: String(input.name).trim(), kind: input.kind, unit_label: String(input.unit_label || '').trim(), price_pence: merged.price_pence,
       available: Boolean(input.available), active: Boolean(input.active), photo_path: input.photo_path || null, photo_alt: String(input.photo_alt || '').trim() || null,
-      ingredients_text: String(input.ingredients_text || '').trim() || null, allergens: [...(input.allergens || [])], allergen_note: String(input.allergen_note || '').trim() || null,
+      allergen_note: String(input.allergen_note || '').trim() || null, allergens_checked_at: input.allergens_checked_at || null,
     };
-    if (input.id) return unwrap(await sb.from('products').update(fields).eq('id', input.id).select('id').single());
-    const existing = unwrap(await sb.from('products').select('slug,sort_order'));
-    const taken = new Set(existing.map((r) => r.slug));
-    const base = slugify(input.name) || 'item'; let slug = base; let n = 2;
-    while (taken.has(slug)) slug = `${base}-${n++}`;
-    return unwrap(await sb.from('products').insert({ ...fields, slug, sort_order: Math.max(0, ...existing.map((r) => r.sort_order)) + 1 }).select('id').single());
+    let id = input.id;
+    if (id) unwrap(await sb.from('products').update(fields).eq('id', id));
+    else {
+      const existing = unwrap(await sb.from('products').select('slug,sort_order'));
+      const taken = new Set(existing.map((r) => r.slug));
+      const base = slugify(input.name) || 'item'; let slug = base; let n = 2;
+      while (taken.has(slug)) slug = `${base}-${n++}`;
+      id = unwrap(await sb.from('products').insert({ ...fields, slug, sort_order: Math.max(0, ...existing.map((r) => r.sort_order)) + 1 }).select('id').single()).id;
+    }
+    // allergens (the list is data) and ingredient tags (in her order): replace this product's rows
+    unwrap(await sb.from('product_allergens').delete().eq('product_id', id));
+    if ((input.allergen_ids || []).length) unwrap(await sb.from('product_allergens').insert(input.allergen_ids.map((allergen_id) => ({ product_id: id, allergen_id }))));
+    unwrap(await sb.from('product_ingredients').delete().eq('product_id', id));
+    const tags = (input.ingredients || []).map((t) => String(t).trim().replace(/\s+/g, ' ')).filter(Boolean);
+    if (tags.length) unwrap(await sb.from('product_ingredients').insert(tags.map((name, i) => ({ product_id: id, name, sort_order: i + 1 }))));
+    return { id };
   },
   async reorderProducts(ids) {
     const sb = await loadClient();
@@ -207,6 +217,23 @@ export const supabaseApi = {
     if (!path) return null;
     return /\.(jpe?g|png|webp)$/i.test(path) ? `${siteConfig.supabaseUrl}/storage/v1/object/public/${BUCKET}/${path}` : `../assets/img/${path}-400.webp`;
   },
+
+  // Allergens: a list she edits (D-062). Products tick from it; deleting one removes it from every product (confirmed on screen).
+  async listAllergens() { const sb = await loadClient(); return unwrap(await sb.from('allergens').select('id,name,sort_order').order('sort_order')); },
+  async saveAllergen({ id, name }) {
+    const sb = await loadClient();
+    const others = unwrap(await sb.from('allergens').select('id,name')).filter((a) => a.id !== id).map((a) => a.name);
+    const error = validateAllergenName(name, others);
+    if (error) refuse(error);
+    const clean = String(name).trim().replace(/\s+/g, ' ');
+    if (id) { unwrap(await sb.from('allergens').update({ name: clean }).eq('id', id)); return; }
+    const top = unwrap(await sb.from('allergens').select('sort_order').order('sort_order', { ascending: false }).limit(1));
+    unwrap(await sb.from('allergens').insert({ name: clean, sort_order: (top[0]?.sort_order ?? 0) + 1 }));
+  },
+  async reorderAllergens(ids) { const sb = await loadClient(); await Promise.all(ids.map((id, i) => sb.from('allergens').update({ sort_order: i + 1 }).eq('id', id).then(unwrap))); },
+  async allergenUsage(id) { const sb = await loadClient(); const { count, error } = await sb.from('product_allergens').select('product_id', { count: 'exact', head: true }).eq('allergen_id', id); if (error) fail(error); return count ?? 0; },
+  async deleteAllergen(id) { const sb = await loadClient(); unwrap(await sb.from('allergens').delete().eq('id', id)); },
+  async ingredientNames() { const sb = await loadClient(); return [...new Set(unwrap(await sb.from('product_ingredients').select('name')).map((r) => r.name))].sort((a, b) => a.localeCompare(b)); },
 
   // Pickup (D-038)
   async getPickup() {

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ordersToCsv, parseSettings, penceToPounds, poundsToPence, slugify, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule } from '../frontend/js/admin-rules.js';
+import { ordersToCsv, parseSettings, penceToPounds, poundsToPence, slugify, validateAllergenName, validateChecked, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule } from '../frontend/js/admin-rules.js';
 
 test('pounds and pence', () => {
   assert.equal(poundsToPence('10'), 1000);
@@ -27,9 +27,24 @@ test('a photo needs alt text', () => {
   assert.equal(validatePhoto({ photo_path: null, photo_alt: '' }), null);
   assert.equal(validatePhoto({ photo_path: 'pack-chicken', photo_alt: '' }), null); // a picture that ships with the site
 });
-test('ingredients and allergens accept only the 14 allergens', () => {
-  assert.equal(validateIngredients({ ingredients_text: 'Chicken', allergens: ['gluten', 'sesame'], allergen_note: '' }), null);
-  assert.match(validateIngredients({ ingredients_text: '', allergens: ['kiwi'], allergen_note: '' }), /Unknown/);
+test('ingredients are tags and allergens are ids from the list in the database', () => {
+  assert.equal(validateIngredients({ ingredients: ['Chicken', 'Onion'], allergen_ids: ['a1', 'a2'], allergen_note: '' }), null);
+  assert.match(validateIngredients({ ingredients: ['Chicken', ' chicken '], allergen_ids: [], allergen_note: '' }), /twice/);
+  assert.match(validateIngredients({ ingredients: [' '], allergen_ids: [], allergen_note: '' }), /empty/);
+  assert.match(validateIngredients({ ingredients: ['x'.repeat(61)], allergen_ids: [], allergen_note: '' }), /too long/);
+  assert.match(validateIngredients({ ingredients: [], allergen_ids: [''], allergen_note: '' }), /Unknown/);
+  assert.match(validateIngredients({ ingredients: [], allergen_ids: [], allergen_note: 'x'.repeat(501) }), /note/);
+});
+test('the safeguard: a product cannot be shown until the information is checked', () => {
+  assert.match(validateChecked({ active: true, checked: false }), /I have checked/);
+  assert.equal(validateChecked({ active: true, checked: true }), null);
+  assert.equal(validateChecked({ active: false, checked: false }), null);
+});
+test('allergen names: required, no duplicates ignoring capitals', () => {
+  assert.equal(validateAllergenName('Kiwi', ['Milk']), null);
+  assert.match(validateAllergenName(' ', []), /Enter/);
+  assert.match(validateAllergenName('milk', ['Milk']), /already in the list/);
+  assert.match(validateAllergenName('x'.repeat(81), []), /at most 80/);
 });
 test('option groups: exactly one default in a one-choice group, no negative price, no duplicates', () => {
   const o = (label, d = false, p = 0) => ({ label, is_default: d, price_delta_pence: p, active: true });

@@ -3,7 +3,7 @@ export const el = (tag, props = {}, ...kids) => {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(props)) {
     if (v === undefined || v === null || v === false) continue;
-    if (k === 'role' || k.startsWith('aria-') || k.startsWith('data-')) node.setAttribute(k, v === true ? '' : v);
+    if (k === 'role' || k === 'list' || k.startsWith('aria-') || k.startsWith('data-')) node.setAttribute(k, v === true ? '' : v);
     else node[k] = v;
   }
   node.append(...kids.flat().filter((k) => k !== null && k !== undefined && k !== false));

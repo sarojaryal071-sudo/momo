@@ -370,3 +370,6 @@ html:has(dialog[open]) { overflow: hidden; }
   .receipt::before, .receipt::after { display: none; }
 }
 .menu-extra:empty, .footer-list li:empty { display: none; }
+
+.ingredient-list { display: flex; flex-wrap: wrap; gap: var(--space-3xs) var(--space-xs); margin: 0 0 var(--space-xs); padding: 0; list-style: none; }
+.ingredient-list li:not(:last-child)::after { content: ","; }

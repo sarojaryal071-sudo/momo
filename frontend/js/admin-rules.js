@@ -1,12 +1,6 @@
 // Admin rules shared by the screens, the demo backend and the tests (D-021, D-046, D-047). Pure functions, no DOM.
 // Money is integer pence; the screens show and accept pounds.
 
-export const ALLERGENS = [
-  { key: 'celery', label: 'Celery' }, { key: 'gluten', label: 'Cereals containing gluten' }, { key: 'crustaceans', label: 'Crustaceans' },
-  { key: 'eggs', label: 'Eggs' }, { key: 'fish', label: 'Fish' }, { key: 'lupin', label: 'Lupin' }, { key: 'milk', label: 'Milk' },
-  { key: 'molluscs', label: 'Molluscs' }, { key: 'mustard', label: 'Mustard' }, { key: 'tree_nuts', label: 'Tree nuts' },
-  { key: 'peanuts', label: 'Peanuts' }, { key: 'sesame', label: 'Sesame' }, { key: 'soya', label: 'Soya' }, { key: 'sulphites', label: 'Sulphites' },
-];
 export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export const LIMITS = { nameMax: 120, unitMax: 60, labelMax: 60, textMax: 2000, noteMax: 500, altMax: 200, maxPence: 100000, slotMax: 240 };
 
@@ -51,11 +45,38 @@ export function validatePhotoFile(file) {
   return null;
 }
 
-export function validateIngredients({ ingredients_text, allergens, allergen_note }) {
-  const known = new Set(ALLERGENS.map((a) => a.key));
-  if (!Array.isArray(allergens) || allergens.some((a) => !known.has(a))) return 'Unknown allergen.';
-  if (text(ingredients_text).length > LIMITS.textMax) return `Ingredients can be at most ${LIMITS.textMax} characters.`;
+export const INGREDIENT_MAX = 60; // characters in one ingredient tag
+export const INGREDIENT_TAGS_MAX = 60; // tags on one product
+export const ALLERGEN_NAME_MAX = 80;
+export const cleanTag = (t) => String(t ?? '').trim().replace(/\s+/g, ' ');
+
+// Ingredients are tags in her order; allergens are ids from the allergen list in the database (nothing is hard-coded here).
+export function validateIngredients({ ingredients = [], allergen_ids = [], allergen_note = '' }) {
+  if (!Array.isArray(allergen_ids) || allergen_ids.some((a) => typeof a !== 'string' || !a)) return 'Unknown allergen.';
+  if (!Array.isArray(ingredients) || ingredients.length > INGREDIENT_TAGS_MAX) return `A product can have at most ${INGREDIENT_TAGS_MAX} ingredients.`;
+  const seen = new Set();
+  for (const raw of ingredients) {
+    const tag = cleanTag(raw);
+    if (!tag) return 'An ingredient cannot be empty.';
+    if (tag.length > INGREDIENT_MAX) return `"${tag.slice(0, 20)}..." is too long. An ingredient can be at most ${INGREDIENT_MAX} characters.`;
+    if (seen.has(tag.toLowerCase())) return `"${tag}" is listed twice.`;
+    seen.add(tag.toLowerCase());
+  }
   if (text(allergen_note).length > LIMITS.noteMax) return `The note can be at most ${LIMITS.noteMax} characters.`;
+  return null;
+}
+
+// The safeguard (D-062): a product cannot be shown until she has confirmed the allergen and ingredient information.
+export function validateChecked({ active, checked }) {
+  return active && !checked ? 'Tick "I have checked the allergen and ingredient information" before this product can be shown in the shop.' : null;
+}
+
+// Allergen names: required, at most 80 characters, no duplicates (ignoring capitals). others = the other names in the list.
+export function validateAllergenName(name, others = []) {
+  const n = cleanTag(name);
+  if (!n) return 'Enter a name for the allergen.';
+  if (n.length > ALLERGEN_NAME_MAX) return `The name can be at most ${ALLERGEN_NAME_MAX} characters.`;
+  if (others.some((o) => cleanTag(o).toLowerCase() === n.toLowerCase())) return `"${n}" is already in the list.`;
   return null;
 }
 

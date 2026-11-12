@@ -4,7 +4,7 @@
 import { getPickupOptions, noticeText, ukParts } from './pickup.js';
 import { siteConfig } from './site-config.js';
 import { toWhatsAppNumber } from './whatsapp.js';
-import { SETTING_FIELDS, slugify, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from './admin-rules.js';
+import { SETTING_FIELDS, slugify, validateAllergenName, validateChecked, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from './admin-rules.js';
 
 export const STORE_KEY = 'ss-store-v2';
 export const STATUSES = ['new', 'confirmed', 'ready', 'collected', 'cancelled'];
@@ -16,6 +16,9 @@ export const DEFAULT_TEMPLATES = {
   cancelled: 'Hi {name}, sorry, we had to cancel your order {order_number}. Please message us if you would like to order again.',
   collected: 'Hi {name}, thank you for collecting your order {order_number}. We hope you enjoy your momo!',
 };
+
+// Demo data only: what the database seeds in migration 0007. The admin screens never contain this list.
+export const DEFAULT_ALLERGENS = ['Celery', 'Cereals containing gluten', 'Crustaceans', 'Eggs', 'Fish', 'Lupin', 'Milk', 'Molluscs', 'Mustard', 'Peanuts', 'Sesame', 'Soya', 'Sulphur dioxide and sulphites', 'Tree nuts'];
 
 export class RuleError extends Error {
   constructor(code, message) { super(message); this.name = 'RuleError'; this.code = code; }
@@ -305,7 +308,7 @@ export function adminProducts(state) {
   return state.products.map((p, i) => ({
     id: p.slug, slug: p.slug, name: p.name, kind: p.kind, category: p.category ?? null, unit_label: p.unit_label || '',
     price_pence: p.price_pence ?? null, available: p.available !== false, active: p.active !== false, sort_order: p.sort_order ?? i + 1,
-    photo_path: p.photo_path ?? p.photo ?? null, photo_alt: p.photo_alt ?? '', ingredients_text: p.ingredients_text ?? '', allergens: [...(p.allergens || [])], allergen_note: p.allergen_note ?? '',
+    photo_path: p.photo_path ?? p.photo ?? null, photo_alt: p.photo_alt ?? '', ingredients: [...(p.ingredients || [])], allergen_ids: [...(p.allergen_ids || [])], allergen_note: p.allergen_note ?? '', allergens_checked_at: p.allergens_checked_at ?? null,
     stock_quantity: p.stock_quantity ?? null,
     option_groups: (p.option_groups || []).map((g, gi) => ({
       id: g.id, label: g.label, kind: g.kind, sort_order: g.sort_order ?? gi + 1, active: g.active !== false,
@@ -320,7 +323,7 @@ const findProduct = (state, id) => state.products.find((p) => p.slug === id) || 
 export function saveProduct(state, input) {
   const price = input.price_pence ?? null;
   const merged = { ...input, price_pence: price };
-  const error = validateProduct(merged) || validatePhoto(merged) || validateIngredients({ ingredients_text: input.ingredients_text, allergens: input.allergens || [], allergen_note: input.allergen_note });
+  const error = validateProduct(merged) || validatePhoto(merged) || validateIngredients({ ingredients: input.ingredients || [], allergen_ids: input.allergen_ids || [], allergen_note: input.allergen_note }) || validateChecked({ active: Boolean(input.active), checked: Boolean(input.allergens_checked_at) });
   if (error) fail(error);
   let p;
   if (input.id) p = findProduct(state, input.id);
@@ -334,7 +337,7 @@ export function saveProduct(state, input) {
   Object.assign(p, {
     name: String(input.name).trim(), kind: input.kind, unit_label: String(input.unit_label || '').trim(), price_pence: price,
     available: Boolean(input.available), active: Boolean(input.active), photo_path: input.photo_path || null, photo_alt: String(input.photo_alt || '').trim(),
-    ingredients_text: String(input.ingredients_text || '').trim(), allergens: [...(input.allergens || [])], allergen_note: String(input.allergen_note || '').trim(),
+    ingredients: (input.ingredients || []).map((t) => String(t).trim().replace(/\s+/g, ' ')), allergen_ids: [...(input.allergen_ids || [])], allergen_note: String(input.allergen_note || '').trim(), allergens_checked_at: input.allergens_checked_at || null,
   });
   if (p.photo_path) p.photo = p.photo_path;
   touched(state);
@@ -401,6 +404,27 @@ export function saveException(state, ex) {
 }
 export function deleteException(state, id) { state.pickup.exceptions = state.pickup.exceptions.filter((e) => e.id !== id); }
 
+// Allergens: a list the admin edits (rename, add, reorder, delete). Products point at them by id.
+const allergensOf = (state) => { if (!state.allergens) state.allergens = DEFAULT_ALLERGENS.map((name, i) => ({ id: `al-${i + 1}`, name, sort_order: i + 1 })); return state.allergens; };
+export const listAllergens = (state) => clone(allergensOf(state)).sort((a, b) => a.sort_order - b.sort_order);
+export function saveAllergen(state, { id, name }) {
+  const list = allergensOf(state);
+  const error = validateAllergenName(name, list.filter((a) => a.id !== id).map((a) => a.name));
+  if (error) fail(error);
+  touched(state);
+  if (id) { const a = list.find((x) => x.id === id) || fail('That allergen was not found.', 'not_found'); a.name = String(name).trim().replace(/\s+/g, ' '); return; }
+  list.push({ id: `al-${RANDOM_ID()}`, name: String(name).trim().replace(/\s+/g, ' '), sort_order: Math.max(0, ...list.map((a) => a.sort_order)) + 1 });
+}
+export function reorderAllergens(state, ids) { const list = allergensOf(state); ids.forEach((id, i) => { const a = list.find((x) => x.id === id); if (a) a.sort_order = i + 1; }); touched(state); }
+export const allergenUsage = (state, id) => state.products.filter((p) => (p.allergen_ids || []).includes(id)).length;
+export function deleteAllergen(state, id) {
+  state.allergens = allergensOf(state).filter((a) => a.id !== id);
+  state.products.forEach((p) => { p.allergen_ids = (p.allergen_ids || []).filter((x) => x !== id); });
+  touched(state);
+}
+// Ingredient names already used on any product (suggestions while typing).
+export const ingredientNames = (state) => [...new Set(state.products.flatMap((p) => p.ingredients || []))].sort((a, b) => a.localeCompare(b));
+
 // Notice banner (live on the public site without a rebuild)
 export const getNotice = (state) => ({ message: '', active: false, ...(state.notice || {}) });
 export function saveNotice(state, { message, active }) {
@@ -459,6 +483,12 @@ export function createMock({ storage = null, loadSeed, now = () => new Date() } 
     setSlotMinutes: (m) => change((s) => setSlotMinutes(s, m)),
     saveException: (e) => change((s) => saveException(s, e)),
     deleteException: (id) => change((s) => deleteException(s, id)),
+    listAllergens: () => change((s) => listAllergens(s)),
+    saveAllergen: (a) => change((s) => saveAllergen(s, a)),
+    reorderAllergens: (ids) => change((s) => reorderAllergens(s, ids)),
+    allergenUsage: (id) => change((s) => allergenUsage(s, id)),
+    deleteAllergen: (id) => change((s) => deleteAllergen(s, id)),
+    ingredientNames: () => query((s) => ingredientNames(s)),
     getNotice: () => query((s) => getNotice(s)),
     saveNotice: (n) => change((s) => saveNotice(s, n)),
     getSiteStatus: () => query((s, now) => getSiteStatus(s, now)),
