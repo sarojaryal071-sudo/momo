@@ -1,6 +1,12 @@
-# Step 1l — Type scale and density, public site (decision D-050)
+# Step 1l — Klandestina typography, density and no visible placeholders (decisions D-050, D-051, D-052)
 
-Prerequisite: Step 1k is merged (it is). Merge `origin/main` first. Read `CLAUDE.md`, `docs/decisions-log.md` D-043, D-044, D-050 and **`docs/design/type-and-spacing-spec.md` in full**. Do only this step; do not start 4a2, 4b, 4c or Step 3. Add the checklist at the bottom to `docs/progress-tracker.md` first.
+Prerequisite: Step 1k is merged (it is). Merge `origin/main` first. Read `CLAUDE.md`, `docs/decisions-log.md` D-044, D-050, D-051, D-052 and **`docs/design/type-and-spacing-spec.md` in full**. Do only this step; do not start 4a2, 4b, 4c or Step 3. Add the checklist at the bottom to `docs/progress-tracker.md` first.
+
+## Owner overrides (12 Nov 2026) — these win over older text
+
+- **D-051 fonts:** the whole platform (public site **and** admin) switches to Bebas Neue (uppercase headings, product names, prices) and Space Grotesk (everything else). Remove Instrument Serif and Hanken Grotesk files, CSS, preloads and licence files. Get Bebas Neue 400 and Space Grotesk 400 to 700 as self-hosted Latin woff2 from the `@fontsource/bebas-neue` and `@fontsource/space-grotesk` npm packages (or the variable file), add their OFL licence texts, preload only what the first paint needs, `font-display: swap`, metric-matched fallbacks to avoid layout jump. Sizes in the spec's D-051 note. Bebas never below 1.375rem; anything smaller uses Space Grotesk. Product names are Bebas uppercase at 1.5rem to 1.625rem; check that long names still fit on two lines at 320px.
+- **D-052 no visible placeholders:** this **overrides the D-023 exception and the "visible TODO" rule in CLAUDE.md** (the owner has decided; do not stop to ask about it). Remove every visible "sample", "demo", "TODO:" and test wording from all public pages and all admin pages (including the demo banner, "sample" badges, example names such as test customers, and hint text). Any fact we do not have (steam time, allergens, storage advice, exact pickup address, legal wording) is **not rendered** until it exists in admin/settings: hide the whole block or line, no invented words. Known values render normally. Pickup hours, daily limit and sauce prices stay editable settings with starting values and render as normal values. Replace `data-placeholder` / `data-todo` with an invisible `data-pending` attribute that the build and launch gate still check. The admin starts with **no seeded orders** and shows a proper empty state ("No orders yet"); keep a developer-only seed function used by tests (not reachable from the UI). List every hidden or pending item in the report.
+- The admin pages get the new fonts and the admin tokens in this step as well; the layout fixes for the admin remain in Step 4a2.
 
 ## Why
 
@@ -19,7 +25,7 @@ The owner finds the site's fonts too big and the page not professional. The scal
 
 ## Do not
 
-Change colours, typefaces, copy, behaviour, data or tests (except where class names change, then update and say so); add libraries, gradients, effects or animations; touch the admin pages other than the scoped admin tokens that you define (the admin itself is Step 4a2); start Step 3.
+Change colours, copy (other than removing placeholder wording), behaviour, data or tests (except where class names change, then update and say so); add libraries, gradients, effects or animations; change the admin layout (that is Step 4a2) beyond fonts, tokens and placeholder removal; start Step 3.
 
 ## Must see (open your own screenshots and say what you saw)
 
@@ -27,7 +33,8 @@ At 390 by 844 and 1440 by 900: home (top, the first product card, the footer), s
 - Body text is 16px and does not change between 390 and 1440 (check computed font sizes); h1 is at most about 80px and h2 at most about 48px at 1440.
 - First product card name visible after one scroll at 390 by 844; hero panel height within the spec at 1440.
 - Section gaps clearly smaller than before but still calm; nothing looks cramped; no component has big empty areas.
-- Product names and prices are in the sans; the serif appears only in large headings.
+- Headings, product names and prices are Bebas Neue uppercase; all other text is Space Grotesk; no trace of the old fonts (check the network list and computed styles).
+- No word "sample", "demo", "TODO" or test data is visible on any public or admin page (search the rendered text of every page); the admin opens with an empty orders list and an empty state.
 - Inputs are 16px and do not zoom on focus (iPhone widths); focus rings visible on inputs, buttons, chips and links.
 - "Place order" shows a loading state and disables itself while saving (use the mock gateway with a delay).
 - No horizontal scroll at 320, 375, 390, 414, 768, 1280 and 1440 px.
@@ -38,6 +45,8 @@ At 390 by 844 and 1440 by 900: home (top, the first product card, the footer), s
 
 ## Tracker checklist to add
 
+- [ ] Fonts switched to Bebas Neue and Space Grotesk, old fonts removed (public and admin)
+- [ ] Visible placeholders and demo data removed; `data-pending` gate in place
 - [ ] Audit table and new type and spacing tokens; old `--step-*` removed
 - [ ] All public components switched to the tokens
 - [ ] Hero and sections at the new density

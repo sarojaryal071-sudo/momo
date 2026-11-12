@@ -1,6 +1,6 @@
 # Step 4a2 — Admin UI polish (decisions D-049, D-050)
 
-> **Do Step 1l first** (it sets the new tokens). In this step use the **admin type tokens and spacing in `docs/design/type-and-spacing-spec.md` sections 3 to 5**; where this file mentions a size (for example the page title), the spec wins.
+> **Fonts are Bebas Neue and Space Grotesk (D-051), and no placeholder or demo wording is visible (D-052); Step 1l sets both.** **Do Step 1l first** (it sets the new tokens). In this step use the **admin type tokens and spacing in `docs/design/type-and-spacing-spec.md` sections 3 to 5**; where this file mentions a size (for example the page title), the spec wins.
 
 Prerequisite: Step 4a and Step 1l are merged. Merge `origin/main` first. Read `CLAUDE.md`, `docs/decisions-log.md` D-043, D-045, D-048, D-049 and `docs/ui-rulebook.md` sections 2b and 5. Do only this step; do not start 4b, 4c or Step 3. Add the checklist at the bottom to `docs/progress-tracker.md` first. No new features and no changes to rules, data or the demo backend: layout, components and styling only. Same fonts and tokens as the public site (Instrument Serif for page titles only, Hanken Grotesk for everything else); no glass, no gradients, no background spots.
 
