@@ -68,6 +68,8 @@ Read `docs/architecture-rulebook.md` section 12 first. In addition to the list a
 - **Admin screens already built (orders, prep list, pickup, settings):** switch them to the live backend and delete nothing they need; run the live flow end to end: place an order on the public site, see it in the admin within a minute, confirm it, cancel it (stock returns once), pause ordering, hit the daily limit.
 - Migrations are versioned files in `backend/supabase/migrations/` that can be re-run on a new project; document how in `backend/README.md`.
 
+- **Realtime (D-057):** enable Supabase Realtime on `orders` (and order status changes) with RLS so only admins receive events; add a test that an anonymous client gets no events. Document it in `backend/README.md`. Do not add socket.io or any server.
+
 ## Do not
 
 Put the service-role key, GitHub token, email key or owner email in the repo, the browser, or workflow variables. Build the admin panel (Step 4). Add payments or customer accounts.
