@@ -227,7 +227,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Tactile controls in the admin only: raised primary, secondary and destructive buttons, spinner when busy, inset-track toggles with a raised thumb, lighter raise for chips, dropdowns and icon buttons; all values are tokens; press-down only under no-preference motion
 - [x] Glass in the admin: sticky top bar, tab bar, menus, toast and paused strip, with a solid fallback; cards and forms stay solid white. The customer site's soft light background was not added: the public site has no ambient layer since D-044, so there was nothing to match
 - [x] Clean URLs: links, redirects, canonicals, sitemap and structured data without `.html` or `index.html`; the build fails on any such link; `js/clean-url.js` cleans an old address in the address bar; the dev server serves extensionless pages
-- [ ] Owner checks: Pickup buttons on one row; raised buttons and toggles; glass bars and menu; `/momo/`, `/momo/shop`, `/momo/admin/`, `/momo/admin/orders` and an old `.html` address
+- [x] Tab bar can never float (iPhone, Settings page): phones use a fixed-height column with a scrolling content area, and the tab bar is its last row instead of a fixed element; wide screens keep the fixed sidebar; print still prints the whole page
+- [ ] Owner checks: tab bar stays at the bottom on every admin page on the iPhone; Pickup buttons on one row; raised buttons and toggles; glass bars and menu; `/momo/`, `/momo/shop`, `/momo/admin/`, `/momo/admin/orders` and an old `.html` address
 
 ## Step 5 — SEO, hardening and launch checks
 
@@ -338,6 +339,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, step 4d (demo backend only): build passes; `admin-session` tests pass. One Playwright run at 390 and 1440 px: login (overflow, only the patches blur, 16px and 44px inputs, show password, neutral error, forgot message, invalid reset link), Home tiles and links, five tabs on every page, pause from Home, 30-day sign-out, signed-in user on the login page. Not checked: Supabase login, the real reset email and link, Realtime on Home.
 
 - 2026-11-12, step 4e: build passes (with the new link check); `regions`, `build-supabase` (first real run; its fake server was blocked by a synchronous spawn, now asynchronous) and `launch-gate` tests pass (10). Playwright at 390 px on the demo backend: public and admin addresses clean, old `.html` addresses stripped, 404 works, tab bar links, Pickup Save and Delete on one row, raised edge, sticky glass bar. Not checked: GitHub Pages serving the clean addresses live (it serves `shop.html` at `/shop`), the other admin pages' buttons by eye, Safari without `backdrop-filter`.
+
+- 2026-11-12, step 4e tab bar fix: Chromium with a mobile 390x844 profile on Home, Orders, Products, Pickup and Settings (demo data, all long pages): the bar's bottom edge equals the viewport at the top, at the end of the scroll, after the viewport shrank to 760 (toolbar collapse emulated by resizing) and after it grew back; the document never scrolls; desktop keeps the fixed sidebar. Could not reproduce the iPhone bug or test real Safari, so the exact cause is unconfirmed.
 
 ## Known issues
 

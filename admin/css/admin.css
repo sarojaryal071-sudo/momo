@@ -271,3 +271,23 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
   .paused-strip { background: color-mix(in srgb, var(--turmeric) 88%, transparent); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
   .toast { background: var(--glass-emerald); -webkit-backdrop-filter: blur(var(--glass-blur-strong)); backdrop-filter: blur(var(--glass-blur-strong)); }
 }
+
+/* ---------- Step 4e: the tab bar can never float (iPhone bug). ----------
+   Phones: the page is a fixed-height column (top strip, top bar, scrolling content, tab bar). The document itself never scrolls, so
+   there is no fixed element to drift when the browser toolbar collapses; the tab bar is simply the last row. Wide screens keep
+   the sidebar. No ancestor of the bar has a transform, filter or backdrop-filter, so nothing can capture it. */
+.admin-body:not(.login-body) { block-size: 100vh; block-size: 100dvh; min-block-size: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; overflow: hidden; padding: 0; }
+.admin-body:not(.login-body) > .paused-strip { grid-row: 1; }
+.admin-body:not(.login-body) > .admin-bar { grid-row: 2; }
+.admin-body:not(.login-body) > .admin-main { grid-row: 3; min-block-size: 0; inline-size: auto; margin: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding-inline: max(var(--gutter), calc((100% - var(--content-admin)) / 2)); }
+.admin-body:not(.login-body) > .tabbar { grid-row: 4; position: static; inset: auto; }
+@media (min-width: 48em) {
+  .admin-body:not(.login-body) { display: block; block-size: auto; min-block-size: 100dvh; overflow: visible; padding-inline-start: var(--sidebar); }
+  .admin-body:not(.login-body) > .admin-main { overflow: visible; padding-inline: 0; inline-size: min(100% - 2 * var(--gutter), var(--content-admin)); margin-inline: auto; }
+  .admin-body:not(.login-body) > .tabbar { position: fixed; inset: 0 auto 0 0; }
+}
+@media print {
+  .admin-body:not(.login-body) { display: block; block-size: auto; overflow: visible; }
+  .admin-body:not(.login-body) > .admin-main { overflow: visible; inline-size: 100%; padding-inline: 0; }
+}
