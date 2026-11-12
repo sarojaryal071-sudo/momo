@@ -49,3 +49,14 @@ export function toNationalFormat(digits) {
   const rest = digits.slice(UK_PREFIX.length);
   return `0${rest.slice(0, 4)} ${rest.slice(4)}`;
 }
+
+// Admin messages (D-045): fills a template such as "Hi {name}, your order {order_number} is confirmed.".
+// Unknown placeholders are left as they are so a typo is visible.
+export function fillTemplate(template, values) {
+  return String(template || '').replace(/\{(name|order_number|pickup|items|address)\}/g, (_, key) => values[key] ?? '');
+}
+
+// One line per item for {items}: "- 2 x Frozen chicken momo (40 pieces) (Hot, No onion)".
+export function describeItems(items) {
+  return items.map((l) => `- ${l.qty} x ${l.name}${l.unit_label ? ` (${l.unit_label})` : ''}${l.options && l.options.length ? ` (${l.options.map((o) => o.label).join(', ')})` : ''}`).join('\n');
+}

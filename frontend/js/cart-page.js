@@ -2,7 +2,7 @@
 import './menu.js';
 import { buildLines, cartTotal, formatPrice, getCart, lineKey, updateHeaderCount } from './cart.js';
 import { loadPickup, loadProducts } from './data.js';
-import { submitOrder } from './order-gateway.js';
+import { getOrderingState, OrderRejected, submitOrder } from './order-gateway.js';
 import { dateLabel, getPickupOptions, noticeText, pickupHours, pickupMinutes, windowText } from './pickup.js';
 import { siteConfig } from './site-config.js';
 import { buildOrderLink, toNationalFormat, toWhatsAppNumber } from './whatsapp.js';
@@ -24,6 +24,7 @@ const phoneInput = $('#f-phone');
 let products = [];
 let pickupOptions = [];
 let pickupConfig = null;
+let closedDates = []; // pickup days that have reached the daily order limit
 
 const el = (tag, cls, text) => {
   const n = document.createElement(tag);
@@ -119,7 +120,7 @@ function refreshPickup(lines) {
   if (!pickupConfig) return;
   const customised = lines.some((l) => l.customised && !l.unavailable);
   const keep = dateSel.value;
-  pickupOptions = getPickupOptions(pickupConfig, new Date(), { customised, customLeadHours: siteConfig.customMinLeadHours });
+  pickupOptions = getPickupOptions(pickupConfig, new Date(), { customised, customLeadHours: siteConfig.customMinLeadHours, closedDates });
   dateSel.replaceChildren(new Option('No date chosen', ''));
   pickupOptions.forEach((o) => dateSel.append(new Option(o.label, o.date)));
   dateSel.value = pickupOptions.some((o) => o.date === keep) ? keep : '';
@@ -216,7 +217,12 @@ async function confirm(e) {
     try { sessionStorage.setItem('ss-last-order', JSON.stringify({ orderNumber: result.orderNumber, lines: summary, totalPence, pickup: order.pickupText, name: order.name, placedAt: new Date().toISOString() })); } catch { /* the done page copes without it */ }
     getCart().clear();
     location.href = `done.html?o=${encodeURIComponent(result.orderNumber)}`;
-  } catch {
+  } catch (err) {
+    if (err instanceof OrderRejected) { // a rule said no: show why, keep the cart
+      errorBox.textContent = err.message;
+      confirmBtn.disabled = err.code === 'paused';
+      return;
+    }
     // The order was not saved. The customer can send it by WhatsApp instead; the cart is kept.
     const { link } = buildOrderLink({ lines: summary, totalPence, pickup: order.pickupText, name: order.name, phone: order.phone, notes: order.notes });
     errorBox.textContent = 'We could not place your order online. Please send us the WhatsApp message instead so we receive it.';
@@ -236,6 +242,14 @@ async function init() {
     products = await loadProducts();
     pickupConfig = await loadPickup();
     if (!pickupConfig.placeholder) $('#pickup-sample').remove();
+    const state = await getOrderingState();
+    closedDates = state.fullDates;
+    if (!state.orderingOpen) { // ordering is paused: the cart says so and Place order stays off
+      const note = $('[data-pause-note]');
+      note.textContent = state.closedMessage;
+      note.hidden = false;
+      confirmBtn.disabled = true;
+    }
   } catch {
     errorBox.textContent = 'We could not load the shop data. Please reload, or call us to order.';
   }

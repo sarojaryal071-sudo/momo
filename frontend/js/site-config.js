@@ -31,5 +31,5 @@ export const siteConfig = {
   gatewayTimeoutMs: 8000,
   swipeClosePx: 80, // how far a swipe down must go to close the details sheet
   addedFlashMs: 1600, // how long the Add to cart button says "Added"
-  mock: { orderNumber: 'SS-TEST-01', delayMs: 400 },
+  mock: { delayMs: 400 }, // the demo backend saves orders in this browser (js/mock-backend.js)
 };

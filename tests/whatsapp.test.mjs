@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildLink, buildMessage, buildOrderLink, toNationalFormat, toWhatsAppNumber } from '../frontend/js/whatsapp.js';
+import { buildLink, buildMessage, buildOrderLink, describeItems, fillTemplate, toNationalFormat, toWhatsAppNumber } from '../frontend/js/whatsapp.js';
 
 const lines = [
   { qty: 1, name: 'Frozen chicken momo', unitLabel: '40 pieces', linePence: 1000 },
@@ -58,4 +58,11 @@ test('the customer phone is listed and numbers are shown back in national format
   assert.equal(toNationalFormat('447413069241'), '07413 069241');
   assert.equal(toNationalFormat(toWhatsAppNumber('+44 7413 069241')), '07413 069241');
   assert.equal(toNationalFormat(null), '');
+});
+
+test('admin templates are filled and items are described with their options', () => {
+  const items = [{ qty: 2, name: 'Frozen chicken momo', unit_label: '40 pieces', options: [{ label: 'Hot' }, { label: 'No onion' }] }, { qty: 1, name: 'Chutney pot', unit_label: '1 pot', options: [] }];
+  assert.equal(describeItems(items), '- 2 x Frozen chicken momo (40 pieces) (Hot, No onion)\n- 1 x Chutney pot (1 pot)');
+  assert.equal(fillTemplate('Hi {name}, order {order_number}. {typo}', { name: 'Asha', order_number: 'SS-1112-01' }), 'Hi Asha, order SS-1112-01. {typo}');
+  assert.equal(fillTemplate('Address: {address}', { address: '' }), 'Address: ');
 });

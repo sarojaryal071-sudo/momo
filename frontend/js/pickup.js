@@ -38,7 +38,8 @@ export function noticeText(hours) {
 
 // Returns [{ date: '2026-11-14', label, times: [{ value: '10:00', label: '10:00 to 11:00' }] }].
 // When the cart holds a customised item, `customLeadHours` replaces the usual minimum notice.
-export function getPickupOptions(config, now = new Date(), { customised = false, customLeadHours } = {}) {
+export function getPickupOptions(config, now = new Date(), { customised = false, customLeadHours, closedDates = [] } = {}) {
+  const closed = new Set(closedDates); // days that have reached the daily order limit
   const { min_lead_hours: usualLead, max_days_ahead: maxDays } = config.settings;
   const lead = customised && Number.isFinite(customLeadHours) ? Math.max(usualLead, customLeadHours) : usualLead;
   const ukNow = ukParts(now);
@@ -70,7 +71,7 @@ export function getPickupOptions(config, now = new Date(), { customised = false,
     const times = [...slots.entries()].sort((a, b) => a[0] - b[0])
       .filter(([t]) => dayMs / MS_PER_MINUTE + t >= earliestMin)
       .map(([t, len]) => ({ value: toHhmm(t), label: `${toHhmm(t)} to ${toHhmm(t + len)}`, end: toHhmm(t + len) }));
-    if (times.length) options.push({ date, label: dateLabel(date), times });
+    if (times.length && !closed.has(date)) options.push({ date, label: dateLabel(date), times });
   }
   return options;
 }

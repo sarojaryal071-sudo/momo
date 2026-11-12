@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.supabase.co; form-action 'self'; base-uri 'self'">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Settings | Admin</title>
+  <link rel="icon" href="../assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="../assets/fonts/hanken-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body" data-auth data-page="settings">
+  <header class="admin-bar">
+    <span class="admin-title">Steam &amp; Spice admin</span>
+    <button type="button" class="btn btn-secondary btn-small" data-logout>Log out</button>
+    <p class="demo-banner" data-demo-banner hidden><strong>Demo mode.</strong> Orders and settings are saved in this browser only. Nothing is sent to customers.</p>
+  </header>
+  <nav class="tabbar" aria-label="Admin">
+    <a href="index.html" data-tab="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Orders</a>
+    <a href="prep.html" data-tab="prep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/><path d="M18 15l2 2 3-4" transform="translate(-2 0)"/></svg>Prep</a>
+    <a href="products.html" data-tab="products"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14c0-5 4.5-9 9-9s9 4 9 9c-3 3-15 3-18 0z"/><path d="M12 6v10"/></svg>Products</a>
+    <a href="pickup.html" data-tab="pickup"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Pickup</a>
+    <a href="settings.html" data-tab="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>Settings</a>
+  </nav>
+  <main class="admin-main" id="main">
+    <h1>Settings</h1>
+    <section class="panel" aria-labelledby="pause-h">
+      <h2 id="pause-h">Pause ordering</h2>
+      <p>When paused, the public cart shows your message and cannot place an order. The pause is live at once.</p>
+      <form data-form="pause">
+        <div class="field"><label><input type="checkbox" data-field="ordering_paused"> Pause ordering now</label></div>
+        <div class="field"><label for="s-closed">Message customers see</label><textarea id="s-closed" rows="3" maxlength="300" data-field="ordering_closed_message"></textarea></div>
+        <div class="btn-row"><button class="btn" type="submit">Save</button><span class="saved" role="status" data-saved></span></div>
+        <p class="error" role="alert" data-error></p>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="addr-h">
+      <h2 id="addr-h">Pickup address (private)</h2>
+      <p>Only used in the messages you send to customers. It is never shown on the public site.</p>
+      <form data-form="address">
+        <div class="field"><label for="s-address">Address and how to find you</label><textarea id="s-address" rows="3" maxlength="500" data-field="pickup_address_text"></textarea></div>
+        <div class="btn-row"><button class="btn" type="submit">Save</button><span class="saved" role="status" data-saved></span></div>
+        <p class="error" role="alert" data-error></p>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="tpl-h">
+      <h2 id="tpl-h">WhatsApp messages</h2>
+      <p>You can use these placeholders: <code>{name}</code> <code>{order_number}</code> <code>{pickup}</code> <code>{items}</code> <code>{address}</code>. You can edit the text again before each message, and you tap send in WhatsApp.</p>
+      <form data-form="templates">
+        <div class="field"><label for="t-confirmed">When confirmed</label><textarea id="t-confirmed" rows="4" maxlength="1000" data-field="wa_template_confirmed"></textarea></div>
+        <div class="field"><label for="t-ready">When ready</label><textarea id="t-ready" rows="4" maxlength="1000" data-field="wa_template_ready"></textarea></div>
+        <div class="field"><label for="t-cancelled">When cancelled</label><textarea id="t-cancelled" rows="4" maxlength="1000" data-field="wa_template_cancelled"></textarea></div>
+        <div class="btn-row"><button class="btn" type="submit">Save</button><span class="saved" role="status" data-saved></span></div>
+        <p class="error" role="alert" data-error></p>
+      </form>
+    </section>
+    <section class="panel" aria-labelledby="sec-h">
+      <h2 id="sec-h">Security</h2>
+      <p class="muted">Two-step login arrives with the real backend in Step 3. Until then this demo login is not a security control.</p>
+    </section>
+    <section class="panel" aria-labelledby="demo-h" data-demo-only hidden>
+      <h2 id="demo-h">Demo data</h2>
+      <p>Put the sample products and orders back as they were. This removes any orders placed in this browser.</p>
+      <div class="btn-row"><button class="btn btn-secondary" type="button" data-reset>Reset demo data</button><span class="saved" role="status" data-reset-msg></span></div>
+    </section>
+  </main>
+  <script type="module" src="js/settings.js"></script>
+</body>
+</html>
