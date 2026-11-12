@@ -191,9 +191,9 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 
 ## Step 4a2 — Admin UI polish (D-049, D-050)
 
-- [x] Slim top bar, menu with Log out, paused strip, bottom padding (no Demo pill: D-052 removes demo wording) — 8063e98, 56 px bar with wordmark and menu (Log out inside), amber paused strip with Resume on every page, bottom padding 80 px above the 65 px tab bar
+- [x] Slim top bar with Log out icon and confirm (D-053, no hamburger), paused strip, bottom padding — 8063e98, 56 px bar with wordmark and menu (Log out inside), amber paused strip with Resume on every page, bottom padding 80 px above the 65 px tab bar
 - [x] Form controls: no overflow, aligned fields, toggle switch — 8063e98, no overflow at 320, 375, 390, 414 and 1440; date fields equal width in a two-column grid; role="switch" toggle works by tap, Space and Enter
-- [x] Orders: compact filters, new card layout with primary next action and More menu — 8063e98, first order card with status badge and Confirm button fully visible at 390x844 (bottom 573, tab bar top 779); chips scroll inside their rows; More menu and in-page cancel confirmation work
+- [x] Orders: two dropdowns (Status, When with Custom range, saved across reloads), new card layout with primary next action and More menu — 8063e98, first order card with status badge and Confirm button fully visible at 390x844 (bottom 573, tab bar top 779); chips scroll inside their rows; More menu and in-page cancel confirmation work
 - [x] Prep list: day chips, clear result layout, print — 8063e98, day chips with counts, opens on 14 Nov (first day with orders), quantities large, options indented, prints on 1 A4 page
 - [x] Settings: toggle, readable card headings — 8063e98, switch, 1rem card headings, "Saved. Ordering is paused now." and the strip appears at once
 - [x] Checked in own screenshots, merged to `main`, deploy confirmed — 8063e98, own screenshots at 390 and 1440 checked; merge and deploy recorded in the log
@@ -288,6 +288,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, step 1l: `npm test` 50 pass; build validation passes; `SITE_INDEXABLE=true` build fails on `data-pending` and `"pending": true` as intended. Playwright at 390x844 and 1440x900 on home, shop, product sheet, cart, done, how to cook, menu and the admin; body 16px on both (admin 15px); h1 49px/96px, h2 38px/60px; no horizontal scroll at 320, 375, 390, 414, 768, 1280, 1440; only font files requested: bebas-neue and space-grotesk; Place order showed "Placing order..." disabled with aria-busy. Home page 305 kB uncompressed on a full scroll (fonts 36 kB, images 157 kB, CSS 56 kB, JS 28 kB).
 
 - 2026-11-12, step 4a2: `npm test` 50 pass; build passes. Playwright at 390x844 and 1440x900 with the developer seed (orders in every status): no overflow at 320, 375, 390, 414, 1440; first order card and its main button visible without scrolling; switch toggles by tap, Space, Enter; strip shows after saving a pause and hides on Resume; day chips and counts correct; print preview 1 page; focus ring visible on chips. Badge and chip contrast 5.98 to 14.09.
+
+- 2026-11-12, step 4a2 update for D-053 (0fae91d): `npm test` 50 pass; build passes. Playwright 390 and 1440: Log out icon 44x44, confirm opens with focus on Cancel, Escape closes, Log out leads to login; Status and When selects 16px and 44px high side by side; Custom range reveals From and To (stacked at 390, no overflow), shows the 15 Nov orders; choices survived a reload; first order action button ends at 472 px at 390x844.
 
 ## Known issues
 
