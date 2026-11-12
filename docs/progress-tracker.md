@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Step 4e, coding agent)
+- Last updated: 2026-11-13 (Step 4f, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 5 (SEO, hardening, launch).
 
@@ -230,6 +230,15 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Tab bar can never float (iPhone, Settings page): phones use a fixed-height column with a scrolling content area, and the tab bar is its last row instead of a fixed element; wide screens keep the fixed sidebar; print still prints the whole page
 - [ ] Owner checks: tab bar stays at the bottom on every admin page on the iPhone; Pickup buttons on one row; raised buttons and toggles; glass bars and menu; `/momo/`, `/momo/shop`, `/momo/admin/`, `/momo/admin/orders` and an old `.html` address
 
+## Step 4f — Admin visual style and Products redesign (D-061)
+
+- [x] Look from the approved reference replaces 4e's: tokens (radii, raised faces and edges, glass, badge tints), soft raised buttons, round icon buttons, inset-track toggles, soft status pills; 4e's one-row buttons, clean URLs and fixed tab bar kept
+- [x] Glass top bar and tab bar with the page scrolling under them (fixed-height column; the content area spans the full height and its padding clears the bars, measured by `shell.js`); menus, dialogs, toast, paused strip glass with solid fallbacks and `prefers-reduced-transparency`
+- [x] One fixed background layer of four blurred brand-colour circles on every admin page and on login
+- [x] Products: card list (thumbnail, name, price, Active toggle, stock chip, Edit, quiet reorder), Unpublished changes / Publish banner, full-screen Edit with glass bar, section cards, groups as chips, 14 allergens in a grid, stock tracking switch, availability, one sticky Save and Cancel, unsaved-changes dialog, toast on save
+- [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
+- [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
@@ -343,6 +352,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, step 4e tab bar fix: Chromium with a mobile 390x844 profile on Home, Orders, Products, Pickup and Settings (demo data, all long pages): the bar's bottom edge equals the viewport at the top, at the end of the scroll, after the viewport shrank to 760 (toolbar collapse emulated by resizing) and after it grew back; the document never scrolls; desktop keeps the fixed sidebar. Could not reproduce the iPhone bug or test real Safari, so the exact cause is unconfirmed.
 
 - 2026-11-12, Products tab blank on the owner's iPhone: could not reproduce on the built site under `/momo/` (demo data) nor with a faked Supabase client; added `admin/js/boot-guard.js` (a failing admin page now shows the error and a Reload link instead of staying blank) and a visible error if the product list cannot load. Cause unconfirmed; ask the owner for the message it shows.
+
+- 2026-11-13, step 4f (demo backend only): build passes; Playwright at 390 px (mobile profile): login, Home, Orders, Products list, Edit product (top, bottom, unsaved dialog, invalid price, save, add with a group), Pickup, Settings; no page errors; Confirm and More on one row; Save and Cancel sticky above the tab bar. Contrast: badges 4.87 to 12.85, muted text on the strongest single patch 4.85. Not checked: real Supabase product save and photo upload, real iPhone scroll smoothness with the blurred layers, desktop width by eye.
 
 ## Known issues
 

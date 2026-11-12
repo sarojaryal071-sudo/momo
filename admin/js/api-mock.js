@@ -43,7 +43,7 @@ export const mockApi = {
   deleteOptionGroup: (pid, gid) => store.deleteOptionGroup(pid, gid),
   // The demo keeps no image files: the name is remembered so the screen can be tried end to end.
   async uploadPhoto(productId, blob, filename) { return `${productId}-${Date.now()}.webp`; },
-  photoUrl: () => null,
+  photoUrl: (path) => (path && !/\.(jpe?g|png|webp)$/i.test(path) ? `../assets/img/${path}-400.webp` : null),
   getPickup: () => store.getPickup(),
   saveRule: (r) => store.saveRule(r),
   deleteRule: (id) => store.deleteRule(id),

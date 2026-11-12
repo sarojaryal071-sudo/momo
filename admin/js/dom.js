@@ -69,3 +69,21 @@ export function actionBar(items) {
   buttons.forEach((b, i) => b.addEventListener('click', () => saving(b, fb, items[i].work)));
   return row;
 }
+
+// A frosted-glass confirm dialog with a dimmed backdrop. Resolves true (confirmed) or false (cancelled, Escape or tap outside).
+export function confirmDialog({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger = false }) {
+  if (typeof HTMLDialogElement === 'undefined') return Promise.resolve(window.confirm(`${title}\n${message}`));
+  return new Promise((resolve) => {
+    const id = `dlg-${Math.random().toString(36).slice(2, 8)}`;
+    const dialog = el('dialog', { className: 'glass-dialog', 'aria-labelledby': id });
+    const finish = (value) => { if (dialog.open) dialog.close(); dialog.remove(); resolve(value); };
+    const ok = el('button', { type: 'button', className: `btn${danger ? ' btn-danger' : ''}`, onclick: () => finish(true) }, confirmLabel);
+    const no = el('button', { type: 'button', className: 'btn btn-secondary', onclick: () => finish(false) }, cancelLabel);
+    dialog.append(el('h2', { id }, title), el('p', {}, message), el('div', { className: 'btn-row' }, ok, no));
+    dialog.addEventListener('cancel', (e) => { e.preventDefault(); finish(false); });
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) finish(false); });
+    document.body.append(dialog);
+    dialog.showModal();
+    no.focus();
+  });
+}

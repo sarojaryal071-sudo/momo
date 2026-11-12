@@ -12,6 +12,12 @@ if (user && isExpired()) { // the 30 days are over: sign out and ask again
   location.replace('login');
 } else {
   document.body.removeAttribute('data-auth');
+  // The page scrolls under the glass bars; their heights keep the first and last line clear of them.
+  const topStack = document.querySelector('.top-stack'); const tabbar = document.querySelector('.tabbar');
+  // the wide-screen sidebar is not a bottom bar, so it adds no bottom space
+  const measure = () => { document.body.style.setProperty('--top-h', `${topStack.offsetHeight}px`); document.body.style.setProperty('--bottom-h', `${getComputedStyle(tabbar).position === 'fixed' ? 0 : tabbar.offsetHeight}px`); };
+  measure();
+  if (window.ResizeObserver) { const ro = new ResizeObserver(measure); ro.observe(topStack); ro.observe(tabbar); }
   const current = document.body.dataset.page;
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === current) a.setAttribute('aria-current', 'page'); });
   document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api.logout(); clearLogin(); location.replace('login'); }));

@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="admin-body" data-auth data-page="products">
+  <div class="bg-patches" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="top-stack">
   <div class="paused-strip" data-paused hidden role="status"><span><strong>Ordering is paused.</strong> Customers cannot place orders.</span><button type="button" class="btn btn-small btn-secondary" data-resume>Resume</button></div>
   <header class="admin-bar">
     <a class="admin-brand" href="./">Steam &amp; Spice</a>
@@ -32,6 +34,7 @@
       </div>
     </div>
   </header>
+  </div>
     <nav class="tabbar" aria-label="Admin">
     <a href="./" data-tab="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/></svg>Home</a>
     <a href="orders" data-tab="orders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Orders</a>
@@ -44,7 +47,7 @@
       <h1>Products</h1>
       <button type="button" class="btn btn-small" data-add>Add product</button>
     </div>
-    <section class="panel" data-publish hidden aria-live="polite"></section>
+    <section class="panel publish-banner" data-publish hidden aria-live="polite"></section>
     <div data-list aria-live="polite"></div>
     <div data-editor hidden></div>
   </main>

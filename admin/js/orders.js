@@ -34,6 +34,9 @@ const el = (tag, props = {}, ...kids) => {
   node.append(...kids.filter((k) => k !== null && k !== undefined));
   return node;
 };
+// Shown on the card: "Today, 17:30", "Tomorrow, 10:00", or "Sat 14 Nov, 10:30". The full date still goes into WhatsApp messages (when).
+const dayWord = (iso) => (iso === ukToday() ? 'Today' : iso === addDays(ukToday(), 1) ? 'Tomorrow' : shortDate(iso));
+const whenShort = (o) => (o.pickup_date ? `${dayWord(o.pickup_date)}${o.pickup_time ? `, ${o.pickup_time}` : ''}` : 'No pickup date');
 const when = (o) => (o.pickup_date ? `${shortDate(o.pickup_date)}${o.pickup_time ? `, ${o.pickup_time}` : ''}` : 'No pickup date');
 const statusOk = (o) => {
   if (view.status === 'all') return true;
@@ -137,8 +140,8 @@ function card(order) {
   article.append(
     el('div', { className: 'order-top' }, el('span', { className: 'order-number' }, order.order_number),
       order.source === 'manual' ? el('span', { className: 'tag tag-manual' }, 'Manual') : null, badge),
-    el('p', { className: 'pickup-line' }, when(order), customised ? el('span', { className: 'tag tag-custom' }, 'Customised') : null),
-    el('p', { className: 'order-who' }, el('strong', {}, order.customer_name || 'No name'), order.customer_phone ? ' · ' : null, order.customer_phone ? el('a', { href: `tel:${order.customer_phone.replace(/[^\d+]/g, '')}` }, order.customer_phone) : null),
+    el('p', { className: 'pickup-line' }, whenShort(order), customised ? el('span', { className: 'tag tag-custom' }, 'Customised') : null),
+    el('p', { className: 'order-who' }, el('span', { className: 'person-icon', 'aria-hidden': 'true' }), el('strong', {}, order.customer_name || 'No name'), order.customer_phone ? el('a', { href: `tel:${order.customer_phone.replace(/[^\d+]/g, '')}` }, order.customer_phone) : null),
     el('ul', { className: 'order-lines' }, ...order.items.map((l) => el('li', {}, `${l.qty} × ${l.name}`, l.options.length ? el('span', { className: 'opts' }, l.options.map((o) => o.label).join(', ')) : null))),
   );
   if (order.notes) article.append(el('p', { className: 'order-notes' }, `Note: ${order.notes}`));
@@ -147,10 +150,10 @@ function card(order) {
   const actions = el('div', { className: 'order-actions' });
   const next = NEXT_STATUS[order.status];
   if (next) actions.append(el('button', { type: 'button', className: 'btn btn-small', onclick: () => { err.textContent = ''; changeStatus(order, next.status, showError, { message: true }); } }, next.label));
-  actions.append(el('button', { type: 'button', className: 'btn btn-secondary btn-small', disabled: !phone, onclick: () => { open(); messageBox(order, article); } }, 'Message'));
 
   const more = el('details', { className: 'more' }, el('summary', { 'aria-label': `More actions for ${order.order_number}` }, 'More'));
   const list = el('div', { className: 'more-list' });
+  if (phone) list.append(el('button', { type: 'button', className: 'menu-item', onclick: () => { more.open = false; open(); messageBox(order, article); } }, 'Message customer'));
   for (const status of ['new', 'confirmed', 'ready', 'collected']) {
     if (status === order.status || status === next?.status) continue;
     list.append(el('button', { type: 'button', className: 'menu-item', onclick: () => { more.open = false; err.textContent = ''; changeStatus(order, status, showError); } }, `Set to ${STATUS_LABELS[status]}`));
@@ -159,8 +162,8 @@ function card(order) {
   more.append(list);
   actions.append(more);
 
-  article.append(el('div', { className: 'order-foot' }, el('span', { className: 'order-total' }, formatPrice(order.total_pence)), actions));
-  if (!phone) article.append(el('p', { className: 'hint error' }, order.customer_phone ? 'The phone number is not valid, so Message is switched off.' : 'There is no phone number, so Message is switched off.'));
+  article.append(el('p', { className: 'order-total' }, formatPrice(order.total_pence)), el('div', { className: 'order-actions order-actions-row' }, ...actions.childNodes));
+  if (!phone) article.append(el('p', { className: 'hint error' }, order.customer_phone ? 'The phone number is not valid, so WhatsApp messages are switched off.' : 'There is no phone number, so WhatsApp messages are switched off.'));
   article.append(err);
   article.addEventListener('click', () => { if (fresh) open(); }, { once: true });
   return article;
