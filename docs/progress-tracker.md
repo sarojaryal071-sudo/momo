@@ -2,9 +2,9 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Step 4a2, coding agent)
-- Current step: **Step 4a2 built and merged (admin polish). Steps 0 to 2 live-URL checks still open**
-- Next action: Step 3 (Supabase, D-055) as soon as the owner has done the account actions in the step file; then Step 4bc on Supabase. Do not start one without instruction.
+- Last updated: 2026-11-12 (Step 3, coding agent)
+- Current step: **Step 3 code built and merged; waiting for the owner actions in `backend/README.md` section 2 to 4. The site still runs on demo data (`SITE_BACKEND` unset)**
+- Next action: when the owner has done `backend/README.md` sections 2 to 4: run the live checks (a real order, the email, Publish), then set `SITE_BACKEND=supabase`. Then Step 4bc.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 
@@ -154,18 +154,18 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] `npm test` covers cart, price, pickup, WhatsApp, phone conversion — 746822c, 23 tests pass
 - [ ] Verified (partial: local dev server only): full flow with empty and filled fields, failure path, keyboard run done locally; live URL and real-phone WhatsApp check pending
 
-## Step 3 — Supabase backend and real orders
+## Step 3 — Supabase backend and real orders (D-055)
 
-- [ ] Owner actions listed and completed (Supabase project, admin user, email key, GitHub token, variables)
-- [ ] Migrations: tables, indexes, `is_admin()`, row-level security, storage bucket, `place_order` function
-- [ ] `seed.sql`
-- [ ] `place-order` edge function
-- [ ] `trigger-rebuild` function and database webhook
-- [ ] Frontend wired to the real gateway and pickup rules
-- [ ] `build.mjs` fetches products, merges content, fills regions, writes `products.json`, converts photos
-- [ ] `notice.js` banner
-- [ ] Backend test script passes (anonymous access, tampered price, concurrent numbers, sold out, empty fields)
-- [ ] Verified: real order saved, owner email received, WhatsApp opens, price edit triggers rebuild
+- [x] Migrations: 4 files in `backend/supabase/migrations/` (tables, indexes, `is_admin()`, RLS and grants on every table, `place_order`, `set_order_status`, `create_manual_order`, `full_pickup_dates`, storage bucket) — a3bcd18, applied on a local PostgreSQL 16 with a Supabase shim; not yet run on the real project
+- [x] Seed data as migration 0004 (D-055 replaces `seed.sql`): 2 real products, sauces unpriced and hidden, option groups, settings, pickup rules, notice and site_status rows — a3bcd18, re-run is a no-op
+- [x] `place-order` edge function (shape check, honeypot, per-IP rate limit, DB rules, owner email) — a3bcd18, request checks tested; function itself not deployed
+- [x] `trigger-rebuild` (admin session only) and `build-status` (token) functions; **no database webhook** (D-055: an explicit Publish action) — a3bcd18, not deployed
+- [x] Frontend: Supabase gateway, runtime pickup rules, settings, stock and full dates, `notice.js` — a3bcd18, gateway tests with a faked fetch
+- [x] `build.mjs` fetches products and photos, merges content, fills regions, writes `products.json`, injects public config; `SITE_BACKEND` variable is the one switch — a3bcd18, tested against a fake Supabase
+- [x] Admin on Supabase: `api-supabase.js` (Auth, RLS reads, RPC status changes), vendored `supabase-js` 2.118.0, demo admin left out of a Supabase build — a3bcd18, not run against a real project
+- [x] Backend tests: `backend/tests/run-local.sh` (about 150 checks: RLS per table, tampered prices and options, sold out, lead times, pause, daily limit, status and stock exactly once, simultaneous orders) — a3bcd18, passed locally before the last doc edits
+- [ ] Owner actions: email key, GitHub token, `BUILD_STATUS_TOKEN`, `ALLOWED_ORIGINS`, `OWNER_EMAIL`; run the migrations; deploy the functions; add the admin row (see `backend/README.md`)
+- [ ] Live checks (need the owner actions): real order saved, owner email received, Publish rebuilds, then set `SITE_BACKEND=supabase`
 
 ## Step 4 — Admin panel
 
@@ -217,7 +217,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [ ] Confirm +44 7413 069241 is also the WhatsApp number
 - [ ] Decide order number date format: MMDD or DDMM (decision D-007)
 - [ ] Real sauce pot prices, steam time, pickup hours and capacity (sample values in use, D-023; each marked `data-placeholder` or `"placeholder": true`)
-- [ ] Supabase project, admin user, email provider key, GitHub token, `SUPABASE_*` variables (Step 3)
+- [x] Supabase project, one admin user, `SUPABASE_URL` and `SUPABASE_ANON_KEY` variables (done by the owner)
+- [ ] Email provider key, `OWNER_EMAIL`, GitHub dispatch token, `BUILD_STATUS_TOKEN` (Supabase secrets; and a GitHub secret for the last), `ALLOWED_ORIGINS`; run migrations, deploy functions, add the admin row; then set the `SITE_BACKEND` variable (`backend/README.md`)
 - [ ] Generate AI mood images for the slots listed after Step 1
 
 ## File map (agent keeps current, one line per file or folder)
@@ -252,6 +253,10 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 | `frontend/js/shop.js`, `cart-page.js`, `done.js`, `data.js` | Page scripts and data loading (products.json, seed fallback) | 2 |
 | `frontend/js/pickup.js`, `data/pickup.seed.json` | Pickup dates and times; sample hours | 2 |
 | `frontend/assets/fonts/` | Bebas Neue 400 and Space Grotesk variable woff2 with OFL texts (D-051) | 1l |
+| `backend/` | `supabase/migrations` (4 files), `supabase/functions` (place-order, trigger-rebuild, build-status, _shared), `config.toml`, `tests/` (local PostgreSQL tests), `README.md` (owner guide) | 3 |
+| `frontend/js/supabase-rest.js`, `notice.js` | Public REST and function calls with the publishable key; site notice strip | 3 |
+| `admin/js/api.js`, `api-supabase.js`, `api-mock.js`, `vendor/` | Admin data layer picks Supabase or mock; pinned supabase-js | 3 |
+| `scripts/lib/supabase.mjs` | Build-time product and photo fetch | 3 |
 | `frontend/js/mock-backend.js` | Demo backend rules and localStorage store, shared by shop and admin (D-048) | 4a |
 | `admin/` (`login/index/prep/settings/products/pickup.html`, `js/`, `css/admin.css`) | Admin on `api.js` (mock now, supabase stub); products and pickup are placeholders | 4a |
 | `frontend/js/order-gateway.js`, `whatsapp.js` | Mock/supabase gateway with timeout; message, link, phone conversion | 2 |
@@ -290,6 +295,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, step 4a2: `npm test` 50 pass; build passes. Playwright at 390x844 and 1440x900 with the developer seed (orders in every status): no overflow at 320, 375, 390, 414, 1440; first order card and its main button visible without scrolling; switch toggles by tap, Space, Enter; strip shows after saving a pause and hides on Resume; day chips and counts correct; print preview 1 page; focus ring visible on chips. Badge and chip contrast 5.98 to 14.09.
 
 - 2026-11-12, step 4a2 update for D-053 (0fae91d): `npm test` 50 pass; build passes. Playwright 390 and 1440: Log out icon 44x44, confirm opens with focus on Cancel, Escape closes, Log out leads to login; Status and When selects 16px and 44px high side by side; Custom range reveals From and To (stacked at 390, no overflow), shows the 15 Nov orders; choices survived a reload; first order action button ends at 472 px at 390x844.
+
+- 2026-11-12, step 3 (code only; the Supabase project is not reachable from the agent's sandbox): `backend/tests/run-local.sh` on a local PostgreSQL 16: migrations apply, seed re-runs, about 150 checks pass (RLS for every table, order rules, stock, status changes, simultaneous orders). Fast tests `functions` and `gateway` pass (16). The build tests against a fake Supabase were written but not run in the final session at the owner's request; the default demo build passes. Not tested: real email, GitHub dispatch, Supabase Auth, the deployed functions.
 
 ## Known issues
 
