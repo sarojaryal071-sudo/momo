@@ -66,7 +66,7 @@ function thumbFor(line) {
   if (p && p.photo) {
     if (String(p.photo).startsWith('pack-')) box.classList.add('card-media-multiply'); // opaque shots on white blend into the tile
     const img = document.createElement('img');
-    Object.assign(img, { src: `assets/img/${p.photo}-400.webp`, width: 400, height: 400, alt: '', loading: 'lazy' });
+    Object.assign(img, { src: `assets/${String(p.photo).includes('/') ? '' : 'img/'}${p.photo}-400.webp`, width: 400, height: 400, alt: '', loading: 'lazy' });
     box.append(img);
   } else {
     box.classList.add('card-art', p && p.kind === 'addon' ? 'card-art-bowl' : 'card-art-momo');

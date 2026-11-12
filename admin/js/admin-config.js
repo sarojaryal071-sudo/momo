@@ -1,11 +1,4 @@
 // Admin configuration: named constants in one place (D-022).
-// Backend `mock` (D-048): two fixed logins, not shown on the page. They are never a security control; Step 3 replaces
-// them with real Supabase Auth.
-export const DEMO_ACCOUNTS = [
-  { label: 'Owner', email: 'owner@demo.test', password: 'owner-demo-1' },
-  { label: 'Developer', email: 'dev@demo.test', password: 'dev-demo-1' },
-];
-export const SESSION_KEY = 'ss-demo-session';
 export const FILTER_KEY = 'ss-admin-orders-filter'; // the chosen Status and When survive a reload
 export const SEEN_KEY = 'ss-admin-seen'; // ids of orders she has opened, so new ones stay highlighted until then
 export const ORDERS_REFRESH_SECONDS = 60; // the orders list refreshes itself (no sound, no live subscription, D-045g)

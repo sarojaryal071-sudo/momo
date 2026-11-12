@@ -1,0 +1,12 @@
+# Supabase CLI configuration for this project (supabase functions deploy / supabase db push).
+# The project uses the new key format (sb_publishable_ / sb_secret_), which is not a JWT, so the default JWT check cannot be
+# used for anonymous calls. place-order and build-status check everything themselves; trigger-rebuild checks the admin session
+# inside the function.
+[functions.place-order]
+verify_jwt = false
+
+[functions.trigger-rebuild]
+verify_jwt = false
+
+[functions.build-status]
+verify_jwt = false

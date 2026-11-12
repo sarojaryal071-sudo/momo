@@ -1,6 +1,7 @@
 // submitOrder(order) -> { orderNumber, totalPence, emailed }. The backend is chosen in site-config.js.
 import { createMock, fetchSeed, ORDER_PREFIX, RuleError } from './mock-backend.js';
 import { siteConfig } from './site-config.js';
+import { callFunction, restGet, rpc, settingsMap } from './supabase-rest.js';
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -37,10 +38,27 @@ const mockGateway = {
   async state(config) { return storeOf(config).publicState(); },
 };
 
-// Supabase: arrives in Step 3 (calls the place-order edge function).
+// Supabase: the place-order edge function does everything (rules, prices, stock, number, email). A rule that says no comes back as
+// 422 with a message for the customer; anything else (network, 5xx) throws, and the cart offers the WhatsApp backup.
 const supabaseGateway = {
-  async submit() { throw new Error('The Supabase gateway is not built yet (Step 3).'); },
-  async state() { return { orderingOpen: true, closedMessage: '', fullDates: [] }; },
+  async submit(order, config) {
+    const { items, name, phone, notes, pickupDate, pickupTime, website } = order; // totalPenceHint and the like are never sent
+    const res = await callFunction('place-order', { items, name, phone, notes, pickupDate, pickupTime, website }, config);
+    let data = null;
+    try { data = await res.json(); } catch { /* not JSON */ }
+    if (res.ok && data && data.orderNumber) return { orderNumber: data.orderNumber, totalPence: data.totalPence, emailed: Boolean(data.emailed) };
+    if ((res.status === 422 || res.status === 429) && data && data.message) throw new OrderRejected(data.code || 'rejected', data.message);
+    throw new Error(`place-order: ${res.status}`);
+  },
+  async state(config) {
+    const open = { orderingOpen: true, closedMessage: '', fullDates: [], customMinLeadHours: config.customMinLeadHours };
+    try {
+      const keys = 'ordering_open,ordering_closed_message,custom_min_lead_hours';
+      const [rows, full] = await Promise.all([restGet(`settings?select=key,value&key=in.(${keys})`, config), rpc('full_pickup_dates', {}, config).catch(() => [])]);
+      const s = settingsMap(rows);
+      return { orderingOpen: s.ordering_open !== false, closedMessage: s.ordering_closed_message || '', fullDates: Array.isArray(full) ? full : [], customMinLeadHours: Number(s.custom_min_lead_hours) || config.customMinLeadHours };
+    } catch { return open; } // if the settings cannot be read the cart stays usable; the function still enforces every rule
+  },
 };
 
 const gateways = { mock: mockGateway, supabase: supabaseGateway };

@@ -134,8 +134,9 @@
 }
 .field input:focus-visible, .field textarea:focus-visible, .field select:focus-visible { border-color: var(--emerald); outline: var(--ring-width) solid var(--ring-color); outline-offset: var(--ring-offset); }
 
-/* Notice strip (shown only when active, from Step 3) */
-.notice { background: var(--turmeric); color: var(--charcoal); padding: var(--space-xs) var(--gutter); text-align: center; }
+/* Notice strip (shown only when active; its space is reserved from the last known state, see js/notice.js) */
+.notice { background: var(--turmeric); color: var(--charcoal); padding: var(--space-xs) var(--gutter); text-align: center; font-size: var(--text-small); font-weight: 600; }
+.notice-reserved { min-block-size: var(--notice-h); }
 
 /* Labels and states */
 .badge { display: inline-block; padding-inline: var(--space-2xs); font-size: var(--text-small); font-weight: 700; border: var(--hairline) solid currentColor; border-radius: var(--radius); }

@@ -1,19 +1,26 @@
 // Build: copy frontend/ and admin/ to dist/, fill marked regions, noindex logic, sitemap, robots, validation.
-// TODO(step-3): fetch products from Supabase (fail the build in CI on a failed or empty fetch), write products.json, convert photos.
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fillRegion, merge, renderRegion } from './lib/render.mjs';
 import { hasPlaceholderData, launchBlockers } from './lib/validate.mjs';
+import { buildPhotos, fetchProducts } from './lib/supabase.mjs';
 import { siteConfig } from '../frontend/js/site-config.js';
 
 const root = resolve(fileURLToPath(import.meta.url), '..', '..');
-const dist = join(root, 'dist');
+const dist = process.env.DIST_DIR ? resolve(process.env.DIST_DIR) : join(root, 'dist'); // DIST_DIR is for the tests only
 const siteUrl = (process.env.SITE_URL || 'http://localhost:8080').replace(/\/+$/, '');
 const indexable = process.env.SITE_INDEXABLE === 'true';
-// Until Step 3 there is no Supabase, so products always come from the seed file.
-const useSeed = process.argv.includes('--seed') || !process.env.SUPABASE_URL;
+// Products come from Supabase when the site is switched to the real backend (siteConfig.backend) and the variables are set;
+// otherwise, or with --seed, from the seed file. A failed or empty live fetch fails the build (the live site keeps its last good version).
+const supabaseUrl = (process.env.SUPABASE_URL || siteConfig.supabaseUrl || '').replace(/\/+$/, '');
+const supabaseKey = process.env.SUPABASE_ANON_KEY || siteConfig.supabaseAnonKey || '';
+// SITE_BACKEND (a repository variable) switches the built site between 'mock' and 'supabase' without a code change.
+const backend = process.env.SITE_BACKEND || siteConfig.backend;
+if (backend !== 'mock' && backend !== 'supabase') throw new Error(`SITE_BACKEND must be mock or supabase, not "${backend}"`);
+const live = backend === 'supabase' && !process.argv.includes('--seed');
+const useSeed = !live;
 
 // Named constants (D-022).
 const INSTAGRAM_GLYPH = '<svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7 h.01"/></svg>';
@@ -55,6 +62,28 @@ if (useSeed) {
     if (existsSync(f)) content[p.slug] = await readJson(f);
   }
   products = merge(seed, content);
+} else {
+  if (!supabaseUrl || !supabaseKey) throw new Error('The site is switched to the real backend but SUPABASE_URL or SUPABASE_ANON_KEY is not set. Set both, or build with --seed.');
+  const { default: sharp } = await import('sharp');
+  const rows = await fetchProducts({ url: supabaseUrl, key: supabaseKey });
+  await buildPhotos(rows, { url: supabaseUrl, key: supabaseKey, dist, sharp });
+  const content = {};
+  for (const p of rows) {
+    const f = join(root, 'frontend/content/products', `${p.slug}.json`);
+    if (existsSync(f)) content[p.slug] = await readJson(f);
+  }
+  products = merge(rows, content);
+}
+
+// The public config values go into the built site-config.js (the publishable key is public by design).
+{
+  const cfg = join(dist, 'js/site-config.js');
+  let text = await readFile(cfg, 'utf8');
+  text = text.replace(/backend: '[^']*'/, `backend: '${backend}'`);
+  // On the real backend the demo admin (and its fixed demo logins) is not shipped.
+  if (backend === 'supabase') await rm(join(dist, 'admin/js/api-mock.js'), { force: true });
+  if (supabaseKey) text = text.replace(/supabaseAnonKey: '[^']*'/, `supabaseAnonKey: '${supabaseKey.replace(/'/g, '')}'`).replace(/supabaseUrl: '[^']*'/, `supabaseUrl: '${supabaseUrl.replace(/'/g, '')}'`);
+  await writeFile(cfg, text);
 }
 
 if (products.length) {
@@ -81,7 +110,7 @@ for (const file of htmlFiles) {
     // Instagram line: a real link once the constant is set, otherwise the line stays empty and hidden (D-052).
     const ig = siteConfig.socialLinks.instagram;
     if (ig) html = html.replace(INSTAGRAM_RE, `<!-- build:instagram --><a class="contact-item" href="${escAttr(ig)}" rel="noopener">${INSTAGRAM_GLYPH}Instagram</a><!-- /build:instagram -->`);
-    if (useSeed && products.length) html = fillRegion(html, renderRegion(page === 'index' ? 'index' : 'shop', products, siteUrl));
+    if (products.length) html = fillRegion(html, renderRegion(page === 'index' ? 'index' : 'shop', products, siteUrl));
     // SEO region: canonical, og:url, og:image, and Organization data on the home page.
     const seo = [
       `<link rel="canonical" href="${urlFor(rel)}">`,

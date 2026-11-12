@@ -28,6 +28,10 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL }}
           SITE_INDEXABLE: ${{ vars.SITE_INDEXABLE }}
+          # Public values only. SITE_BACKEND stays empty (the shop runs on the demo data) until the owner sets it to "supabase".
+          SITE_BACKEND: ${{ vars.SITE_BACKEND }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -42,3 +46,23 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Tells the admin panel whether the last publish went live or failed (D-055). Runs only on the real backend, and only when
+  # the BUILD_STATUS_TOKEN secret exists; it can do nothing but set that one state, so it is not a risk. Never fails the run.
+  report:
+    needs: [build, deploy]
+    if: ${{ always() && vars.SITE_BACKEND == 'supabase' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report the build state to the admin panel
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          BUILD_STATUS_TOKEN: ${{ secrets.BUILD_STATUS_TOKEN }}
+          STATE: ${{ needs.deploy.result == 'success' && 'live' || 'failed' }}
+        run: |
+          if [ -z "$BUILD_STATUS_TOKEN" ]; then echo "BUILD_STATUS_TOKEN is not set; skipping"; exit 0; fi
+          curl -fsS -X POST "$SUPABASE_URL/functions/v1/build-status" \
+            -H "apikey: $SUPABASE_ANON_KEY" -H "x-build-token: $BUILD_STATUS_TOKEN" -H "content-type: application/json" \
+            -d "{\"state\":\"$STATE\"}"

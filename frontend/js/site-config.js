@@ -8,12 +8,12 @@ export const PICKUP_STEP_MINUTES = 1; // pickup times can be any minute inside h
 export const KIND_LABELS = { pack: 'Momo', addon: 'Sauces' }; // filter chip labels by product kind
 
 export const siteConfig = {
-  backend: 'mock', // 'mock' or 'supabase' (Step 3)
+  backend: 'mock', // 'mock' (this browser only) or 'supabase' (the real backend). The one switch: see backend/README.md, last step.
   whatsappNumber: '447413069241', // also her phone number; the same digits are in the HTML links and scripts/build.mjs
   currency: 'GBP',
   socialLinks: { instagram: '' }, // the build fills the footer and menu Instagram line from this; empty hides the line
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://mohkrxpdqtwnhzzmcxdw.supabase.co', // public project URL
+  supabaseAnonKey: '', // the publishable key (sb_publishable_...): the build fills it from the SUPABASE_ANON_KEY variable
   limits: {
     maxQtyPerItem: 10,
     maxLineItems: 20,

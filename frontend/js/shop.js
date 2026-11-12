@@ -3,7 +3,7 @@
 import './main.js';
 import { buildLines, formatPrice, getCart, updateHeaderCount } from './cart.js';
 import { updateCheckoutBar } from './checkout-bar.js';
-import { loadPickup } from './data.js';
+import { loadPickup, loadRuntimeStock } from './data.js';
 import { usedKeyboard } from './input-mode.js';
 import { earliestPickup, noticeText } from './pickup.js';
 import { siteConfig } from './site-config.js';
@@ -246,6 +246,11 @@ document.addEventListener('pointerup', endDrag);
 document.addEventListener('pointercancel', endDrag);
 
 document.querySelectorAll('[data-slug]').forEach(renderCardAction);
+// Real backend: the stock in the page is from the last build, so read the current stock and redraw the cards.
+loadRuntimeStock().then((stock) => {
+  if (!stock) return;
+  document.querySelectorAll('[data-slug]').forEach((card) => { if (stock.has(card.dataset.slug)) card.dataset.stock = String(stock.get(card.dataset.slug)); else delete card.dataset.stock; renderCardAction(card); });
+});
 
 // ---- Filter chips and search. Every card is in the HTML; this only hides and shows them. ----
 const tools = document.querySelector('[data-shop-tools]');

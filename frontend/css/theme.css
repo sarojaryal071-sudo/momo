@@ -74,6 +74,7 @@
   --text-statement: clamp(2.25rem, 1.4rem + 3vw, 3.5rem);
   --muted: #5B5751;            /* secondary text: 7.2:1 on white, 6.3:1 on the tints */
   --section-space: clamp(2.5rem, 1.5rem + 3.5vw, 5rem);  /* vertical section padding and gaps: 40 to 80px */
+  --notice-h: 2.5rem;
   --hero-pad: clamp(1.5rem, 1rem + 3vw, 3.5rem);
   --section-head-gap: clamp(1.25rem, 1rem + 1vw, 2rem);
 

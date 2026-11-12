@@ -37,9 +37,9 @@ const kindLabel = (kind) => KIND_LABELS[kind] || kind.charAt(0).toUpperCase() + 
 // Image tile: the product photo, or a quiet drawn placeholder until a photo exists.
 function mediaHtml(p, sizes = MEDIA_SIZES, cls = '') {
   if (p.photo) {
-    const base = `assets/img/${esc(p.photo)}`;
+    const base = p.photo.includes('/') ? `assets/${esc(p.photo)}` : `assets/img/${esc(p.photo)}`; // 'products/<slug>' = built from an uploaded photo
     const multiply = p.photo.startsWith('pack-'); // opaque shots on white: blended into the tinted tile
-    return `<div class="card-media${cls}${multiply ? ' card-media-multiply' : ''}"><img src="${base}.webp" srcset="${base}-400.webp 400w, ${base}.webp 800w" sizes="${sizes}" width="800" height="800" alt="${multiply ? PACK_ALT : esc(p.name)}" loading="lazy"></div>`;
+    return `<div class="card-media${cls}${multiply ? ' card-media-multiply' : ''}"><img src="${base}.webp" srcset="${base}-400.webp 400w, ${base}.webp 800w" sizes="${sizes}" width="800" height="800" alt="${multiply ? PACK_ALT : esc(p.photo_alt || p.name)}" loading="lazy"></div>`;
   }
   const art = p.kind === 'addon' ? 'bowl' : 'momo';
   return `<div class="card-media${cls} card-art card-art-${art}" aria-hidden="true"></div>`;
@@ -68,6 +68,20 @@ function optionGroupHtml(p, g) {
 
 // The details window: one native dialog per product, with its text in the page source.
 // Three zones: header (thumbnail, name, price, close), scrolling middle, footer (notes, stepper, add).
+const ALLERGEN_LABELS = { celery: 'Celery', gluten: 'Gluten', crustaceans: 'Crustaceans', eggs: 'Eggs', fish: 'Fish', lupin: 'Lupin', milk: 'Milk',
+  molluscs: 'Molluscs', mustard: 'Mustard', tree_nuts: 'Tree nuts', peanuts: 'Peanuts', sesame: 'Sesame', soya: 'Soya', sulphites: 'Sulphites' };
+// Ingredients and allergens come from the admin. With no data the whole block is left out (D-052): nothing is invented.
+export function ingredientsHtml(p) {
+  const allergens = (p.allergens || []).filter((a) => ALLERGEN_LABELS[a]);
+  if (!p.ingredients_text && !allergens.length && !p.allergen_note) return '';
+  return `<section class="dialog-section">
+        <h3>Ingredients and allergens</h3>
+        ${p.ingredients_text ? `<p>${esc(p.ingredients_text)}</p>` : ''}
+        ${allergens.length ? `<p class="allergy-line"><strong>Contains:</strong> ${allergens.map((a) => esc(ALLERGEN_LABELS[a])).join(', ')}</p>` : ''}
+        ${p.allergen_note ? `<p class="allergy-line">${esc(p.allergen_note)}</p>` : ''}
+      </section>`;
+}
+
 function dialogHtml(p) {
   const priced = p.price_pence != null;
   const stock = Number.isInteger(p.stock_quantity) ? p.stock_quantity : null;
@@ -98,6 +112,7 @@ function dialogHtml(p) {
       <button type="button" class="dialog-close" data-dialog-close aria-label="Close"><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
     </div>
     <div class="dialog-body" data-options>
+      ${ingredientsHtml(p)}
       ${groupsOf(p).map((g) => optionGroupHtml(p, g)).join('\n      ')}
     </div>
     <div class="dialog-foot">
