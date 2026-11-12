@@ -229,6 +229,9 @@
   --switch-w: 3.25rem;
   --switch-h: 1.75rem;
   --tab-icon: 1.5rem;
+  --login-card: 22rem;         /* the login form's maximum width */
+  --patch-size: 16rem;         /* phone login: the soft colour patches (the only blurred things in the admin) */
+  --patch-blur: 3.5rem;
   --space-s: 0.75rem;
   --space-m: 1rem;
   --space-l: 1.5rem;

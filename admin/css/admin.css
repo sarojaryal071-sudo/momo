@@ -76,9 +76,37 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .panel p { font-size: var(--text-small); color: var(--muted); }
 .panel .btn[type="submit"] { min-inline-size: 8rem; }
 
-/* Login */
-.login-main { inline-size: min(100% - 2 * var(--gutter), var(--dialog-max)); margin-inline: auto; padding-block: var(--space-xl); }
-.login-main h1 { font-size: var(--text-modal); }
+/* Login and reset (D-059). Phone: the form over soft blurred colour patches. Desktop: a brand panel with a photo beside the form. */
+.login-body { padding: 0; min-block-size: 100svh; background: var(--white); }
+.login-layout { display: grid; min-block-size: 100svh; }
+.login-main { display: grid; place-items: center; padding: var(--space-l) var(--gutter); }
+.login-card { inline-size: min(100%, var(--login-card)); padding: var(--space-m); background: var(--white); border: var(--hairline) solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+.login-card h1 { font-size: var(--text-modal); margin-block-end: var(--space-s); }
+.login-mark { display: block; margin-block-end: var(--space-2xs); }
+.login-note { padding: var(--space-xs) var(--space-s); background: var(--green-tint); border-radius: var(--radius); font-size: var(--text-small); font-weight: 600; color: var(--emerald); }
+.login-links { margin: var(--space-s) 0 0; text-align: center; }
+.link-button { min-block-size: var(--tap); padding-inline: var(--space-xs); font: inherit; font-weight: 600; color: var(--emerald); background: none; border: 0; text-decoration: underline; text-underline-offset: var(--space-3xs); cursor: pointer; }
+.login-card .btn-big { inline-size: 100%; }
+.password-wrap { position: relative; display: grid; }
+.password-wrap input { padding-inline-end: calc(var(--tap) * 1.6); }
+.password-toggle { position: absolute; inset-block: 0; inset-inline-end: 0; min-inline-size: calc(var(--tap) * 1.5); padding-inline: var(--space-s); font: inherit; font-size: var(--text-small); font-weight: 700; color: var(--emerald); background: none; border: 0; cursor: pointer; }
+.login-brand { display: none; }
+/* phone only: three large soft patches, fixed behind everything, no gradient, no movement */
+.login-patches { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.login-patches i { position: absolute; display: block; border-radius: 50%; filter: blur(var(--patch-blur)); }
+.login-patches i:nth-child(1) { inline-size: var(--patch-size); block-size: var(--patch-size); inset-block-start: calc(var(--patch-size) * -0.3); inset-inline-start: calc(var(--patch-size) * -0.35); background: var(--emerald); opacity: 0.4; }
+.login-patches i:nth-child(2) { inline-size: calc(var(--patch-size) * 1.2); block-size: calc(var(--patch-size) * 1.2); inset-block-end: calc(var(--patch-size) * -0.4); inset-inline-end: calc(var(--patch-size) * -0.4); background: var(--sage); opacity: 0.6; }
+.login-patches i:nth-child(3) { inline-size: calc(var(--patch-size) * 0.7); block-size: calc(var(--patch-size) * 0.7); inset-block-start: 55%; inset-inline-start: calc(var(--patch-size) * -0.3); background: var(--green); opacity: 0.25; }
+@media (min-width: 48em) {
+  .login-layout { grid-template-columns: 1fr 1fr; }
+  .login-patches { display: none; }
+  .login-brand { display: flex; flex-direction: column; gap: var(--space-m); padding: var(--space-xl); background: var(--emerald); color: var(--white); }
+  .login-brand img { flex: 1; min-block-size: 0; inline-size: 100%; object-fit: cover; border-radius: var(--radius-lg); }
+  .login-wordmark { margin: 0; font-family: var(--font-head); font-size: var(--text-h2); line-height: 1; letter-spacing: var(--tracking-display); text-transform: uppercase; }
+  .login-brand-text p:last-child { margin: var(--space-2xs) 0 0; font-size: var(--text-read); }
+  .login-card { padding: var(--space-l); border: 0; box-shadow: none; }
+  .login-mark { display: none; }
+}
 
 /* Orders */
 .new-badge { padding: var(--space-3xs) var(--space-xs); font-size: var(--text-small); font-weight: 700; color: var(--emerald); background: var(--green-tint); border: var(--hairline) solid var(--emerald); border-radius: var(--radius-pill); }
@@ -168,3 +196,18 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .add-rule summary { display: flex; align-items: center; min-block-size: var(--tap); font-weight: 600; color: var(--emerald); cursor: pointer; }
 .admin-main .field input[type="time"], .admin-main .field input[type="file"] { inline-size: 100%; min-inline-size: 0; }
 .admin-main .field input[type="time"] { -webkit-appearance: none; appearance: none; display: block; }
+
+.order-flash { outline: var(--ring-width) solid var(--emerald); outline-offset: var(--ring-offset); }
+
+/* Home */
+.greeting { margin: 0 0 var(--space-s); color: var(--muted); }
+.home-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-xs); margin-block-end: var(--space-s); }
+.home-tile { display: grid; align-content: start; gap: var(--space-3xs); padding: var(--space-s); color: var(--charcoal); text-decoration: none; background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--radius); }
+.home-tile-strong { background: var(--emerald); color: var(--white); border-color: var(--emerald); }
+.home-tile-label { font-size: var(--text-small); font-weight: 600; }
+.home-tile-value { font-family: var(--font-head); font-size: var(--admin-count); line-height: 1; letter-spacing: var(--tracking-display); }
+.home-tile:not(.home-tile-strong) .home-tile-value { color: var(--emerald); }
+.home-tile-sub { font-size: var(--text-small); }
+.home-list { list-style: none; margin: 0; padding: 0; }
+.home-list a { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--space-xs); min-block-size: var(--tap); padding-block: var(--space-2xs); color: var(--charcoal); text-decoration: none; border-block-end: var(--hairline) solid var(--line); }
+@media (min-width: 48em) { .home-tiles { grid-template-columns: repeat(4, 1fr); } }

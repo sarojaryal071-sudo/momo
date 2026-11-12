@@ -48,6 +48,7 @@ function window_() {
   if (view.range === 'tomorrow') { const d = addDays(today, 1); return { from: d, to: d }; }
   if (view.range === 'week') return { from: today, to: endOfWeek(today) };
   if (view.range === 'past') return { from: null, to: addDays(today, -1) };
+  if (view.range === 'all') return { from: null, to: null };
   if (view.range === 'custom') return { from: fromInput.value || null, to: toInput.value || null };
   return { from: today, to: null };
 }
@@ -174,7 +175,7 @@ async function refresh() {
   if (known) { // orders that were not there on the last look: tell her (toast, optional sound, browser notification)
     const added = everything.filter((o) => !known.has(o.id) && o.status === 'new');
     if (added.length) {
-      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS });
+      toast(`New order ${added[0].order_number}${added[0].customer_name ? ` from ${added[0].customer_name}` : ''}${added.length > 1 ? ` and ${added.length - 1} more` : ''}`, { seconds: TOAST_SECONDS, href: 'orders.html' });
       notifyNewOrder(added[0]);
       if (soundOn()) playSoftSound();
     }
@@ -198,6 +199,11 @@ async function refresh() {
   }
   emptyNote.textContent = everything.length ? 'No orders match these filters.' : 'No orders yet. New orders appear here as soon as they are placed.';
   emptyNote.hidden = shown.length > 0;
+  if (openId) {
+    const target = root.querySelector(`[data-id="${CSS.escape(openId)}"]`);
+    openId = null;
+    if (target) { target.scrollIntoView({ block: 'center' }); target.classList.add('order-flash'); target.setAttribute('tabindex', '-1'); target.focus({ preventScroll: true }); }
+  }
 }
 
 // Filters: two dropdowns (D-053). The choice survives a reload.
@@ -211,6 +217,11 @@ try {
     fromInput.value = saved.from || ''; toInput.value = saved.to || '';
   }
 } catch { /* start with the defaults */ }
+// Links from Home: ?status=new shows every new order; ?open=<id> opens one order (today's pickups).
+const params = new URLSearchParams(location.search);
+let openId = params.get('open');
+if (params.get('status') && [...statusSelect.options].some((o) => o.value === params.get('status'))) { view.status = params.get('status'); view.range = 'all'; }
+if (openId) { view.status = 'all'; view.range = 'all'; }
 showFilters();
 const onFilter = () => { view.status = statusSelect.value; view.range = whenSelect.value; showFilters(); saveFilters(); busy = false; refresh(); };
 statusSelect.addEventListener('change', onFilter);

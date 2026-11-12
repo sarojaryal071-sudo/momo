@@ -14,7 +14,7 @@ let clientPromise;
 function loadClient() {
   clientPromise ??= new Promise((resolve, reject) => {
     const make = () => resolve(window.supabase.createClient(siteConfig.supabaseUrl, siteConfig.supabaseAnonKey, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'ss-admin-auth' },
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'ss-admin-auth' },
     }));
     if (window.supabase) return make();
     const tag = document.createElement('script');
@@ -59,6 +59,30 @@ export const supabaseApi = {
     return { email: data.user.email };
   },
   async logout() { const sb = await loadClient(); await sb.auth.signOut(); },
+
+  // Forgot password (D-059). The answer is always the same, so nothing reveals whether an email has an account. Supabase's built-in
+  // sender only delivers to members of the Supabase organisation until a custom email sender is set up.
+  async requestPasswordReset(email) {
+    const sb = await loadClient();
+    try { await sb.auth.resetPasswordForEmail(String(email).trim(), { redirectTo: new URL('reset.html', location.href).href }); } catch { /* same answer either way */ }
+    return true;
+  },
+  // True when the page was opened from a valid reset link (the library turns the link into a short-lived session).
+  async hasRecoverySession() {
+    const sb = await loadClient();
+    const { data } = await sb.auth.getSession();
+    if (data?.session) return true;
+    return new Promise((resolve) => {
+      const { data: sub } = sb.auth.onAuthStateChange((event, session) => { if (event === 'PASSWORD_RECOVERY' || session) { sub.subscription.unsubscribe(); resolve(true); } });
+      setTimeout(() => { sub.subscription.unsubscribe(); resolve(false); }, 4000);
+    });
+  },
+  async updatePassword(password) {
+    const sb = await loadClient();
+    const { error } = await sb.auth.updateUser({ password });
+    if (error) refuse('The password could not be changed. The link may have expired: ask for a new one.');
+    await sb.auth.signOut(); // she logs in again with the new password
+  },
   async currentUser() {
     const sb = await loadClient();
     const { data } = await sb.auth.getSession(); // refreshes the token when it has expired

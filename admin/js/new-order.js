@@ -80,7 +80,7 @@ saveButton.addEventListener('click', async () => {
       pickupDate: date.control.value || '', pickupTime: date.control.value ? time.control.value || '' : '',
     });
     done.hidden = false; done.replaceChildren(el('h2', {}, `Order ${result.order_number} saved`), el('p', {}, 'It is in the Orders list marked "Manual", and stock was taken like any order.'),
-      el('div', { className: 'btn-row' }, el('a', { className: 'btn', href: 'index.html' }, 'Back to orders'), el('button', { type: 'button', className: 'btn btn-secondary', onclick: () => location.reload() }, 'Add another')));
+      el('div', { className: 'btn-row' }, el('a', { className: 'btn', href: 'orders.html' }, 'Back to orders'), el('button', { type: 'button', className: 'btn btn-secondary', onclick: () => location.reload() }, 'Add another')));
     done.scrollIntoView({ block: 'nearest' });
     saveButton.hidden = true;
   } catch (e) { saveMsg.error(e.message); saveButton.disabled = false; }

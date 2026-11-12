@@ -22,6 +22,9 @@ export const mockApi = {
     return { email: account.email, label: account.label };
   },
   async logout() { storage()?.removeItem(SESSION_KEY); },
+  async requestPasswordReset() { return true; }, // the same answer as the real backend
+  async hasRecoverySession() { return false; },
+  async updatePassword() { throw new Error('Passwords cannot be changed here.'); },
   async currentUser() {
     try { const raw = storage()?.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
   },

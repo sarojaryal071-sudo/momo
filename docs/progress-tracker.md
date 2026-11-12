@@ -2,8 +2,8 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-12 (Steps 4b and 4c, coding agent)
-- Current step: **Steps 4b and 4c built and merged. Waiting for the owner: backend secrets (`backend/README.md` section 3), then live checks and `SITE_BACKEND=supabase`**
+- Last updated: 2026-11-12 (Step 4d, coding agent)
+- Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 5 (SEO, hardening, launch).
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
@@ -214,6 +214,13 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Manifest and icons for `/admin/` (no service worker); shared rules and 9 tests in `frontend/js/admin-rules.js`, `tests/admin-rules.test.mjs`
 - [ ] Live checks on Supabase (owner): see the report; the agent checked every screen once on the demo backend only
 
+## Step 4d — Admin login page and Home (D-059)
+
+- [x] Login: wordmark and "Admin", show/hide password, loading state, neutral error, Forgot password (always the same message), `reset.html` for the new password, noindex; desktop brand panel with a momo photo, phone blurred colour patches; 30-day session (`ADMIN_SESSION_DAYS`), signed-in users go to Home
+- [x] Home (`index.html`): greeting, tiles (new orders, today, tomorrow, stock), today's pickups, shop status with the pause switch and Publish, quick links, Realtime plus one-minute refresh, empty state
+- [x] Navigation: Home, Orders (`orders.html`), Products, Pickup, Settings on every page; Prep list from Home and Orders; `?status=new` and `?open=<id>` links
+- [ ] Owner checks: login on phone and laptop, forgot password with the owner's own email (Supabase Redirect URL needed), 30-day limit, Home tiles with a test order, tab bar on every page
+
 ## Step 5 — SEO, hardening and launch checks
 
 - [ ] SEO audit of every public page fixed
@@ -318,6 +325,8 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-12, step 3 (code only; the Supabase project is not reachable from the agent's sandbox): `backend/tests/run-local.sh` on a local PostgreSQL 16: migrations apply, seed re-runs, 158 checks pass (RLS for every table, order rules, stock, status changes, simultaneous orders). Fast tests `functions` and `gateway` pass (16). The build tests against a fake Supabase were written but not run in the final session at the owner's request; the default demo build passes. Not tested: real email, GitHub dispatch, Supabase Auth, the deployed functions.
 
 - 2026-11-12, steps 4b and 4c: build passes; `admin-rules`, `mock-backend`, `gateway`, `whatsapp` tests pass (38) and the migration guard test passes. One Playwright pass on the demo backend at 390 px over products, pickup, settings, new order and orders (23 checks, no page errors). Not checked: anything against Supabase, real photo upload to the bucket, Realtime, the Publish button's GitHub dispatch, real WhatsApp, installing the app on a phone.
+
+- 2026-11-12, step 4d (demo backend only): build passes; `admin-session` tests pass. One Playwright run at 390 and 1440 px: login (overflow, only the patches blur, 16px and 44px inputs, show password, neutral error, forgot message, invalid reset link), Home tiles and links, five tabs on every page, pause from Home, 30-day sign-out, signed-in user on the login page. Not checked: Supabase login, the real reset email and link, Realtime on Home.
 
 ## Known issues
 

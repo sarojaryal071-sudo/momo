@@ -1,15 +1,20 @@
 // Runs on every admin page except the login: checks the session, wires the Log out button and its confirm, and shows the paused strip.
 // With the real backend the database checks the session too; this check is only for friendliness.
 import { api } from './api.js';
+import { clearLogin, isExpired } from './session.js';
 
 export const user = await api.currentUser();
-if (!user) {
+if (user && isExpired()) { // the 30 days are over: sign out and ask again
+  await api.logout();
+  clearLogin();
+  location.replace('login.html?expired=1');
+} else if (!user) {
   location.replace('login.html');
 } else {
   document.body.removeAttribute('data-auth');
   const current = document.body.dataset.page;
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === current) a.setAttribute('aria-current', 'page'); });
-  document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api.logout(); location.replace('login.html'); }));
+  document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api.logout(); clearLogin(); location.replace('login.html'); }));
 
   // Log out: an icon button that opens a small in-page confirm. Escape or a click elsewhere closes it.
   const outBtn = document.querySelector('[data-logout-btn]');

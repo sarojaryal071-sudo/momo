@@ -20,15 +20,40 @@
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body class="admin-body login-body">
-  <main class="login-main" id="main">
-    <h1>Admin log in</h1>
-    <form data-login novalidate>
-      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required></div>
-      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
-      <button class="btn btn-big" type="submit">Log in</button>
-      <p class="error" role="alert" data-error></p>
-    </form>
-  </main>
+  <div class="login-patches" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="login-layout">
+    <aside class="login-brand">
+      <img src="../assets/img/photo-plate-800.webp" alt="">
+      <div class="login-brand-text">
+        <p class="login-wordmark">Steam &amp; Spice</p>
+        <p>Taste like Nepal.</p>
+      </div>
+    </aside>
+    <main class="login-main" id="main">
+      <div class="login-card">
+        <p class="admin-brand login-mark">Steam &amp; Spice</p>
+        <h1>Admin</h1>
+        <p class="login-note" role="status" data-message hidden></p>
+        <form data-login novalidate>
+          <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required></div>
+          <div class="field"><label for="password">Password</label>
+            <div class="password-wrap"><input id="password" name="password" type="password" autocomplete="current-password" required><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" data-toggle-password>Show</button></div>
+          </div>
+          <button class="btn btn-big" type="submit" data-submit>Log in</button>
+          <p class="error" role="alert" data-error></p>
+          <p class="login-links"><button type="button" class="link-button" data-forgot>Forgot password?</button></p>
+        </form>
+        <form data-forgot-form hidden novalidate>
+          <p>Enter your email and we will send a link to choose a new password.</p>
+          <div class="field"><label for="reset-email">Email</label><input id="reset-email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required></div>
+          <button class="btn btn-big" type="submit" data-reset-submit>Send reset link</button>
+          <p class="login-note" role="status" data-reset-message></p>
+          <p class="error" role="alert" data-reset-error></p>
+          <p class="login-links"><button type="button" class="link-button" data-back>Back to log in</button></p>
+        </form>
+      </div>
+    </main>
+  </div>
   <script type="module" src="js/login.js"></script>
 </body>
 </html>
