@@ -2,7 +2,7 @@
 
 Prerequisite: Step 2 done. Read `CLAUDE.md`, `docs/architecture-rulebook.md` sections 4 to 7 and the technical rulebook sections 2, 3 and 5 first. Do only this step.
 
-> **Order change (D-048):** the admin screens (Steps 4a to 4c) are built first on a demo backend. This step therefore also **connects the admin to Supabase**: implement the `supabase` side of `admin/js/api.js` (replacing the stub), add Supabase Auth login with the two admin users and the vendored, version-pinned `supabase-js` in `admin/js/vendor/`, optional two-step login (TOTP), and run the same behaviour checks the mock rules tests describe against the real database. Switch `siteConfig.backend` to `supabase` only at the end, keep `mock` selectable for local work, and remove the demo banner and demo accounts from production.
+> **Order change (D-055, supersedes D-048): this step now comes BEFORE Steps 4bc.** Build everything for the real backend so that nothing is redone later (see "Added by D-055" at the end of this file). The older note follows for background. **(D-048):** the admin screens (Steps 4a to 4c) are built first on a demo backend. This step therefore also **connects the admin to Supabase**: implement the `supabase` side of `admin/js/api.js` (replacing the stub), add Supabase Auth login with the two admin users and the vendored, version-pinned `supabase-js` in `admin/js/vendor/`, optional two-step login (TOTP), and run the same behaviour checks the mock rules tests describe against the real database. Switch `siteConfig.backend` to `supabase` only at the end, keep `mock` selectable for local work, and remove the demo banner and demo accounts from production.
 
 ## Goal
 
@@ -53,6 +53,16 @@ Read `docs/architecture-rulebook.md` section 12 first. In addition to the list a
 - Seed: `ordering_open` true; `wa_template_*` with plain starter wording (marked sample, for example "Hi {name}, your order {order_number} is confirmed for {pickup}.") and an empty `pickup_address_text`.
 - Frontend (runtime, anon key): the cart reads `ordering_open` and its message (disable "Place order" and show the message when closed) and `full_pickup_dates` (hide full dates in the date list). The build fills ingredients, allergens and the note into the product window and JSON-LD; with no data it keeps the `TODO:` marker.
 - Tests: two simultaneous orders respect `max_orders_per_day`; a full date and a paused shop are refused by the function; `set_order_status` returns and re-takes stock exactly once, even if called twice; anonymous users cannot read private settings or call the admin functions.
+
+## Added by D-055 (so Step 4bc needs no rework)
+
+- **Admin login:** Supabase Auth email and password for two admin users; the admin pages require a session; `admin/js/api.js` `supabase` side is the live one, the mock is used only by automated tests. Log out works; sessions refresh.
+- **RLS and functions for everything the admin will edit:** admins can read and write `products`, option groups and options, `stock`, `settings`, pickup rules and exceptions, `orders` and order items (through the SQL functions for status changes and manual orders). Anonymous users still cannot. Write one policy test per table.
+- **Product photos:** a Supabase Storage bucket `product-images` (public read, admin write only, file size and type limits as constants). The build script downloads current photos, makes the sized WebP set with `sharp` and requires alt text per product.
+- **Publish pipeline:** `trigger-rebuild` edge function is callable only by an admin session; product and option edits mark "unpublished changes"; a Publish action runs the build; the admin can read the last build state (Publishing, Live, Failed) from a small `site_status` row that the workflow updates. Stock and settings changes never rebuild.
+- **Seed the real data:** the migration seeds the two real products (frozen chicken momo and frozen veg momo, 40 pieces, 1000 pence) and the two sauce pots with prices unset and hidden until she sets them. No test orders in the live database. Mark unconfirmed values `data-pending` (D-052).
+- **Admin screens already built (orders, prep list, pickup, settings):** switch them to the live backend and delete nothing they need; run the live flow end to end: place an order on the public site, see it in the admin within a minute, confirm it, cancel it (stock returns once), pause ordering, hit the daily limit.
+- Migrations are versioned files in `backend/supabase/migrations/` that can be re-run on a new project; document how in `backend/README.md`.
 
 ## Do not
 

@@ -4,7 +4,7 @@ The coding agent updates this file at the end of every phase (see `docs/usage-ru
 
 - Last updated: 2026-11-12 (Step 4a2, coding agent)
 - Current step: **Step 4a2 built and merged (admin polish). Steps 0 to 2 live-URL checks still open**
-- Next action: Step 4b (products admin), 4c or Step 3, as the owner decides. Do not start one without instruction.
+- Next action: Step 3 (Supabase, D-055) as soon as the owner has done the account actions in the step file; then Step 4bc on Supabase. Do not start one without instruction.
 
 Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-line evidence.
 

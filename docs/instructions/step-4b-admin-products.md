@@ -1,4 +1,4 @@
-> **Do Steps 4b and 4c as one session (D-054).** Do all of this file, commit, then do all of `step-4c-admin-pickup-settings.md`, commit, and give one combined report (under 50 lines). Run each part's own checks once. Merge to `main` only after both parts are done. Remember D-052 (no visible placeholders or demo wording) and the fonts in D-051.
+> **Do Steps 4b and 4c as one session (D-054).** Do all of this file, commit, then do all of `step-4c-admin-pickup-settings.md`, commit, and give one combined report (under 50 lines). Run each part's own checks once. Merge to `main` only after both parts are done. Build directly on Supabase (D-055): Step 3 is a prerequisite, no demo backend. Remember D-052 (no visible placeholders or demo wording) and the fonts in D-051.
 
 # Step 4b — Admin: products, options, stock, ingredients and allergens (D-009, D-031, D-046)
 
