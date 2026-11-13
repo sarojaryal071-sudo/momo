@@ -1,4 +1,4 @@
-# Step 4p — New logo everywhere (decision D-068)
+# Step 4p — New logo everywhere (D-068) and sauce pictures (D-069)
 
 Prerequisite: merge `origin/main` first. Any earlier step may already be merged. Read `CLAUDE.md`, D-068, `docs/ui-rulebook.md` (header and image rules) and `docs/design/logo/logo-source-transparent.png` (look at it). Session rules from the owner: write the code, run the build once and only the tests for files you changed; look at your own screenshots.
 
@@ -27,3 +27,13 @@ Relative paths or `SITE_URL`; no pixel sizes outside token definitions; no new c
 ## Verify and report
 
 Look at screenshots at 390 and 1440 px of home (header, footer, menu open), the receipt and the admin login; check the favicon renders in a tab. Under 15 lines: files made, where each is used, anything not crisp at small size, old files removed. Merge to `main` and confirm the deploy.
+
+## Part 2 — Sauce pictures (decision D-069)
+
+`photo-sauce.webp` is the owner's real photo of the **hot sauce** (red-orange). The normal momo sauce, the chutney, is **turmeric yellow** and has no picture yet. Today the red photo is wrongly used as a generic sauce picture. Fix:
+
+1. **Home Sauces tile:** keep the red photo but make it honest: alt text "A bowl of homemade red hot sauce", and a short visible caption under or beside it ("Hot sauce"). If `frontend/assets/img/photo-chutney.webp` exists (see 3), show it beside the red one as a second framed photo with the caption "Chutney", both within the tile without growing the tile height or causing horizontal scroll at 390 px.
+2. **Admin add-on fallback** (`admin/js/products.js`, `SAUCE_PICTURE`): the red photo must not be the fallback for every add-on. Remove that fallback. Add-ons without their own photo show the same neutral drawn placeholder as the public shop. Make the seed `hot-sauce-pot` use `photo-sauce.webp` as its picture (public card, dialog and admin list), and `chutney-pot` keep the placeholder until it has its own picture.
+3. **Chutney picture:** the owner will add `frontend/assets/img/photo-chutney.webp` (turmeric yellow chutney) later, through this step or through the admin photo upload. Write the code so that when that file exists it is used for `chutney-pot` in the home tile and the public card with no other change; when it does not exist, nothing breaks and no red picture appears for the chutney. Do not draw or generate a yellow picture yourself.
+4. `docs/design/image-manifest.md`: correct the `photo-sauce.webp` row (hot sauce, red, tied to `hot-sauce-pot`) and add a `photo-chutney.webp` row marked "owner to supply, turmeric yellow".
+5. Alt text must match what is in the picture; no invented claims about ingredients or spice level.
