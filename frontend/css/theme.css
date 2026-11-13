@@ -33,6 +33,8 @@
 
 /* Design tokens: Emerald & Copper (D-027). Change colours and fonts here only. Pixel values live only in this file (D-022). */
 :root {
+  --patch-size: 16rem;         /* the soft colour patches behind every page, admin and public (D-067): one place for both */
+  --patch-blur: 3rem;
   --white: #FFFFFF;       /* page background, cards */
   --emerald: #004D3B;     /* primary: headings, buttons, footer and strong bands */
   --green: #0F8A72;       /* hover, borders, icons, large decoration; never small text */
@@ -258,8 +260,6 @@
   --thumb: 4.5rem;             /* product thumbnail in the list */
   --dur-panel: 240ms;
   --login-card: 22rem;         /* the login form's maximum width */
-  --patch-size: 16rem;         /* the soft colour patches behind the whole admin (the only blurred things besides the glass bars) */
-  --patch-blur: 3rem;
   --space-s: 0.75rem;
   --space-m: 1rem;
   --space-l: 1.5rem;

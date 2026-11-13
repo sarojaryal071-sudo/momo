@@ -239,13 +239,6 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 
 /* background patches: one fixed layer behind the whole admin (also used on login). Solid circles, blurred, low opacity; the page base
    stays white, so text on any area keeps at least 4.5:1. No gradient, no animation, never over content. */
-.bg-patches { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-.bg-patches i { position: absolute; display: block; border-radius: 50%; filter: blur(var(--patch-blur)); }
-.bg-patches i:nth-child(1) { inline-size: calc(var(--patch-size) * 1.25); block-size: calc(var(--patch-size) * 1.25); inset-block-start: calc(var(--patch-size) * -0.4); inset-inline-end: calc(var(--patch-size) * -0.2); background: var(--emerald); opacity: 0.22; }
-.bg-patches i:nth-child(2) { inline-size: var(--patch-size); block-size: var(--patch-size); inset-block-start: 32%; inset-inline-start: calc(var(--patch-size) * -0.45); background: var(--sage); opacity: 0.45; }
-.bg-patches i:nth-child(3) { inline-size: calc(var(--patch-size) * 1.2); block-size: calc(var(--patch-size) * 1.2); inset-block-end: calc(var(--patch-size) * -0.4); inset-inline-end: calc(var(--patch-size) * -0.35); background: var(--peach); opacity: 0.4; }
-.bg-patches i:nth-child(4) { inline-size: calc(var(--patch-size) * 0.6); block-size: calc(var(--patch-size) * 0.6); inset-block-start: 62%; inset-inline-start: 38%; background: var(--green); opacity: 0.14; }
-
 /* cards and form areas: solid white, hairline, soft shadow */
 .panel, .order, .group-card, .home-tile, .product-card, .edit-card { background: var(--white); border: var(--hairline) solid color-mix(in srgb, var(--charcoal) 11%, transparent); border-radius: var(--r-card); box-shadow: var(--card-shadow); }
 .group-card { box-shadow: none; }

@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4l, coding agent)
+- Last updated: 2026-11-13 (Step 4o, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 4h (weekly pickup hours redesign, D-063), then Step 4i (admin sales summary, D-064), then Step 4j (Realtime connection fix), then Step 4n (admin fixes round: product editor back to one page, Settings hub look and back path, notice-period modal, red allergen navigation, order More menu, Publish wording; 4m is folded into it), Step 4o (blurred colour patches on the public site, D-067), Step 4l (catalogue: categories, reusable options, allergens by product, D-065), then Step 5 (SEO, hardening, launch).
 
@@ -238,6 +238,11 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Products: card list (thumbnail, name, price, Active toggle, stock chip, Edit, quiet reorder), Unpublished changes / Publish banner, full-screen Edit with glass bar, section cards, groups as chips, 14 allergens in a grid, stock tracking switch, availability, one sticky Save and Cancel, unsaved-changes dialog, toast on save
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
+
+## Step 4o — Public background patches (D-067)
+
+- [x] Patch tokens in `:root` (theme.css) and the `.bg-patches` rules in base.css, shared by admin and public; layer added to home, shop, cart, done, how to cook; hidden in print and under reduced transparency. Admin look unchanged.
+- Lowest contrast over the darkest patch pixel: muted text 4.81:1, body 10.8:1, emerald 6.6:1; chutney error red 4.01:1 only if it ever sits on bare patch (errors sit on solid cards).
 
 ## Step 4l — Catalogue (D-065, D-066)
 
