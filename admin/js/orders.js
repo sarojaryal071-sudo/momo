@@ -1,4 +1,5 @@
 import { api } from './shell.js';
+import { recordRefresh } from './live-feed.js';
 import { FILTER_KEY, ORDERS_REFRESH_SECONDS, SEEN_KEY, TOAST_SECONDS, STATUS_LABELS, TEMPLATE_BY_STATUS, NEXT_STATUS } from './admin-config.js';
 import { formatPrice } from '../../js/cart.js';
 import { ukToday } from '../../js/mock-backend.js';
@@ -171,6 +172,7 @@ function card(order) {
 
 async function refresh() {
   if (busy) return;
+  recordRefresh();
   settings = await api.getSettings();
   const { from, to } = window_();
   const all = await api.listOrders({ from, to });

@@ -1,5 +1,6 @@
 // Home (D-059): today's numbers on one screen. Updates live (Realtime) with the one-minute refresh as the fallback.
 import { api } from './shell.js';
+import { recordRefresh } from './live-feed.js';
 import { HOME_PICKUPS_SHOWN, HOME_WAITING_MINUTES, ORDERS_REFRESH_SECONDS, STATUS_LABELS, TOAST_SECONDS } from './admin-config.js';
 import { addDays, shortDate } from './dates.js';
 import { notifyNewOrder, playSoftSound, soundOn } from './alerts.js';
@@ -47,6 +48,7 @@ async function drawShop(settings) {
 }
 
 async function refresh() {
+  recordRefresh();
   const today = ukToday();
   const tomorrow = addDays(today, 1);
   const wk = salesRange('week', today);

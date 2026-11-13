@@ -22,3 +22,9 @@ test('a session with no recorded time starts now instead of being refused, and l
   clearLogin();
   assert.equal(store.has('ss-admin-login-at'), false);
 });
+
+// Step 4j: the live feed retry schedule
+import { backoffSeconds } from '../admin/js/live-feed.js';
+test('live feed backoff: 2, 4, 8, 16, 30 seconds, then every 30', () => {
+  assert.deepEqual([0, 1, 2, 3, 4, 5, 20].map(backoffSeconds), [2, 4, 8, 16, 30, 30, 30]);
+});

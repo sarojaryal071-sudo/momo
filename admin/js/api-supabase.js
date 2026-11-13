@@ -5,6 +5,8 @@ import { siteConfig } from '../../js/site-config.js';
 import { prepList as computePrep } from '../../js/mock-backend.js';
 import { SETTING_FIELDS, slugify, validateAllergenName, validateChecked, validateException, validateGroup, validateIngredients, validatePhoto, validateProduct, validateRule, validateSlot } from '../../js/admin-rules.js';
 
+import { backoffSeconds, LIVE_FLAG_AFTER_SECONDS, recordLive } from './live-feed.js';
+
 const SCRIPT = 'js/vendor/supabase.js'; // vendored, version pinned (see js/vendor/README.md); relative to the admin page
 const SETTING_LIMITS = { ordering_closed_message: 300, wa_template_confirmed: 1000, wa_template_ready: 1000, wa_template_cancelled: 1000, wa_template_collected: 1000, pickup_address_text: 500 };
 const BUCKET = 'product-images';
@@ -324,15 +326,62 @@ export const supabaseApi = {
 
   // Live order feed (D-057): Supabase Realtime. Row-level security means only a signed-in admin receives anything. The page also
   // refreshes every minute, so a dropped connection costs at most a minute; onStatus('live' | 'reconnecting') drives a small indicator.
+  // Live feed (D-057, Step 4j). The socket is signed in with the admin's own session before it subscribes (the orders table is only
+  // readable by an admin, so an unauthenticated socket never receives a row), re-subscribes after a token refresh, and after any
+  // error retries with a capped backoff. It pauses while the page is hidden. "reconnecting" is reported only after a few seconds.
   subscribeOrders(onEvent, onStatus) {
-    let channel; let stopped = false;
-    loadClient().then((sb) => {
+    let sb = null; let channel = null; let stopped = false; let attempt = 0; let retry = null; let flag = null; let live = false; let authSub = null;
+    const warn = (...a) => console.warn('[live]', ...a);
+    const report = (isLive) => {
+      live = isLive;
+      if (isLive) { clearTimeout(flag); flag = null; onStatus?.('live'); }
+      else if (!flag) flag = setTimeout(() => { flag = null; if (!live) onStatus?.('reconnecting'); }, LIVE_FLAG_AFTER_SECONDS * 1000);
+    };
+    const drop = () => { clearTimeout(retry); retry = null; if (channel) { const old = channel; channel = null; try { sb.removeChannel(old); } catch { /* already gone */ } } };
+    const later = () => {
+      if (stopped || retry || document.hidden) return;
+      const seconds = backoffSeconds(attempt++);
+      retry = setTimeout(() => { retry = null; connect(); }, seconds * 1000);
+    };
+    async function connect() {
+      if (stopped || document.hidden) return;
+      drop();
+      try {
+        const { data } = await sb.auth.getSession();
+        if (!data?.session) { recordLive({ status: 'no session', error: 'Not signed in' }); report(false); later(); return; }
+        sb.realtime.setAuth(data.session.access_token);
+      } catch (e) { warn('auth', e?.message); recordLive({ status: 'auth failed', error: e?.message || String(e) }); report(false); later(); return; }
       if (stopped) return;
-      channel = sb.channel('admin-orders')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => onEvent({ kind: payload.eventType === 'INSERT' ? 'insert' : 'change', row: payload.new }))
-        .subscribe((status) => onStatus?.(status === 'SUBSCRIBED' ? 'live' : 'reconnecting'));
-    }).catch(() => onStatus?.('reconnecting'));
-    return () => { stopped = true; if (channel) loadClient().then((sb) => sb.removeChannel(channel)); };
+      const mine = sb.channel('admin-orders');
+      channel = mine;
+      const got = (kind) => (payload) => { recordLive({ eventAt: Date.now() }); onEvent({ kind, row: payload.new }); };
+      mine
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, got('insert'))
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, got('change'))
+        .subscribe((status, err) => {
+          if (channel !== mine) return; // a channel we already replaced or removed
+          warn(status, err?.message || '');
+          recordLive({ status, error: err?.message || (status === 'SUBSCRIBED' ? '' : undefined), statusAt: Date.now() });
+          if (status === 'SUBSCRIBED') { attempt = 0; report(true); return; }
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') { report(false); drop(); later(); }
+        });
+    }
+    const onVisible = () => { if (document.hidden) { clearTimeout(retry); retry = null; } else if (!live) { attempt = 0; connect(); } };
+    document.addEventListener('visibilitychange', onVisible);
+    loadClient().then((client) => {
+      if (stopped) return;
+      sb = client;
+      const sub = sb.auth.onAuthStateChange((event, session) => {
+        // defer: calling the auth client from inside its own callback can lock up
+        if (event === 'TOKEN_REFRESHED' && session) setTimeout(() => { if (!stopped) { attempt = 0; connect(); } }, 0);
+        else if (event === 'SIGNED_IN' && session && !live) setTimeout(() => { if (!stopped) connect(); }, 0);
+        else if (event === 'SIGNED_OUT') { drop(); report(false); }
+      });
+      authSub = sub?.data?.subscription;
+      report(false);
+      connect();
+    }).catch((e) => { recordLive({ status: 'client failed', error: e?.message }); report(false); });
+    return () => { stopped = true; clearTimeout(retry); clearTimeout(flag); document.removeEventListener('visibilitychange', onVisible); authSub?.unsubscribe(); if (sb) drop(); };
   },
   onChange(callback) { return this.subscribeOrders(() => callback()); },
 };

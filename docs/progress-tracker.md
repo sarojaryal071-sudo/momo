@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4i, coding agent)
+- Last updated: 2026-11-13 (Step 4j, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 4h (weekly pickup hours redesign, D-063), then Step 4i (admin sales summary, D-064), then Step 4j (Realtime connection fix), then Step 5 (SEO, hardening, launch).
 
@@ -239,6 +239,12 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
 
+## Step 4j — Live order feed connection
+
+- [x] Realtime socket signed in with the admin session (`setAuth`), re-subscribe on token refresh, INSERT and UPDATE on `public.orders`, capped backoff (2, 4, 8, 16, 30 s), paused while hidden
+- [x] "Reconnecting…" only after 3 s without a connection; `[live]` console warnings; Settings "Live feed" line (`admin/js/live-feed.js`)
+- Not verified: the real connection (Supabase unreachable from the sandbox). supabase-js stays at the pinned 2.118.0.
+
 ## Step 4i — Admin sales summary (D-064)
 
 - [x] Migration 0009 `sales_summary(from_date, to_date)`: admin-only, Collected orders per day (pence + count), zero days included, totals only
@@ -398,3 +404,5 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-13, step 4h (demo backend only): build passes; admin-rules and mock-backend tests pass (27); local PostgreSQL tests pass incl. new 0008 checks; Playwright at 390 px: chips, two windows, a custom day, overlap refused, Save and reload, close-all summary, Cancel discard dialog, preview, Save bar docked on tab bar; no horizontal overflow at 320 px. Not checked: real Supabase (migration 0008 applied by the workflow, real save).
 
 - 2026-11-13, step 4i (demo backend only): build passes; admin-rules and mock-backend tests pass (30); local PostgreSQL tests pass incl. sales_summary checks; Playwright at 390 px: Home strip and empty state, Sales week/month/custom, validation, remembered period, bar labels, hidden table, no overflow at 320 px. Not checked: real Supabase (migration 0009 applied by the workflow).
+
+- 2026-11-13, step 4j: build passes; admin-session test (backoff) passes; syntax checks on changed files; Settings Live feed line checked on the demo backend. Not checked: the real Realtime connection.

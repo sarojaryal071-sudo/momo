@@ -102,6 +102,12 @@ the repo, and is not a JWT, so the default JWT check cannot protect anonymous en
   Stock, settings, pickup rules and orders never rebuild the site.
 - Product photos: upload to the `product-images` bucket (public read, admin write, 5 MB, jpeg/png/webp). A photo needs alt text before the build accepts it.
 
+**If the admin shows "Reconnecting…" for good (Step 4j).** The admin signs the live socket in with your session and retries by itself.
+Open Settings, **Live feed**: it shows the last status and error. If it says `CHANNEL_ERROR` or `TIMED_OUT` with a message, check in
+Supabase: Database, Publications, `supabase_realtime` lists `orders`; Project Settings, **Realtime** (or API settings), Realtime is enabled
+and "Allow public access" is not required (the feed uses your signed-in session); your user is in `public.admins` (the feed only delivers
+rows you may read). `no session` means you must log in again.
+
 ## 6. Switch the live site to the real backend (last step)
 
 Do this only after sections 2 to 4 are done (the backend deployed, the function secrets set, your admin row added) and a test order works.

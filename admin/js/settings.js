@@ -1,5 +1,6 @@
 import { api } from './shell.js';
 import { SAVED_MESSAGE_SECONDS } from './admin-config.js';
+import { readLive } from './live-feed.js';
 
 const settings = await api.getSettings();
 const flash = (node, text, ms) => { node.textContent = text; setTimeout(() => { node.textContent = ''; }, ms * 1000); };
@@ -96,6 +97,17 @@ const submitRow = (label, work) => {
   const ask = el('button', { type: 'button', className: 'btn btn-secondary', onclick: async () => { await askNotificationPermission(); draw(); } }, 'Turn on notifications');
   const sound = makeSwitch('Soft sound for a new order', soundOn(), (on) => { setSound(on); if (on) playSoftSound(); });
   extra.append(panel('New order alerts', el('p', {}, 'New orders appear on the Orders page by themselves, with a badge, a number in the page title and a message at the top. Notifications and the sound work while the admin is open, even in the background.'), status, el('div', { className: 'btn-row' }, ask), sound.row));
+}
+
+// Live feed: a quiet line that shows what the order feed is doing, so a problem can be read without developer tools.
+{
+  const line = el('p', { className: 'muted live-feed-line' });
+  const at = (t) => (t ? new Date(t).toLocaleTimeString('en-GB', { timeZone: 'Europe/London' }) : 'none yet');
+  let mine = 'connecting';
+  const draw = () => { const i = readLive(); line.textContent = `Status: ${mine === 'live' ? 'connected' : mine}. Last status: ${i.status || 'none yet'}${i.error ? ` (${i.error})` : ''}. Last event: ${at(i.eventAt)}. Last refresh: ${at(i.refreshAt)}.`; };
+  api.subscribeOrders(() => draw(), (s) => { mine = s === 'live' ? 'live' : 'reconnecting'; draw(); });
+  setInterval(draw, 5000); draw();
+  extra.append(panel('Live feed', el('p', {}, 'New orders arrive by themselves while this is connected.'), line));
 }
 
 // Allergens: the list products tick from (D-062). The same editor as in the product screen.
