@@ -205,3 +205,41 @@ test('re-opening onto a full pickup day is refused', () => {
   state.settings.max_orders_per_day = null;
   assert.equal(setOrderStatus(state, 'a', 'new').status, 'new');
 });
+
+// Step 4l: catalogue (categories, option library, bulk allergens)
+import { deleteCategory, deleteLibraryGroup, ensureCatalogue, listLibrary, saveCategory, saveLibraryGroup, setAllergenProducts, setGroupApplies, setProductGroups } from '../frontend/js/mock-backend.js';
+const freshCatalogue = () => { const s = buildInitialState({ products: read('products.seed.json'), pickup: read('pickup.seed.json') }, new Date('2026-11-13T12:00:00Z')); ensureCatalogue(s); return s; };
+test('catalogue: identical per-product groups become one library group and products keep the same options', () => {
+  const s = freshCatalogue();
+  const spice = listLibrary(s).filter((g) => g.name === 'Spice level');
+  assert.equal(spice.length, 1);
+  assert.ok(['chicken-momo', 'veg-momo'].every((slug) => spice[0].product_ids.includes(slug)));
+  const chicken = s.products.find((p) => p.slug === 'chicken-momo');
+  assert.ok(chicken.option_groups.some((g) => g.label === 'Spice level' && g.options.length >= 3));
+});
+test('catalogue: a group applied to a category is on its products and can be ordered; one not linked is refused', () => {
+  const s = freshCatalogue();
+  saveCategory(s, { name: 'Sauces' });
+  const cat = s.categories.find((c) => c.name === 'Sauces');
+  const g = saveLibraryGroup(s, { name: 'Dip', kind: 'single', options: [{ label: 'Small', is_default: true }, { label: 'Large', price_delta_pence: 50 }] });
+  const large = g.options.find((o) => o.label === 'Large');
+  assert.throws(() => placeOrder(s, { items: [{ slug: 'chutney-pot', qty: 1, options: [large.id] }], name: 'T', phone: '07700 900123' }, new Date('2026-11-13T12:00:00Z')), /not valid/);
+  s.products.find((p) => p.slug === 'chutney-pot').category_id = cat.id;
+  setGroupApplies(s, g.id, { category_ids: [cat.id], product_ids: [] });
+  assert.ok(s.products.find((p) => p.slug === 'chutney-pot').option_groups.some((x) => x.label === 'Dip' && x.source === 'category'));
+  placeOrder(s, { items: [{ slug: 'chutney-pot', qty: 1, options: [large.id] }], name: 'T', phone: '07700 900123' }, new Date('2026-11-13T12:00:00Z'));
+  assert.equal(s.orders.at(-1).items[0].options[0].label, 'Large');
+  deleteLibraryGroup(s, g.id); // the order keeps its snapshot
+  assert.equal(s.orders.at(-1).items[0].options[0].label, 'Large');
+  assert.equal(deleteCategory(s, cat.id), 1);
+  assert.equal(s.products.find((p) => p.slug === 'chutney-pot').category_id, undefined);
+});
+test('catalogue: bulk allergens clear the check of changed products only', () => {
+  const s = freshCatalogue();
+  s.products.forEach((p) => { p.allergens_checked_at = '2026-11-01T00:00:00Z'; });
+  const id = listAllergens(s).find((a) => a.name === 'Milk').id;
+  assert.equal(setAllergenProducts(s, id, ['chicken-momo']), 1);
+  assert.equal(s.products.find((p) => p.slug === 'chicken-momo').allergens_checked_at, null);
+  assert.ok(s.products.find((p) => p.slug === 'veg-momo').allergens_checked_at);
+  assert.equal(setAllergenProducts(s, id, ['chicken-momo']), 0);
+});

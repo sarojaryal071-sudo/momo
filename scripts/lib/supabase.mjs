@@ -2,9 +2,11 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const SELECT = 'slug,name,kind,category,unit_label,price_pence,available,photo_path,photo_alt,sort_order,allergen_note,allergens_checked_at,'
+// Options come from the library (Step 4l): groups linked to the product, plus groups linked to its category (its effective groups).
+const GROUP = 'id,name,kind,sort_order,active,options(id,label,price_delta_pence,is_default,sort_order,active)';
+const SELECT = 'slug,name,kind,unit_label,price_pence,available,photo_path,photo_alt,sort_order,allergen_note,allergens_checked_at,'
   + 'product_allergens(allergens(name,sort_order)),product_ingredients(name,sort_order),'
-  + 'product_option_groups(id,label,kind,sort_order,active,product_options(id,label,price_delta_pence,is_default,sort_order,active)),product_stock(quantity)';
+  + `categories(name,category_option_groups(option_groups(${GROUP}))),product_option_groups_link(sort_order,option_groups(${GROUP})),product_stock(quantity)`;
 export const PHOTO_SIZES = [400, 800]; // widths written for each photo (the -400 file and the full size)
 const BUCKET = 'product-images';
 const FETCH_TIMEOUT_MS = 20000;
@@ -19,16 +21,19 @@ async function get(url, key) {
 // query (the policy hides inactive ones); a product with no price is left out of the shop.
 export function mapProducts(rows) {
   return rows.map((r) => {
-    const groups = (r.product_option_groups || []).filter((g) => g.active)
-      .sort((a, b) => a.sort_order - b.sort_order)
+    const direct = (r.product_option_groups_link || []).slice().sort((x, y) => x.sort_order - y.sort_order).map((l) => l.option_groups).filter(Boolean);
+    const inherited = ((r.categories && r.categories.category_option_groups) || []).map((l) => l.option_groups).filter(Boolean)
+      .sort((x, y) => x.sort_order - y.sort_order);
+    const seen = new Set();
+    const groups = [...direct, ...inherited].filter((g) => g.active && !seen.has(g.id) && seen.add(g.id))
       .map((g) => ({
-        id: g.id, label: g.label, kind: g.kind,
-        options: (g.product_options || []).filter((o) => o.active).sort((a, b) => a.sort_order - b.sort_order)
+        id: g.id, label: g.name, kind: g.kind,
+        options: (g.options || []).filter((o) => o.active).sort((x, y) => x.sort_order - y.sort_order)
           .map((o) => ({ id: o.id, label: o.label, price_delta_pence: o.price_delta_pence, is_default: o.is_default })),
       })).filter((g) => g.options.length);
     const stock = Array.isArray(r.product_stock) ? r.product_stock[0] : r.product_stock;
     return {
-      slug: r.slug, name: r.name, kind: r.kind, category: r.category ?? undefined, unit_label: r.unit_label, price_pence: r.price_pence,
+      slug: r.slug, name: r.name, kind: r.kind, category: (r.categories && r.categories.name) || undefined, unit_label: r.unit_label, price_pence: r.price_pence,
       available: r.available, photo_path: r.photo_path, photo_alt: r.photo_alt ?? undefined, sort_order: r.sort_order,
       // allergens and ingredients come from the tables the admin edits (D-062), in her order; nothing is invented when there are none
       ingredients: (r.product_ingredients || []).slice().sort((a, b) => a.sort_order - b.sort_order).map((i) => i.name),

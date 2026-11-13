@@ -36,16 +36,17 @@ const orderRow = (r) => ({ ...r, pickup_time: time5(r.pickup_time) });
 const refuse = (message) => { throw new Error(message); };
 
 // A database product row (with its stock and option groups) in the shape the screens use (the same as the demo backend).
-const productRow = (r) => {
+// A product row. library: the option groups from the library (with their category and product links), categories: id -> name.
+const productRow = (r, library = [], categoryNames = new Map()) => {
   const stock = Array.isArray(r.product_stock) ? r.product_stock[0] : r.product_stock;
+  const effective = library.filter((g) => g.product_ids.includes(r.id) || (r.category_id && g.category_ids.includes(r.category_id)))
+    .map((g) => ({ id: g.id, label: g.name, kind: g.kind, source: g.product_ids.includes(r.id) ? 'product' : 'category', sort_order: g.sort_order, active: g.active, options: g.options }))
+    .sort((a, b) => a.sort_order - b.sort_order);
   return {
-    id: r.id, slug: r.slug, name: r.name, kind: r.kind, category: r.category, unit_label: r.unit_label || '', price_pence: r.price_pence, available: r.available, active: r.active,
-    sort_order: r.sort_order, photo_path: r.photo_path, photo_alt: r.photo_alt || '', ingredients: (r.product_ingredients || []).slice().sort((a, b) => a.sort_order - b.sort_order).map((i) => i.name), allergen_ids: (r.product_allergens || []).map((x) => x.allergen_id), allergen_note: r.allergen_note || '', allergens_checked_at: r.allergens_checked_at || null,
+    id: r.id, slug: r.slug, name: r.name, kind: r.kind, category: categoryNames.get(r.category_id) ?? null, category_id: r.category_id ?? null, unit_label: r.unit_label || '', price_pence: r.price_pence, available: r.available, active: r.active,
+    sort_order: r.sort_order, photo_path: r.photo_path, photo_alt: r.photo_alt || '', ingredients: (r.product_ingredients || []).slice().sort((a, b) => a.sort_order - b.sort_order).map((i) => i.name), allergen_ids: (r.product_allergens || []).map((x) => x.allergen_id), allergen_note: r.allergen_note || '', allergens_checked_at: r.allergens_checked_at ?? null,
     stock_quantity: stock ? stock.quantity : null,
-    option_groups: (r.product_option_groups || []).map((g) => ({
-      id: g.id, label: g.label, kind: g.kind, sort_order: g.sort_order, active: g.active,
-      options: (g.product_options || []).map((o) => ({ id: o.id, label: o.label, price_delta_pence: o.price_delta_pence, is_default: o.is_default, sort_order: o.sort_order, active: o.active })).sort((a, b) => a.sort_order - b.sort_order),
-    })).sort((a, b) => a.sort_order - b.sort_order),
+    option_groups: effective,
   };
 };
 const timeRow = (r) => ({ ...r, start_time: time5(r.start_time), end_time: time5(r.end_time) });
@@ -137,8 +138,12 @@ export const supabaseApi = {
 
   async listProducts() {
     const sb = await loadClient();
-    const rows = unwrap(await sb.from('products').select('*,product_stock(quantity),product_option_groups(*,product_options(*)),product_allergens(allergen_id),product_ingredients(name,sort_order)').order('sort_order'));
-    return rows.map(productRow);
+    const [rows, library, categories] = await Promise.all([
+      sb.from('products').select('*,product_stock(quantity),product_allergens(allergen_id),product_ingredients(name,sort_order)').order('sort_order').then(unwrap),
+      this.listLibrary(), this.listCategories(),
+    ]);
+    const names = new Map(categories.map((x) => [x.id, x.name]));
+    return rows.map((r) => productRow(r, library, names));
   },
 
   // Creates (no id) or updates one product. Products are never deleted: switch active off instead. Marks the site "unpublished" (trigger).
@@ -150,7 +155,7 @@ export const supabaseApi = {
     const fields = {
       name: String(input.name).trim(), kind: input.kind, unit_label: String(input.unit_label || '').trim(), price_pence: merged.price_pence,
       available: Boolean(input.available), active: Boolean(input.active), photo_path: input.photo_path || null, photo_alt: String(input.photo_alt || '').trim() || null,
-      allergen_note: String(input.allergen_note || '').trim() || null, allergens_checked_at: input.allergens_checked_at || null,
+      allergen_note: String(input.allergen_note || '').trim() || null, allergens_checked_at: input.allergens_checked_at || null, category_id: input.category_id || null,
     };
     let id = input.id;
     if (id) unwrap(await sb.from('products').update(fields).eq('id', id));
@@ -183,29 +188,90 @@ export const supabaseApi = {
     return quantity;
   },
 
-  // One option group with all its options. Options removed from the list are deleted; the single default is moved without a clash.
-  async saveOptionGroup(productId, group) {
+  // ---------- catalogue (Step 4l): categories and the option library ----------
+  async listCategories() {
+    const sb = await loadClient();
+    const [cats, prods, links] = await Promise.all([
+      sb.from('categories').select('id,name,sort_order').order('sort_order').then(unwrap),
+      sb.from('products').select('category_id').then(unwrap),
+      sb.from('category_option_groups').select('category_id,group_id').then(unwrap),
+    ]);
+    return cats.map((x) => ({ ...x, product_count: prods.filter((p) => p.category_id === x.id).length, group_ids: links.filter((l) => l.category_id === x.id).map((l) => l.group_id) }));
+  },
+  async saveCategory({ id, name }) {
+    const sb = await loadClient();
+    const text = String(name ?? '').trim().replace(/\s+/g, ' ');
+    if (!text) refuse('Enter a name for the category.');
+    if (text.length > 60) refuse('The category name can be at most 60 characters.');
+    const taken = unwrap(await sb.from('categories').select('id,name,sort_order'));
+    if (taken.some((x) => x.id !== id && x.name.toLowerCase() === text.toLowerCase())) refuse('There is already a category with that name.');
+    if (id) unwrap(await sb.from('categories').update({ name: text }).eq('id', id));
+    else unwrap(await sb.from('categories').insert({ name: text, sort_order: Math.max(0, ...taken.map((x) => x.sort_order)) + 1 }));
+  },
+  async reorderCategories(ids) { const sb = await loadClient(); await Promise.all(ids.map((id, i) => sb.from('categories').update({ sort_order: i + 1 }).eq('id', id).then(unwrap))); },
+  // Products in the deleted category end up with no category (the database sets it empty). Returns how many.
+  async deleteCategory(id) {
+    const sb = await loadClient();
+    const moved = unwrap(await sb.from('products').select('id').eq('category_id', id)).length;
+    unwrap(await sb.from('categories').delete().eq('id', id));
+    return moved;
+  },
+  async listLibrary() {
+    const sb = await loadClient();
+    const rows = unwrap(await sb.from('option_groups').select('*,options(*),category_option_groups(category_id),product_option_groups_link(product_id)').order('sort_order'));
+    return rows.map((g) => ({
+      id: g.id, name: g.name, kind: g.kind, sort_order: g.sort_order, active: g.active,
+      options: (g.options || []).map((o) => ({ id: o.id, label: o.label, price_delta_pence: o.price_delta_pence, is_default: o.is_default, sort_order: o.sort_order, active: o.active })).sort((a, b) => a.sort_order - b.sort_order),
+      category_ids: (g.category_option_groups || []).map((x) => x.category_id), product_ids: (g.product_option_groups_link || []).map((x) => x.product_id),
+    }));
+  },
+  // One library group with all of its options. Options removed from the list are deleted; the single default is moved without a clash.
+  async saveLibraryGroup(group, applies = null) {
     const sb = await loadClient();
     const options = (group.options || []).map((o, i) => ({ ...o, price_delta_pence: o.price_delta_pence ?? 0, active: o.active !== false, sort_order: i + 1 }));
-    const error = validateGroup(group, options);
+    const error = validateGroup({ label: group.name, kind: group.kind }, options);
     if (error) refuse(error);
-    const gFields = { label: String(group.label).trim(), kind: group.kind, active: group.active !== false, sort_order: group.sort_order ?? 1 };
+    const gFields = { name: String(group.name).trim(), kind: group.kind, active: group.active !== false };
     let groupId = group.id;
-    if (groupId) unwrap(await sb.from('product_option_groups').update(gFields).eq('id', groupId));
-    else groupId = unwrap(await sb.from('product_option_groups').insert({ ...gFields, product_id: productId }).select('id').single()).id;
+    if (groupId) unwrap(await sb.from('option_groups').update(gFields).eq('id', groupId));
+    else {
+      const last = unwrap(await sb.from('option_groups').select('sort_order'));
+      groupId = unwrap(await sb.from('option_groups').insert({ ...gFields, sort_order: Math.max(0, ...last.map((r) => r.sort_order)) + 1 }).select('id').single()).id;
+    }
     const keep = options.filter((o) => o.id).map((o) => o.id);
-    const current = unwrap(await sb.from('product_options').select('id').eq('group_id', groupId)).map((r) => r.id);
+    const current = unwrap(await sb.from('options').select('id').eq('group_id', groupId)).map((r) => r.id);
     const gone = current.filter((id) => !keep.includes(id));
-    if (gone.length) unwrap(await sb.from('product_options').delete().in('id', gone));
-    if (current.length) unwrap(await sb.from('product_options').update({ is_default: false }).eq('group_id', groupId));
+    if (gone.length) unwrap(await sb.from('options').delete().in('id', gone));
+    if (current.length) unwrap(await sb.from('options').update({ is_default: false }).eq('group_id', groupId));
     for (const o of options) {
       const row = { label: String(o.label).trim(), price_delta_pence: o.price_delta_pence, is_default: Boolean(o.is_default), active: o.active, sort_order: o.sort_order };
-      if (o.id) unwrap(await sb.from('product_options').update(row).eq('id', o.id));
-      else unwrap(await sb.from('product_options').insert({ ...row, group_id: groupId }));
+      if (o.id) unwrap(await sb.from('options').update(row).eq('id', o.id));
+      else unwrap(await sb.from('options').insert({ ...row, group_id: groupId }));
     }
-    return groupId;
+    if (applies) await this.setGroupApplies(groupId, applies);
+    return { id: groupId };
   },
-  async deleteOptionGroup(productId, groupId) { const sb = await loadClient(); unwrap(await sb.from('product_option_groups').delete().eq('id', groupId)); },
+  async deleteLibraryGroup(id) { const sb = await loadClient(); unwrap(await sb.from('option_groups').delete().eq('id', id)); },
+  async reorderLibrary(ids) { const sb = await loadClient(); await Promise.all(ids.map((id, i) => sb.from('option_groups').update({ sort_order: i + 1 }).eq('id', id).then(unwrap))); },
+  // Where a group applies: whole categories and single products. Both lists are replaced.
+  async setGroupApplies(id, { category_ids = [], product_ids = [] }) {
+    const sb = await loadClient();
+    unwrap(await sb.from('category_option_groups').delete().eq('group_id', id));
+    if (category_ids.length) unwrap(await sb.from('category_option_groups').insert(category_ids.map((category_id) => ({ category_id, group_id: id }))));
+    unwrap(await sb.from('product_option_groups_link').delete().eq('group_id', id));
+    if (product_ids.length) unwrap(await sb.from('product_option_groups_link').insert(product_ids.map((product_id) => ({ product_id, group_id: id }))));
+  },
+  // The groups linked directly to one product (picked from the library in the product editor).
+  async setProductGroups(productId, groupIds) {
+    const sb = await loadClient();
+    unwrap(await sb.from('product_option_groups_link').delete().eq('product_id', productId));
+    if (groupIds.length) unwrap(await sb.from('product_option_groups_link').insert(groupIds.map((group_id, i) => ({ product_id: productId, group_id, sort_order: i + 1 }))));
+  },
+  // Bulk allergens: the products that contain one allergen. The database clears the "I have checked" confirmation of every product that changes.
+  async setAllergenProducts(allergenId, productIds) {
+    const sb = await loadClient();
+    return unwrap(await sb.rpc('set_allergen_products', { p_allergen_id: allergenId, p_product_ids: productIds }));
+  },
 
   // Photos: the screen shrinks the picture first; this uploads it to the product-images bucket (public read, admin write).
   async uploadPhoto(productId, blob, filename) {

@@ -3,6 +3,7 @@
 import { api } from './shell.js';
 import { PHOTO_QUALITY, PUBLISH_POLL_SECONDS } from './admin-config.js';
 import { confirmDialog, el, field, makeSwitch, toast } from './dom.js';
+import { groupForm, optionSummary } from './option-editor.js';
 import { mountAllergenManager, LEGAL_REMINDER } from './allergens.js';
 import { cleanTag, formatMoney, PHOTO_MAX_BYTES, PHOTO_MAX_EDGE, penceToPounds, poundsToPence, slugify, validateChecked, validateGroup, validateIngredients, validatePhoto, validatePhotoFile, validateProduct } from '../../js/admin-rules.js';
 
@@ -15,6 +16,23 @@ const topStack = document.querySelector('.top-stack');
 const SAUCE_PICTURE = '../assets/img/photo-sauce.webp'; // the existing sauce picture, used for add-ons that have no photo yet
 
 let products = [];
+let categoryFilter = ''; // '' all, '_none' no category, or a category id
+const filterRow = document.querySelector('[data-filter]');
+const filterSelect = document.querySelector('[data-cat-filter]');
+const manageBtn = document.querySelector('[data-manage-btn]');
+const manageMenu = document.getElementById('manage-menu');
+const setManage = (open) => { manageMenu.hidden = !open; manageBtn.setAttribute('aria-expanded', String(open)); };
+manageBtn.addEventListener('click', () => { setManage(manageMenu.hidden); if (!manageMenu.hidden) manageMenu.querySelector('a').focus(); });
+document.addEventListener('click', (e) => { if (!manageMenu.hidden && !e.target.closest('.manage')) setManage(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !manageMenu.hidden) { setManage(false); manageBtn.focus(); } });
+async function drawFilter() {
+  const cats = await api.listCategories().catch(() => []);
+  filterRow.hidden = !cats.length;
+  filterSelect.replaceChildren(el('option', { value: '' }, 'All categories'), ...cats.map((x) => el('option', { value: x.id }, x.name)), el('option', { value: '_none' }, 'No category'));
+  filterSelect.value = cats.some((x) => x.id === categoryFilter) || categoryFilter === '_none' ? categoryFilter : '';
+  categoryFilter = filterSelect.value;
+}
+filterSelect.addEventListener('change', () => { categoryFilter = filterSelect.value; drawList(); });
 let pollTimer = null;
 let publishProblem = ''; // shown in the banner until the next try, so it does not vanish like a toast
 
@@ -53,7 +71,10 @@ function stockChip(p) {
 function drawList() {
   listBox.replaceChildren();
   if (!products.length) { listBox.append(el('p', { className: 'muted empty-state' }, 'No products yet. Press Add product.')); return; }
+  const visible = products.filter((p) => !categoryFilter || (categoryFilter === '_none' ? !p.category_id : p.category_id === categoryFilter));
+  if (!visible.length) listBox.append(el('p', { className: 'muted empty-state' }, 'No products in this category.'));
   products.forEach((p, i) => {
+    if (!visible.includes(p)) return;
     const unpriced = p.price_pence == null;
     const off = !p.active || unpriced;
     const pic = pictureOf(p);
@@ -72,7 +93,7 @@ function drawList() {
       el('div', { className: 'pc-thumb' }, pic ? el('img', { src: pic, alt: '', loading: 'lazy' }) : el('span', { className: 'pc-initial', 'aria-hidden': 'true' }, p.name.charAt(0))),
       el('div', { className: 'pc-main' },
         el('h3', { className: 'pc-name' }, p.name),
-        el('p', { className: 'pc-price' }, unpriced ? el('a', { href: '#', onclick: (e) => { e.preventDefault(); edit(p.id); } }, 'Set price') : `${formatMoney(p.price_pence)}${p.unit_label ? ` · ${p.unit_label}` : ''}`),
+        el('p', { className: 'pc-price' }, unpriced ? el('a', { href: '#', onclick: (e) => { e.preventDefault(); edit(p.id); } }, 'Set price') : `${formatMoney(p.price_pence)}${p.unit_label ? ` · ${p.unit_label}` : ''}${p.category ? ` · ${p.category}` : ''}`),
         el('div', { className: 'pc-row' }, sw.row, stockChip(p)),
         !p.active && blocker ? el('button', { type: 'button', className: 'needs-chip', onclick: () => edit(p.id, blocker) }, blocker === 'price' ? 'Set a price first' : 'Needs allergen check') : null),
       el('div', { className: 'pc-side' },
@@ -151,7 +172,7 @@ async function edit(id, guide = null) {
   const leave = async () => {
     window.onbeforeunload = null; dirty = false; bar.remove(); document.body.classList.remove('is-editing');
     editorBox.hidden = true; titleRow.hidden = false; listBox.hidden = false;
-    await load(); drawList(); await drawPublish();
+    await load(); await drawFilter(); drawList(); await drawPublish();
     document.querySelector('.admin-main').scrollTop = 0;
   };
   const back = async () => { if (dirty && !(await confirmDialog({ title: 'Discard your changes?', message: 'You have changes that are not saved.', confirmLabel: 'Discard', cancelLabel: 'Keep editing', danger: true }))) return; await leave(); };
@@ -173,9 +194,11 @@ async function edit(id, guide = null) {
     tracked: product ? product.stock_quantity != null : false, stock: product?.stock_quantity ?? 0,
   };
   let pending = null; // { blob, name } a new photo not uploaded yet
-  const groups = (product?.option_groups ?? []).map(clone);
-  const removed = [];
-  let selected = groups.length ? 0 : -1;
+  // option groups: the library, and the groups linked directly to this product. The category adds its own on top (effective groups).
+  let library = await api.listLibrary();
+  const categories = await api.listCategories();
+  draft.group_ids = (product?.option_groups ?? []).filter((g) => g.source !== 'category').map((g) => g.id);
+  draft.category_id = product?.category_id ?? '';
   const errors = {};
   const showError = (key, text) => { if (errors[key]) errors[key].textContent = text || ''; };
 
@@ -187,7 +210,9 @@ async function edit(id, guide = null) {
   name.control.addEventListener('input', () => { draft.name = name.control.value; bar.querySelector('h2').textContent = draft.name || 'New product'; markDirty(); });
   kind.control.addEventListener('change', () => { draft.kind = kind.control.value; markDirty(); });
   unit.control.addEventListener('input', () => { draft.unit_label = unit.control.value; markDirty(); });
-  editorBox.append(card('Name', name.wrap, errors.name, kind.wrap, unit.wrap));
+  const category = field('Category', 'select', { value: draft.category_id }, [['', 'No category'], ...categories.map((x) => [x.id, x.name])]);
+  category.control.addEventListener('change', () => { draft.category_id = category.control.value; markDirty(); drawOptions(); });
+  editorBox.append(card('Name', name.wrap, errors.name, kind.wrap, category.wrap, unit.wrap));
 
   // ----- Price -----
   const price = field('Price (£)', 'text', { value: draft.price, inputMode: 'decimal', hint: 'For example 10 or 10.50. It is stored in pence.' });
@@ -220,54 +245,58 @@ async function edit(id, guide = null) {
   });
   editorBox.append(card('Photo', el('div', { className: 'photo-row' }, preview, change, clear), fileInput, alt.wrap, errors.photo));
 
-  // ----- Options (groups as chips) -----
-  const chipRow = el('div', { className: 'chip-set', role: 'group', 'aria-label': 'Option groups' });
-  const groupBox = el('div');
+  // ----- Options: the groups that apply to this product (from the library) -----
+  const optionBox = el('div', { className: 'option-groups' });
   const previewBox = el('div', { className: 'option-preview' });
   errors.options = errorLine();
-  editorBox.append(card('Options', el('p', {}, 'Choosing anything other than the standard option makes the order customised and needs the longer notice.'), chipRow, groupBox, errors.options, previewBox));
-  const drawPreview = () => {
+  editorBox.append(card('Options', el('p', {}, 'Choosing anything other than the standard option makes the order customised and needs the longer notice. Groups come from your option library: a group can apply to a whole category or to this product.'), optionBox, errors.options, previewBox));
+  const effective = () => library.filter((g) => draft.group_ids.includes(g.id) || (draft.category_id && g.category_ids.includes(draft.category_id)));
+  function drawOptions() {
+    const list = effective();
+    optionBox.replaceChildren();
+    if (!list.length) optionBox.append(el('p', { className: 'muted' }, 'No option groups on this product. Customers just choose how many.'));
+    for (const g of list) {
+      const direct = draft.group_ids.includes(g.id); const inherited = draft.category_id && g.category_ids.includes(draft.category_id);
+      optionBox.append(el('div', { className: 'group-card' }, el('p', {}, el('strong', {}, g.name), ` (${g.kind === 'single' ? 'choose one' : 'choose any'}) `, inherited ? el('span', { className: 'tag' }, 'from category') : null, !g.active ? el('span', { className: 'tag' }, 'hidden') : null),
+        el('p', { className: 'muted' }, optionSummary(g)),
+        direct ? el('div', { className: 'btn-row' }, el('button', { type: 'button', className: 'btn btn-secondary btn-small', 'aria-label': `Remove ${g.name} from this product`, onclick: () => { draft.group_ids = draft.group_ids.filter((x) => x !== g.id); markDirty(); drawOptions(); } }, 'Remove from this product')) : null));
+    }
+    const free = library.filter((g) => !list.some((x) => x.id === g.id));
+    const pick = el('select', { 'aria-label': 'Option group to add' }, ...free.map((g) => el('option', { value: g.id }, g.name)));
+    const add = el('button', { type: 'button', className: 'btn btn-secondary btn-small', disabled: !free.length, onclick: () => { if (!pick.value) return; draft.group_ids.push(pick.value); markDirty(); drawOptions(); } }, 'Add option group');
+    optionBox.append(el('div', { className: 'add-group-row' }, free.length ? pick : el('span', { className: 'muted' }, 'Every group in your library is already on this product.'), add,
+      el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: createGroup }, 'Create new group')));
+    drawPreview(list);
+  }
+  const drawPreview = (list) => {
     previewBox.replaceChildren(el('h3', {}, 'How customers see it'));
-    const live = groups.filter((g) => g.active && g.options.some((o) => o.active));
+    const live = list.filter((g) => g.active && g.options.some((o) => o.active));
     if (!live.length) previewBox.append(el('p', { className: 'muted' }, 'No options. Customers just choose how many.'));
-    for (const g of live) previewBox.append(el('p', {}, el('strong', {}, `${g.label || 'Group'} (${g.kind === 'single' ? 'choose one' : 'choose any'}): `), g.options.filter((o) => o.active).map((o) => `${o.label}${o.is_default ? ' (standard)' : ''}${o.price_delta_pence > 0 ? ` +${formatMoney(o.price_delta_pence)}` : ''}`).join(', ')));
+    for (const g of live) previewBox.append(el('p', {}, el('strong', {}, `${g.name} (${g.kind === 'single' ? 'choose one' : 'choose any'}): `), optionSummary({ options: g.options.filter((o) => o.active) })));
   };
-  function drawChips() {
-    chipRow.replaceChildren(...groups.map((g, i) => el('button', { type: 'button', className: 'chip', 'aria-pressed': String(i === selected), onclick: () => { selected = i; drawChips(); drawGroup(); } }, g.label || 'New group')),
-      el('button', { type: 'button', className: 'chip', onclick: () => { groups.push({ id: null, label: '', kind: 'single', sort_order: groups.length + 1, active: true, options: [] }); selected = groups.length - 1; markDirty(); drawChips(); drawGroup(); } }, '+ Add group'));
+  // a new group is added to the shared library at once (it is not tied to this product's Save) and linked to this product
+  function createGroup() {
+    const form = groupForm({ name: '', kind: 'single', options: [{ id: null, label: '', price_delta_pence: 0, is_default: true, active: true }] });
+    const id = `dlg-${Math.random().toString(36).slice(2, 8)}`;
+    const dialog = el('dialog', { className: 'glass-dialog new-group-dialog', 'aria-labelledby': id });
+    const problem = el('p', { className: 'field-error', role: 'alert' });
+    const finish = () => { if (dialog.open) dialog.close(); dialog.remove(); };
+    const save = el('button', { type: 'button', className: 'btn' }, 'Create group');
+    save.addEventListener('click', async () => {
+      problem.textContent = ''; save.disabled = true;
+      try {
+        const made = await api.saveLibraryGroup(form.get());
+        library = await api.listLibrary();
+        draft.group_ids.push(made.id); markDirty(); drawOptions(); finish();
+        toast('The group was added to your option library and to this product.', { seconds: 4 });
+      } catch (e) { problem.textContent = e.message; save.disabled = false; }
+    });
+    dialog.append(el('div', { className: 'dialog-head' }, el('h2', { id }, 'New option group'), el('button', { type: 'button', className: 'icon-btn dialog-close', 'aria-label': 'Close', onclick: finish }, glyph('M6 6l12 12M18 6L6 18'))),
+      form.node, problem, el('div', { className: 'btn-row' }, save, el('button', { type: 'button', className: 'btn btn-secondary', onclick: finish }, 'Cancel')));
+    dialog.addEventListener('cancel', (e) => { e.preventDefault(); finish(); });
+    document.body.append(dialog); dialog.showModal(); form.nameField.focus();
   }
-  function drawGroup() {
-    groupBox.replaceChildren(); drawPreview();
-    const g = groups[selected];
-    if (!g) return;
-    const label = field('Group name', 'text', { value: g.label, maxLength: 60, hint: 'For example "Spice level" or "Leave out".' });
-    const gkind = field('Customers can choose', 'select', { value: g.kind }, [['single', 'One option'], ['multiple', 'Any number of options']]);
-    const shown = makeSwitch('Shown to customers', g.active, (on) => { g.active = on; markDirty(); drawPreview(); });
-    const rows = el('div');
-    const drawRows = () => {
-      rows.replaceChildren(...g.options.map((o, oi) => {
-        const oname = el('input', { type: 'text', value: o.label, maxLength: 60, 'aria-label': 'Choice name', oninput: () => { o.label = oname.value; markDirty(); drawPreview(); } });
-        const oprice = el('input', { type: 'text', value: penceToPounds(o.price_delta_pence || 0), inputMode: 'decimal', 'aria-label': 'Price change in pounds', oninput: () => { const v = poundsToPence(oprice.value || '0'); o.price_delta_pence = v === null ? -1 : v; markDirty(); drawPreview(); } });
-        const odef = el('input', { type: g.kind === 'single' ? 'radio' : 'checkbox', name: `std-${selected}`, checked: o.is_default, 'aria-label': 'Standard choice', onchange: () => { if (g.kind === 'single') g.options.forEach((x) => { x.is_default = false; }); o.is_default = odef.checked; markDirty(); drawPreview(); } });
-        const oact = el('input', { type: 'checkbox', checked: o.active, 'aria-label': 'Shown', onchange: () => { o.active = oact.checked; markDirty(); drawPreview(); } });
-        return el('div', { className: 'option-row' }, el('label', {}, 'Choice', oname), el('label', {}, 'Price change £', oprice), el('label', { className: 'check' }, odef, ' Standard'), el('label', { className: 'check' }, oact, ' Shown'),
-          el('button', { type: 'button', className: 'btn btn-secondary btn-small', 'aria-label': `Remove choice ${o.label}`, onclick: () => { g.options.splice(oi, 1); markDirty(); drawRows(); drawPreview(); } }, 'Remove'));
-      }));
-    };
-    drawRows();
-    label.control.addEventListener('input', () => { g.label = label.control.value; markDirty(); drawChips(); drawPreview(); });
-    gkind.control.addEventListener('change', () => { g.kind = gkind.control.value; if (g.kind === 'single') { let seen = false; g.options.forEach((o) => { if (o.is_default && seen) o.is_default = false; seen ||= o.is_default; }); } markDirty(); drawRows(); drawPreview(); });
-    const addOption = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { g.options.push({ id: null, label: '', price_delta_pence: 0, is_default: g.kind === 'single' && !g.options.some((o) => o.is_default), active: true }); markDirty(); drawRows(); } }, 'Add a choice');
-    const del = el('button', { type: 'button', className: 'btn btn-danger btn-small', onclick: async () => {
-      if (!(await confirmDialog({ title: `Delete the group "${g.label || 'new group'}"?`, message: 'Its choices are deleted too. Orders already placed keep what they chose.', confirmLabel: 'Delete group', danger: true }))) return;
-      if (g.id) removed.push(g.id);
-      groups.splice(selected, 1); selected = groups.length ? Math.min(selected, groups.length - 1) : -1; markDirty(); drawChips(); drawGroup();
-    } }, 'Delete group');
-    const earlier = el('button', { type: 'button', className: 'btn btn-secondary btn-small', disabled: selected === 0, 'aria-label': 'Move group earlier', onclick: () => { [groups[selected - 1], groups[selected]] = [groups[selected], groups[selected - 1]]; selected -= 1; markDirty(); drawChips(); drawGroup(); } }, '←');
-    const later = el('button', { type: 'button', className: 'btn btn-secondary btn-small', disabled: selected === groups.length - 1, 'aria-label': 'Move group later', onclick: () => { [groups[selected + 1], groups[selected]] = [groups[selected], groups[selected + 1]]; selected += 1; markDirty(); drawChips(); drawGroup(); } }, '→');
-    groupBox.append(el('div', { className: 'group-card' }, label.wrap, gkind.wrap, shown.row, rows, el('div', { className: 'btn-row' }, addOption, earlier, later, del)), previewBox);
-  }
-  drawChips(); drawGroup();
+  drawOptions();
 
   // ----- the safeguard: changing allergens or ingredients clears "I have checked" and asks again -----
   let checkBox = null; let checkNote = null;
@@ -365,7 +394,7 @@ async function edit(id, guide = null) {
     Object.values(errors).forEach((e) => { e.textContent = ''; });
     const priceText = draft.price.trim();
     const pence = priceText === '' ? null : poundsToPence(priceText);
-    const fields = { id: product?.id, name: draft.name, kind: draft.kind, unit_label: draft.unit_label, price_pence: pence, active: draft.active, available: draft.available,
+    const fields = { id: product?.id, name: draft.name, kind: draft.kind, unit_label: draft.unit_label, price_pence: pence, category_id: draft.category_id || null, active: draft.active, available: draft.available,
       photo_path: pending ? 'pending.webp' : draft.photo_path, photo_alt: draft.photo_alt, ingredients: draft.ingredients, allergen_ids: draft.allergen_ids, allergen_note: draft.allergen_note,
       allergens_checked_at: draft.checked ? (draft.infoChanged || !draft.checkedAt ? new Date().toISOString() : draft.checkedAt) : null };
     let first = null;
@@ -375,7 +404,6 @@ async function edit(id, guide = null) {
     const pe = validatePhoto({ photo_path: fields.photo_path, photo_alt: draft.photo_alt }); if (pe) fail('photo', pe);
     const ie = validateIngredients({ ingredients: draft.ingredients, allergen_ids: draft.allergen_ids, allergen_note: draft.allergen_note }); if (ie) fail('allergens', ie);
     const ce = validateChecked({ active: draft.active, checked: draft.checked }); if (ce) fail('checked', ce);
-    for (const g of groups) { const ge = validateGroup(g, g.options); if (ge) { fail('options', `${g.label || 'New group'}: ${ge}`); break; } }
     let stockValue = null;
     if (draft.tracked) { const n = Number(String(draft.stock).trim()); if (String(draft.stock).trim() === '' || !Number.isInteger(n) || n < 0) fail('stock', 'Enter a whole number, 0 or more.'); else stockValue = n; }
     if (first) {
@@ -390,8 +418,7 @@ async function edit(id, guide = null) {
       if (pending) path = await api.uploadPhoto(product?.id ?? (slugify(draft.name) || 'item'), pending.blob, pending.name);
       const saved = await api.saveProduct({ ...fields, photo_path: path });
       const productId = product?.id ?? saved?.id ?? saved;
-      for (const gid of removed) await api.deleteOptionGroup(productId, gid);
-      for (const [i, g] of groups.entries()) await api.saveOptionGroup(productId, { ...g, sort_order: i + 1 });
+      await api.setProductGroups(productId, draft.group_ids);
       await api.setStock(productId, stockValue);
       toast('Saved. Press Publish to put changes on the site.', { seconds: 5 });
       await leave();
@@ -405,5 +432,5 @@ async function edit(id, guide = null) {
 }
 
 addButton.addEventListener('click', () => edit(null));
-try { await load(); drawList(); await drawPublish(); }
+try { await load(); await drawFilter(); drawList(); await drawPublish(); }
 catch (e) { listBox.replaceChildren(el('p', { className: 'error', role: 'alert' }, `The products could not be loaded: ${e.message}`)); }

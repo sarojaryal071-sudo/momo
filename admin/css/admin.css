@@ -533,3 +533,31 @@ svg:where(:not([width])) { inline-size: var(--icon); block-size: var(--icon); }
 .dialog-close { flex: none; min-inline-size: var(--tap); min-block-size: var(--tap); }
 .notice-dialog .btn-row { margin-block-start: var(--space-s); }
 @media (min-width: 48em) { .order-day { inset-block-start: var(--top-h, 0px); } }
+
+/* Step 4l: catalogue screens */
+.manage { position: relative; }
+.manage-menu { position: absolute; inset-block-start: calc(100% + var(--space-3xs)); inset-inline-end: 0; z-index: 5; display: grid; min-inline-size: 12rem; padding: var(--space-3xs); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--radius); box-shadow: var(--shadow-card); }
+.manage-menu[hidden] { display: none; }
+.manage-menu a { display: flex; align-items: center; min-block-size: var(--tap); padding-inline: var(--space-s); font-weight: 600; color: var(--emerald); text-decoration: none; border-radius: var(--r-input); }
+.manage-menu a:hover, .manage-menu a:focus-visible { background: var(--green-tint); }
+@media (prefers-reduced-transparency: no-preference) { .manage-menu { background: var(--admin-glass); -webkit-backdrop-filter: blur(var(--admin-glass-blur)); backdrop-filter: blur(var(--admin-glass-blur)); border-color: var(--admin-glass-border); } }
+.title-row .manage { margin-inline-start: auto; }
+.title-row .manage + .btn { margin-inline-start: 0; }
+.title-row h1 { margin-inline-end: auto; }
+.title-row .manage ~ h1 { margin-inline-end: 0; }
+.filter-row { margin-block-end: var(--space-s); }
+.category-row { display: grid; gap: var(--space-2xs); }
+.category-row h3 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); margin: 0; font-size: var(--text-read); }
+.category-row p { margin: 0; }
+.checklist { display: grid; gap: var(--space-2xs); margin-block: var(--space-s); }
+.checklist-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-xs); }
+.checklist-head h3 { margin: 0; font-size: var(--text-ui); }
+.check-list { display: grid; gap: var(--space-3xs); max-block-size: 16rem; overflow-y: auto; padding: var(--space-2xs); border: var(--hairline) solid var(--line); border-radius: var(--r-input); background: var(--white); }
+.check-list .check { min-block-size: var(--tap); }
+.bulk-allergen > summary { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); min-block-size: var(--tap); cursor: pointer; }
+.summary-row { display: grid; gap: var(--space-3xs); padding-block: var(--space-xs); border-block-end: var(--hairline) solid var(--line); }
+.needs-chip.static { cursor: default; justify-self: start; min-block-size: 0; padding-block: var(--space-3xs); }
+.add-group-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); margin-block-start: var(--space-xs); }
+.add-group-row select { min-block-size: var(--tap); flex: 1 1 10rem; min-inline-size: 0; padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); }
+.new-group-dialog { inline-size: min(100% - 2 * var(--gutter), 32rem); max-block-size: 90dvh; overflow-y: auto; }
+.checklist input[type="search"], .filter-row select { min-block-size: var(--tap); padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); inline-size: 100%; }

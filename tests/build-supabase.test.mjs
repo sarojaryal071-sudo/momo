@@ -11,13 +11,13 @@ import { mapProducts } from '../scripts/lib/supabase.mjs';
 
 const OPT = (id, label, is_default = false, price = 0) => ({ id, label, price_delta_pence: price, is_default, sort_order: 1, active: true });
 const rows = (extra = {}) => [{
-  slug: 'chicken-momo', name: 'Frozen chicken momo', kind: 'pack', category: null, unit_label: '40 pieces', price_pence: 1050, available: true, photo_path: 'chicken.jpg', photo_alt: 'A bag of chicken momo',
+  slug: 'chicken-momo', name: 'Frozen chicken momo', kind: 'pack', categories: { name: 'Momo', category_option_groups: [{ option_groups: { id: 'g2', name: 'Leave out', kind: 'multiple', sort_order: 2, active: true, options: [OPT('o3', 'No onion')] } }, { option_groups: { id: 'g1', name: 'Spice level', kind: 'single', sort_order: 1, active: true, options: [OPT('o1', 'Mild')] } }] }, unit_label: '40 pieces', price_pence: 1050, available: true, photo_path: 'chicken.jpg', photo_alt: 'A bag of chicken momo',
   sort_order: 1, allergens_checked_at: '2026-11-13T10:00:00Z', allergen_note: null,
   product_allergens: [{ allergens: { name: 'Sulphur dioxide and sulphites', sort_order: 13 } }, { allergens: { name: 'Cereals containing gluten', sort_order: 2 } }],
   product_ingredients: [{ name: 'Onion', sort_order: 2 }, { name: 'Chicken', sort_order: 1 }],
-  product_option_groups: [{ id: 'g1', label: 'Spice level', kind: 'single', sort_order: 1, active: true, product_options: [OPT('o1', 'Mild'), OPT('o2', 'Hot', false, 50)] }],
+  product_option_groups_link: [{ sort_order: 1, option_groups: { id: 'g1', name: 'Spice level', kind: 'single', sort_order: 1, active: true, options: [OPT('o1', 'Mild'), OPT('o2', 'Hot', false, 50)] } }],
   product_stock: { quantity: 7 }, ...extra,
-}, { slug: 'unpriced', name: 'No price yet', kind: 'addon', unit_label: '', price_pence: null, available: false, sort_order: 2, product_option_groups: [], product_stock: null }];
+}, { slug: 'unpriced', name: 'No price yet', kind: 'addon', unit_label: '', price_pence: null, available: false, sort_order: 2, product_option_groups_link: [], product_stock: null }];
 
 async function withServer(handler, fn) {
   const server = createServer(handler);
@@ -43,6 +43,9 @@ test('mapProducts keeps active options, the stock and drops products without a p
   assert.equal(rest.length, 0);
   assert.equal(p.stock_quantity, 7);
   assert.deepEqual(p.option_groups[0].options.map((o) => [o.label, o.price_delta_pence]), [['Mild', 0], ['Hot', 50]]);
+  // effective groups: the directly linked group first, then the category's groups, and a group present in both appears once
+  assert.deepEqual(p.option_groups.map((g) => g.label), ['Spice level', 'Leave out']);
+  assert.equal(p.category, 'Momo');
 });
 
 test('a live build writes products.json, the product cards, the photos and the public config', async () => {

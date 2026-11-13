@@ -47,8 +47,8 @@ begin execute p_action; execute p_check into r; return coalesce(r, false); end $
 create function t.order_json(p_slug text, p_qty integer, p_opts jsonb default '[]', p_extra jsonb default '{}') returns jsonb language sql as $$
   select jsonb_build_object('items', jsonb_build_array(jsonb_build_object('slug', p_slug, 'qty', p_qty, 'options', p_opts)), 'name', 'Test Buyer', 'phone', '07700 900123') || p_extra $$;
 create function t.opt(p_slug text, p_group text, p_label text) returns text language sql as $$
-  select o.id::text from product_options o join product_option_groups g on g.id = o.group_id join products p on p.id = g.product_id
-  where p.slug = p_slug and g.label = p_group and o.label = p_label $$;
+  select o.id::text from options o join option_groups g on g.id = o.group_id
+  where g.name = p_group and o.label = p_label limit 1 $$;
 create function t.stock(p_slug text) returns integer language sql as $$ select quantity from product_stock s join products p on p.id = s.product_id where p.slug = p_slug $$;
 create function t.place(p jsonb, p_now timestamptz default '2026-11-13 12:00:00+00') returns jsonb language sql as $$ select public._place_order(p, false, p_now) $$;
 
@@ -165,12 +165,30 @@ select t.chk(t.seq($$select t.place(t.order_json('veg-momo', 2) || '{"total_penc
 select t.chk(t.seq($$select t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('chicken-momo', 'Spice level', 'Medium'))))$$, $$select not (select (items -> 0 ->> 'customised')::boolean from orders order by created_at desc limit 1)$$), 'the default option does not make an order customised');
 select t.chk(t.seq($$select t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('chicken-momo', 'Spice level', 'Hot'), t.opt('chicken-momo', 'Leave out', 'No onion'))))$$, $$select (select (items -> 0 ->> 'customised')::boolean and jsonb_array_length(items -> 0 -> 'options') = 2 from orders order by created_at desc limit 1)$$), 'a non-default option makes it customised and is stored in the snapshot');
 select t.chk(t.stock('chicken-momo') = 7, 'a customised order does not lower stock (10 - 1 - 1 - 1 standard orders = 7)');
-select t.chk(t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('veg-momo', 'Spice level', 'Hot')))) ->> 'code' = 'option', 'an option from another product is rejected');
+-- effective groups: linked directly to the product, or to its category; a group linked to neither is rejected
+insert into option_groups (name, kind) values ('Extra sauce', 'single');
+insert into options (group_id, label, price_delta_pence, is_default) select id, 'Garlic', 30, false from option_groups where name = 'Extra sauce';
+insert into product_option_groups_link (product_id, group_id) select p.id, g.id from products p, option_groups g where p.slug = 'veg-momo' and g.name = 'Extra sauce';
+select t.chk(t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('x', 'Extra sauce', 'Garlic')))) ->> 'code' = 'option', 'an option from a group not linked to the product (or its category) is rejected');
+select t.chk(t.seq($$select t.place(t.order_json('veg-momo', 1, jsonb_build_array(t.opt('x', 'Extra sauce', 'Garlic'))))$$, $$select (select total_pence from orders order by created_at desc limit 1) = 1030$$), 'an option from a group linked directly to the product is accepted and priced from the table (1000 + 30)');
+insert into categories (name) values ('Test category');
+update products set category_id = (select id from categories where name = 'Test category') where slug = 'chicken-momo';
+insert into category_option_groups (category_id, group_id) select c.id, g.id from categories c, option_groups g where c.name = 'Test category' and g.name = 'Extra sauce';
+select t.chk(t.seq($$select t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('x', 'Extra sauce', 'Garlic'))))$$, $$select (select total_pence from orders order by created_at desc limit 1) = 1030$$), 'a group applied to the product''s category is accepted for its products (effective groups)');
+-- a snapshot of the chosen option survives renaming and deleting the library entries
+select t.chk((select items -> 0 -> 'options' -> 0 ->> 'label' from orders order by created_at desc limit 1) = 'Garlic' and (select items -> 0 -> 'options' -> 0 ->> 'group' from orders order by created_at desc limit 1) = 'Extra sauce', 'the order keeps the option label and group name');
+update option_groups set name = 'Renamed' where name = 'Extra sauce';
+update options set label = 'Renamed too', price_delta_pence = 99 where label = 'Garlic';
+select t.chk((select items -> 0 -> 'options' -> 0 ->> 'label' from orders order by created_at desc limit 1) = 'Garlic' and (select (items -> 0 -> 'options' -> 0 ->> 'price_delta_pence')::int from orders order by created_at desc limit 1) = 30, 'renaming and repricing an option does not change an old order');
+delete from option_groups where name = 'Renamed';
+select t.chk((select items -> 0 -> 'options' -> 0 ->> 'label' from orders order by created_at desc limit 1) = 'Garlic', 'deleting the group does not change an old order');
+update products set category_id = null where slug = 'chicken-momo';
+delete from categories where name = 'Test category';
 select t.chk(t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('chicken-momo', 'Spice level', 'Hot'), t.opt('chicken-momo', 'Spice level', 'Mild')))) ->> 'code' = 'option', 'two options in a single group are rejected');
-update product_options set active = false where label = 'No coriander';
+update options set active = false where label = 'No coriander';
 select t.chk(t.place(t.order_json('chicken-momo', 1, jsonb_build_array(t.opt('chicken-momo', 'Leave out', 'No coriander')))) ->> 'code' = 'option', 'an inactive option is rejected');
-update product_options set active = true where label = 'No coriander';
-update product_options set price_delta_pence = 50 where label = 'Hot' and group_id = (select g.id from product_option_groups g join products p on p.id = g.product_id where p.slug = 'veg-momo' and g.label = 'Spice level');
+update options set active = true where label = 'No coriander';
+update options set price_delta_pence = 50 where label = 'Hot' and group_id = (select id from option_groups where name = 'Spice level');
 select t.chk(t.seq($$select t.place(t.order_json('veg-momo', 1, jsonb_build_array(t.opt('veg-momo', 'Spice level', 'Hot'))))$$, $$select (select total_pence from orders order by created_at desc limit 1) = 1050$$), 'a real option price change is added (1000 + 50)');
 select t.chk((t.place(t.order_json('veg-momo', 1, jsonb_build_array(t.opt('veg-momo', 'Spice level', 'Hot')), '{}') || '{"items":[{"slug":"veg-momo","qty":1,"options":[{"label":"Hot","price_delta_pence":0}]}]}') ->> 'ok') is distinct from 'true', 'option objects with a tampered delta are not accepted (ids only)');
 -- required fields, limits, availability
@@ -258,6 +276,30 @@ select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary
 select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary('2026-03-01','2026-03-05') where day = '2026-03-04' and total_pence = 500 and order_count = 1$$) = 1, 'an order with no pickup date counts on the day it was placed');
 select t.chk(t.count('authenticated', :'a', $$select * from public.sales_summary('2026-03-01','2026-03-05') where day in ('2026-03-01','2026-03-03','2026-03-05') and total_pence = 0 and order_count = 0$$) = 3, 'days with no sales are zero');
 delete from orders where order_number like 'SS-T-%';
+
+-- ===== catalogue (Step 4l) =====
+select t.chk(not exists (
+  select 1 from products p where
+    (select coalesce(array_agg(g.label || '/' || o.label order by g.label, o.label), '{}') from product_option_groups g join product_options o on o.group_id = g.id where g.product_id = p.id)
+    is distinct from
+    (select coalesce(array_agg(g.name || '/' || o.label order by g.name, o.label), '{}') from option_groups g join options o on o.group_id = g.id
+       where g.id in (select group_id from product_option_groups_link where product_id = p.id))), 'the data migration gave every existing product exactly its old groups and options');
+select t.table_policy('categories', $$insert into categories (name) values ('RLS test')$$, $$update categories set sort_order = 9 where name = 'RLS test'$$, $$delete from categories where name = 'RLS test'$$);
+select t.table_policy('option_groups', $$insert into option_groups (name, kind) values ('RLS test', 'single')$$, $$update option_groups set sort_order = 9 where name = 'RLS test'$$, $$delete from option_groups where name = 'RLS test'$$);
+select t.chk(t.try('anon', null, $$insert into categories (name) values ('anon')$$) = 'denied', 'anon cannot write categories');
+select t.chk(t.try('anon', null, $$insert into product_option_groups_link (product_id, group_id) select p.id, g.id from products p, option_groups g limit 1$$) = 'denied', 'anon cannot link options');
+select t.chk(t.count('anon', null, 'select * from categories') >= 0 and t.try('anon', null, 'select * from option_id_aliases') = 'denied', 'anon reads categories but not the internal alias table');
+-- bulk allergens: the products of one allergen are set in one go, and every changed product loses its check
+select id as milk from allergens where name = 'Milk' \gset
+update products set allergens_checked_at = now() where slug in ('chicken-momo', 'veg-momo');
+select t.chk(t.try('anon', null, format('select public.set_allergen_products(%L, array[]::uuid[])', :'milk')) = 'denied', 'anon cannot set allergens in bulk');
+select t.chk(t.try('authenticated', :'b', format('select public.set_allergen_products(%L, array[]::uuid[])', :'milk')) = 'denied', 'a non-admin cannot set allergens in bulk');
+select id as chk_a from products where slug = 'chicken-momo' \gset
+select t.chk(t.try('authenticated', :'a', format('select public.set_allergen_products(%L, array[%L]::uuid[])', :'milk', :'chk_a')) = 'ok', 'an admin sets the products of an allergen');
+select t.chk((select count(*) from product_allergens where allergen_id = :'milk') = 1 and exists (select 1 from product_allergens where allergen_id = :'milk' and product_id = :'chk_a'), 'exactly the chosen product has the allergen');
+select t.chk((select allergens_checked_at is null from products where id = :'chk_a') and (select allergens_checked_at is not null from products where slug = 'veg-momo'), 'only the changed product loses its allergen check');
+select t.chk(t.try('authenticated', :'a', format('select public.set_allergen_products(%L, array[%L]::uuid[])', :'milk', :'chk_a')) = 'ok' and (select allergens_checked_at is null from products where id = :'chk_a'), 'setting the same list again changes nothing more');
+delete from product_allergens where allergen_id = :'milk';
 
 -- ===== publish pipeline =====
 update site_status set unpublished = false, state = 'live' where id = 1;

@@ -321,12 +321,12 @@ export function settingsWithDefaults(state) {
 
 export function adminProducts(state) {
   return state.products.map((p, i) => ({
-    id: p.slug, slug: p.slug, name: p.name, kind: p.kind, category: p.category ?? null, unit_label: p.unit_label || '',
+    id: p.slug, slug: p.slug, name: p.name, kind: p.kind, category: (state.categories || []).find((x) => x.id === p.category_id)?.name ?? null, category_id: p.category_id ?? null, unit_label: p.unit_label || '',
     price_pence: p.price_pence ?? null, available: p.available !== false, active: p.active !== false, sort_order: p.sort_order ?? i + 1,
     photo_path: p.photo_path ?? p.photo ?? null, photo_alt: p.photo_alt ?? '', ingredients: [...(p.ingredients || [])], allergen_ids: [...(p.allergen_ids || [])], allergen_note: p.allergen_note ?? '', allergens_checked_at: p.allergens_checked_at ?? null,
     stock_quantity: p.stock_quantity ?? null,
     option_groups: (p.option_groups || []).map((g, gi) => ({
-      id: g.id, label: g.label, kind: g.kind, sort_order: g.sort_order ?? gi + 1, active: g.active !== false,
+      id: g.id, label: g.label, kind: g.kind, source: g.source || 'product', sort_order: g.sort_order ?? gi + 1, active: g.active !== false,
       options: (g.options || []).map((o, oi) => ({ id: o.id, label: o.label, price_delta_pence: o.price_delta_pence || 0, is_default: Boolean(o.is_default), sort_order: o.sort_order ?? oi + 1, active: o.active !== false })),
     })).sort((a, b) => a.sort_order - b.sort_order),
   })).sort((a, b) => a.sort_order - b.sort_order);
@@ -350,12 +350,13 @@ export function saveProduct(state, input) {
     state.products.push(p);
   }
   Object.assign(p, {
-    name: String(input.name).trim(), kind: input.kind, unit_label: String(input.unit_label || '').trim(), price_pence: price,
+    name: String(input.name).trim(), kind: input.kind, unit_label: String(input.unit_label || '').trim(), price_pence: price, category_id: input.category_id || undefined,
     available: Boolean(input.available), active: Boolean(input.active), photo_path: input.photo_path || null, photo_alt: String(input.photo_alt || '').trim(),
     ingredients: (input.ingredients || []).map((t) => String(t).trim().replace(/\s+/g, ' ')), allergen_ids: [...(input.allergen_ids || [])], allergen_note: String(input.allergen_note || '').trim(), allergens_checked_at: input.allergens_checked_at || null,
   });
   if (p.photo_path) p.photo = p.photo_path;
-  touched(state);
+  if (!input.category_id) delete p.category_id;
+  syncEffective(state); touched(state);
   return adminProducts(state).find((x) => x.id === p.slug);
 }
 
@@ -373,24 +374,102 @@ export function setStock(state, id, quantity) {
   return p.stock_quantity;
 }
 
-// One option group with all of its options, replaced as a whole.
-export function saveOptionGroup(state, productId, group) {
-  const p = findProduct(state, productId);
-  const options = (group.options || []).map((o, i) => ({ ...o, price_delta_pence: o.price_delta_pence ?? 0, active: o.active !== false, sort_order: i + 1 }));
-  const error = validateGroup(group, options);
-  if (error) fail(error);
-  p.option_groups ??= [];
-  let g = group.id ? p.option_groups.find((x) => x.id === group.id) : null;
-  if (!g) { g = { id: `g-${RANDOM_ID()}` }; p.option_groups.push(g); }
-  Object.assign(g, { label: String(group.label).trim(), kind: group.kind, active: group.active !== false, sort_order: group.sort_order ?? p.option_groups.length,
-    options: options.map((o) => ({ id: o.id || `o-${RANDOM_ID()}`, label: String(o.label).trim(), price_delta_pence: o.price_delta_pence, is_default: Boolean(o.is_default), active: o.active, sort_order: o.sort_order })) });
-  touched(state);
-  return adminProducts(state).find((x) => x.id === p.slug).option_groups.find((x) => x.id === g.id);
+// ---------- catalogue (Step 4l): categories and a library of option groups that apply to products or whole categories ----------
+// A library group: { id, name, kind, sort_order, active, options[], category_ids[], product_ids[] (slugs) }. The effective groups of a product
+// (linked to it plus linked to its category) are copied onto product.option_groups, the shape the shop and the order check already use.
+const optionRow = (o, i) => ({ id: o.id || `o-${RANDOM_ID()}`, label: String(o.label).trim(), price_delta_pence: o.price_delta_pence || 0, is_default: Boolean(o.is_default), sort_order: i + 1, active: o.active !== false });
+export function syncEffective(state) {
+  if (!state.library) return; // the catalogue is built on first use
+  for (const p of state.products) {
+    const mine = state.library.filter((g) => (g.product_ids || []).includes(p.slug) || (p.category_id && (g.category_ids || []).includes(p.category_id)));
+    mine.sort((a, b) => ((g) => g)(a).sort_order - b.sort_order);
+    p.option_groups = mine.map((g) => ({ id: g.id, label: g.name, kind: g.kind, sort_order: g.sort_order, active: g.active !== false, source: (g.product_ids || []).includes(p.slug) ? 'product' : 'category', options: g.options.map((o) => ({ ...o })) }));
+  }
 }
-export function deleteOptionGroup(state, productId, groupId) {
-  const p = findProduct(state, productId);
-  p.option_groups = (p.option_groups || []).filter((g) => g.id !== groupId);
+// First load: build the library from the per-product groups the seed has (identical groups are merged), and categories from the category text.
+export function ensureCatalogue(state) {
+  if (state.library && state.categories) return;
+  state.categories = []; state.library = [];
+  for (const p of state.products) {
+    const name = String(p.category || '').trim();
+    if (name) { let c = state.categories.find((x) => x.name.toLowerCase() === name.toLowerCase()); if (!c) { c = { id: `c-${RANDOM_ID()}`, name, sort_order: state.categories.length + 1 }; state.categories.push(c); } p.category_id = c.id; }
+  }
+  const sig = (g) => JSON.stringify([g.label, g.kind, g.active !== false, (g.options || []).map((o) => [o.label, o.price_delta_pence || 0, Boolean(o.is_default), o.active !== false]).sort()]);
+  const bySig = new Map();
+  for (const p of state.products) {
+    for (const g of p.option_groups || []) {
+      const key = sig(g); let lib = bySig.get(key);
+      if (!lib) { lib = { id: g.id || `g-${RANDOM_ID()}`, name: g.label, kind: g.kind, sort_order: state.library.length + 1, active: g.active !== false, options: (g.options || []).map(optionRow), category_ids: [], product_ids: [] }; bySig.set(key, lib); state.library.push(lib); }
+      lib.product_ids.push(p.slug);
+    }
+  }
+  const names = new Map(); state.library.forEach((g) => names.set(g.name, (names.get(g.name) || 0) + 1));
+  state.library.forEach((g) => { if (names.get(g.name) > 1) g.name = `${g.name} (${state.products.find((p) => p.slug === g.product_ids[0])?.name})`; });
+  syncEffective(state);
+}
+const findGroup = (state, id) => state.library.find((g) => g.id === id) || fail('That option group was not found.', 'not_found');
+const findCategory = (state, id) => state.categories.find((c) => c.id === id) || fail('That category was not found.', 'not_found');
+export function listCategories(state) {
+  return clone(state.categories).sort((a, b) => a.sort_order - b.sort_order).map((c) => ({ ...c, product_count: state.products.filter((p) => p.category_id === c.id).length, group_ids: state.library.filter((g) => (g.category_ids || []).includes(c.id)).map((g) => g.id) }));
+}
+export function saveCategory(state, { id, name }) {
+  const text = String(name ?? '').trim().replace(/\s+/g, ' ');
+  if (!text) fail('Enter a name for the category.');
+  if (text.length > 60) fail('The category name can be at most 60 characters.');
+  if (state.categories.some((c) => c.id !== id && c.name.toLowerCase() === text.toLowerCase())) fail('There is already a category with that name.');
+  if (id) findCategory(state, id).name = text;
+  else state.categories.push({ id: `c-${RANDOM_ID()}`, name: text, sort_order: Math.max(0, ...state.categories.map((c) => c.sort_order)) + 1 });
+  syncEffective(state); touched(state);
+}
+export function reorderCategories(state, ids) { ids.forEach((id, i) => { findCategory(state, id).sort_order = i + 1; }); touched(state); }
+// Deleting a category moves its products to no category and removes its option links. Returns how many products moved.
+export function deleteCategory(state, id) {
+  findCategory(state, id);
+  const moved = state.products.filter((p) => p.category_id === id);
+  moved.forEach((p) => { delete p.category_id; });
+  state.categories = state.categories.filter((c) => c.id !== id);
+  state.library.forEach((g) => { g.category_ids = (g.category_ids || []).filter((x) => x !== id); });
+  syncEffective(state); touched(state);
+  return moved.length;
+}
+export function listLibrary(state) {
+  return clone(state.library).sort((a, b) => a.sort_order - b.sort_order).map((g) => ({ ...g, category_ids: g.category_ids || [], product_ids: g.product_ids || [] }));
+}
+// Creates or replaces one library group with all of its options. applies: optional { category_ids, product_ids } set in the same call.
+export function saveLibraryGroup(state, group, applies = null) {
+  const options = (group.options || []).map(optionRow);
+  const error = validateGroup({ label: group.name, kind: group.kind, active: group.active !== false }, options);
+  if (error) fail(error);
+  let g = group.id ? findGroup(state, group.id) : null;
+  if (!g) { g = { id: `g-${RANDOM_ID()}`, category_ids: [], product_ids: [], sort_order: Math.max(0, ...state.library.map((x) => x.sort_order)) + 1 }; state.library.push(g); }
+  Object.assign(g, { name: String(group.name).trim(), kind: group.kind, active: group.active !== false, options });
+  if (applies) { g.category_ids = [...(applies.category_ids || [])]; g.product_ids = [...(applies.product_ids || [])]; }
+  syncEffective(state); touched(state);
+  return clone(g);
+}
+export function deleteLibraryGroup(state, id) { findGroup(state, id); state.library = state.library.filter((g) => g.id !== id); syncEffective(state); touched(state); }
+export function reorderLibrary(state, ids) { ids.forEach((id, i) => { findGroup(state, id).sort_order = i + 1; }); syncEffective(state); touched(state); }
+export function setGroupApplies(state, id, { category_ids = [], product_ids = [] }) {
+  const g = findGroup(state, id); g.category_ids = [...category_ids]; g.product_ids = [...product_ids]; syncEffective(state); touched(state);
+}
+// The groups linked directly to one product (the ones she picks from the library in the product editor).
+export function setProductGroups(state, slug, groupIds) {
+  findProduct(state, slug);
+  for (const g of state.library) { const has = (g.product_ids || []).includes(slug); const want = groupIds.includes(g.id); if (has && !want) g.product_ids = g.product_ids.filter((x) => x !== slug); else if (!has && want) (g.product_ids ||= []).push(slug); }
+  syncEffective(state); touched(state);
+}
+// Bulk allergens: the products that contain one allergen. Every product whose list changes loses its "I have checked" confirmation.
+export function setAllergenProducts(state, allergenId, slugs) {
+  allergensOf(state).find((a) => a.id === allergenId) || fail('That allergen was not found.', 'not_found');
+  let changed = 0;
+  for (const p of state.products) {
+    const has = (p.allergen_ids || []).includes(allergenId); const want = slugs.includes(p.slug);
+    if (has === want) continue;
+    p.allergen_ids = want ? [...(p.allergen_ids || []), allergenId] : p.allergen_ids.filter((x) => x !== allergenId);
+    p.allergens_checked_at = null; changed += 1;
+  }
   touched(state);
+  return changed;
 }
 
 // Pickup rules and exceptions (D-038). Rows get ids the first time the admin reads them.
@@ -484,6 +563,7 @@ export function createMock({ storage = null, loadSeed, now = () => new Date() } 
   const load = async () => {
     let state = read();
     if (!state || state.version !== 1) { state = buildInitialState(await loadSeed(), now()); write(state); }
+    if (!state.library) { ensureCatalogue(state); write(state); }
     return state;
   };
   // Runs a change on the state and saves it only when the change succeeds.
@@ -503,8 +583,17 @@ export function createMock({ storage = null, loadSeed, now = () => new Date() } 
     saveProduct: (p) => change((s) => saveProduct(s, p)),
     reorderProducts: (ids) => change((s) => reorderProducts(s, ids)),
     setStock: (id, q) => change((s) => setStock(s, id, q)),
-    saveOptionGroup: (pid, g) => change((s) => saveOptionGroup(s, pid, g)),
-    deleteOptionGroup: (pid, gid) => change((s) => deleteOptionGroup(s, pid, gid)),
+    listCategories: () => query((s) => listCategories(s)),
+    saveCategory: (x) => change((s) => saveCategory(s, x)),
+    reorderCategories: (ids) => change((s) => reorderCategories(s, ids)),
+    deleteCategory: (id) => change((s) => deleteCategory(s, id)),
+    listLibrary: () => query((s) => listLibrary(s)),
+    saveLibraryGroup: (g, applies) => change((s) => saveLibraryGroup(s, g, applies)),
+    deleteLibraryGroup: (id) => change((s) => deleteLibraryGroup(s, id)),
+    reorderLibrary: (ids) => change((s) => reorderLibrary(s, ids)),
+    setGroupApplies: (id, a) => change((s) => setGroupApplies(s, id, a)),
+    setProductGroups: (slug, ids) => change((s) => setProductGroups(s, slug, ids)),
+    setAllergenProducts: (id, slugs) => change((s) => setAllergenProducts(s, id, slugs)),
     getPickup: () => change((s) => adminPickup(s)),
     saveRule: (r) => change((s) => saveRule(s, r)),
     deleteRule: (id) => change((s) => deleteRule(s, id)),

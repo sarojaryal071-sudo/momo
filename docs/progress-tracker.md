@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4n, coding agent)
+- Last updated: 2026-11-13 (Step 4l, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 4h (weekly pickup hours redesign, D-063), then Step 4i (admin sales summary, D-064), then Step 4j (Realtime connection fix), then Step 4n (admin fixes round: product editor back to one page, Settings hub look and back path, notice-period modal, red allergen navigation, order More menu, Publish wording; 4m is folded into it), Step 4l (catalogue: categories, reusable options, allergens by product, D-065), then Step 5 (SEO, hardening, launch).
 
@@ -239,6 +239,14 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
 
+## Step 4l — Catalogue (D-065, D-066)
+
+- [x] Migration 0011: `categories`, `products.category_id`, option library (`option_groups`, `options`), links `product_option_groups_link` and `category_option_groups`, `option_id_aliases`; existing data moved (identical groups merged, same option ids reused, aliases for merged ones). Old tables and `products.category` kept, unused.
+- [x] Migration 0012: `_place_order` validates options against the effective groups (product links plus category links), snapshot of group name, label and price kept; `set_allergen_products` (admin only, clears the check of changed products).
+- [x] Build reads effective groups per product into the same shape; category name from `categories`.
+- [x] Admin: Manage menu on Products (Categories, Options, Allergens screens), category filter and category on each row, product editor with Category and library-based Options card (from category / direct, add from library, create new group).
+- Product-level exclusions from a category group: not built.
+
 ## Step 4n — Admin fixes round (D-066, includes 4m)
 
 - [x] A: product editor back to one scrolling form (tabs removed); failed Save focuses the first invalid field with a red icon and words
@@ -427,3 +435,5 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-13, step 4k (demo backend only): build passes; Playwright at 390 px: hub, each section opens by hash, save and summary update, validation, unsaved dialog (Back and browser Back), deep links, Save bar on tab bar; product tabs, keyboard (arrows, Home, End), unsaved dot, error dot, jump and focus, safeguard on Availability. Not checked: real Supabase, desktop width by eye.
 
 - 2026-11-13, step 4n (demo backend only): build passes; mock-backend test (19) passes; local PostgreSQL tests pass incl. reopen on a full day; Playwright at 390 px: flagged check and price, auto Active on tick and save, notice modal (Escape, validation, unsaved edit kept), failed save focus, hub and back path, More menu per status; no overflow or oversized SVG at 320, 390 and 1440 px on Settings and the editor. Not checked: real Supabase.
+
+- 2026-11-13, step 4l: build passes; database tests pass (effective groups, tampered or unlinked option refused, snapshot survives rename and delete, bulk allergens clear the check, RLS on the new tables, migration kept every product's options); build-supabase and mock-backend tests pass; Playwright at 390 px on the mock backend: Manage menu, categories, options library and applies-to, editor options card and Create new group, category filter, allergens bulk and summary. Not checked: real Supabase (migrations 0011 and 0012 applied by the workflow).

@@ -45,8 +45,17 @@
   <main class="admin-main" id="main">
     <div class="title-row">
       <h1>Products</h1>
+      <div class="manage">
+        <button type="button" class="btn btn-secondary btn-small" aria-haspopup="true" aria-expanded="false" aria-controls="manage-menu" data-manage-btn>Manage</button>
+        <div class="manage-menu" id="manage-menu" role="menu" hidden>
+          <a role="menuitem" href="categories">Categories</a>
+          <a role="menuitem" href="options">Options</a>
+          <a role="menuitem" href="allergens">Allergens</a>
+        </div>
+      </div>
       <button type="button" class="btn btn-small" data-add>Add product</button>
     </div>
+    <div class="field filter-row" data-filter hidden><label for="cat-filter">Category</label><select id="cat-filter" data-cat-filter></select></div>
     <section class="panel publish-banner" data-publish hidden aria-live="polite"></section>
     <div data-list aria-live="polite"></div>
     <div data-editor hidden></div>
