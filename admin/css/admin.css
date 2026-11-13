@@ -472,3 +472,26 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
   .admin-body:not(.login-body) .admin-bar .admin-brand { display: none; }
   .admin-body:not(.login-body) .admin-bar { justify-content: flex-end; }
 }
+
+/* Step 4k: product editor tabs */
+.tab-strip { position: sticky; inset-block-start: 0; z-index: 2; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-block-end: var(--space-s); background: color-mix(in srgb, var(--white) 78%, transparent); -webkit-backdrop-filter: blur(var(--admin-glass-blur)); backdrop-filter: blur(var(--admin-glass-blur)); border: var(--hairline) solid var(--admin-glass-border); border-radius: var(--r-input); overflow: hidden; }
+.tab-btn { position: relative; display: flex; align-items: center; justify-content: center; gap: var(--space-3xs); min-block-size: var(--tap); padding-inline: var(--space-3xs); font: inherit; font-size: var(--text-small); font-weight: 600; color: var(--charcoal); background: transparent; border: 0; border-block-end: var(--space-3xs) solid transparent; cursor: pointer; min-inline-size: 0; }
+.tab-btn[aria-selected="true"] { color: var(--emerald); background: var(--white); border-block-end-color: var(--emerald); }
+.tab-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tab-mark:empty { display: none; }
+.tab-btn[data-mark="dirty"] .tab-mark { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: var(--emerald); }
+.tab-btn[data-mark="error"] .tab-mark { display: inline-grid; place-items: center; inline-size: 1rem; block-size: 1rem; border-radius: 50%; background: var(--chutney); color: var(--white); font-size: 0.75rem; font-weight: 700; line-height: 1; }
+.tab-btn:focus-visible { outline: var(--ring-width) solid var(--emerald); outline-offset: calc(var(--ring-width) * -1); }
+.tab-panel[hidden] { display: none; }
+
+/* Step 4k: settings hub */
+.settings-list { display: grid; gap: var(--space-xs); }
+.settings-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-s); min-block-size: calc(var(--tap) * 1.4); padding: var(--space-s); color: var(--charcoal); text-decoration: none; background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--radius); }
+.settings-row:hover { background: var(--green-tint); }
+.settings-row:focus-visible { outline: var(--ring-width) solid var(--emerald); outline-offset: var(--ring-width); }
+.settings-row svg { inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: var(--emerald); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.settings-icon { display: grid; place-items: center; inline-size: var(--tap); block-size: var(--tap); background: var(--green-tint); border-radius: var(--r-input); }
+.settings-text { display: grid; gap: var(--space-3xs); min-inline-size: 0; }
+.settings-text .muted { font-size: var(--text-small); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.settings-page .title-row .back-link svg { inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+@media (min-width: 48em) { .tab-strip { inset-block-start: var(--top-h, 0px); } }

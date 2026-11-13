@@ -104,14 +104,46 @@ async function edit(id) {
   const product = id ? products.find((p) => p.id === id) : null;
   const settings = await api.getSettings().catch(() => ({}));
   let dirty = false;
-  const markDirty = () => { dirty = true; window.onbeforeunload = () => ''; };
+  // Four tabs (D-065). A tab is marked when something on it changed, or when Save found a problem on it.
+  const TABS = [['basic', 'Basic'], ['advanced', 'Advanced'], ['allergens', 'Allergens'], ['availability', 'Availability']];
+  const dirtyTabs = new Set(); const errorTabs = new Set();
+  const fromHash = location.hash.replace('#', '');
+  let activeTab = TABS.some(([k]) => k === fromHash) ? fromHash : 'basic';
+  const markDirty = () => { dirty = true; dirtyTabs.add(activeTab); paintTabs(); window.onbeforeunload = () => ''; };
 
   // frame: glass edit bar replaces the wordmark bar; the list and its header are hidden
   document.body.classList.add('is-editing');
   titleRow.hidden = true; listBox.hidden = true; publishBox.hidden = true;
   editorBox.hidden = false; editorBox.replaceChildren();
+  const strip = el('div', { className: 'tab-strip', role: 'tablist', 'aria-label': 'Product sections' });
+  const panels = {}; const tabBtns = {};
+  for (const [key, label] of TABS) {
+    const b = el('button', { type: 'button', className: 'tab-btn', role: 'tab', id: `tab-${key}`, 'aria-controls': `panel-${key}`, 'aria-selected': 'false', tabIndex: -1 }, el('span', { className: 'tab-label' }, label), el('span', { className: 'tab-mark' }));
+    b.addEventListener('click', () => activate(key));
+    b.addEventListener('keydown', (e) => {
+      const i = TABS.findIndex(([k]) => k === key); const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: TABS.length - 1 }[e.key];
+      if (to === undefined) return; e.preventDefault(); activate(TABS[(to + TABS.length) % TABS.length][0], true);
+    });
+    tabBtns[key] = b; strip.append(b);
+    panels[key] = el('div', { className: 'tab-panel', role: 'tabpanel', id: `panel-${key}`, 'aria-labelledby': `tab-${key}`, hidden: true });
+  }
+  editorBox.append(strip, ...Object.values(panels));
+  function paintTabs() {
+    for (const [key] of TABS) {
+      const b = tabBtns[key]; const on = key === activeTab;
+      b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; panels[key].hidden = !on;
+      const bad = errorTabs.has(key); const unsaved = dirtyTabs.has(key);
+      b.dataset.mark = bad ? 'error' : unsaved ? 'dirty' : '';
+      b.querySelector('.tab-mark').replaceChildren(...(bad ? [el('span', { 'aria-hidden': 'true' }, '!'), el('span', { className: 'visually-hidden' }, ' (needs attention)')] : unsaved ? [el('span', { className: 'visually-hidden' }, ' (unsaved changes)')] : []));
+    }
+  }
+  function activate(key, focus = false) {
+    activeTab = key; paintTabs();
+    history.replaceState(null, '', `#${key}`);
+    if (focus) tabBtns[key].focus();
+  }
   const leave = async () => {
-    window.onbeforeunload = null; dirty = false; bar.remove(); document.body.classList.remove('is-editing');
+    window.onbeforeunload = null; dirty = false; if (location.hash) history.replaceState(null, '', location.pathname + location.search); bar.remove(); document.body.classList.remove('is-editing');
     editorBox.hidden = true; titleRow.hidden = false; listBox.hidden = false;
     await load(); drawList(); await drawPublish();
     document.querySelector('.admin-main').scrollTop = 0;
@@ -149,13 +181,13 @@ async function edit(id) {
   name.control.addEventListener('input', () => { draft.name = name.control.value; bar.querySelector('h2').textContent = draft.name || 'New product'; markDirty(); });
   kind.control.addEventListener('change', () => { draft.kind = kind.control.value; markDirty(); });
   unit.control.addEventListener('input', () => { draft.unit_label = unit.control.value; markDirty(); });
-  editorBox.append(card('Name', name.wrap, errors.name, kind.wrap, unit.wrap));
+  panels.basic.append(card('Name', name.wrap, errors.name, kind.wrap, unit.wrap));
 
   // ----- Price -----
   const price = field('Price (£)', 'text', { value: draft.price, inputMode: 'decimal', hint: 'For example 10 or 10.50. It is stored in pence.' });
   errors.price = errorLine();
   price.control.addEventListener('input', () => { draft.price = price.control.value; markDirty(); });
-  editorBox.append(card('Price', price.wrap, errors.price));
+  panels.basic.append(card('Price', price.wrap, errors.price));
 
   // ----- Photo -----
   const preview = el('img', { className: 'photo-preview', alt: '' });
@@ -178,14 +210,14 @@ async function edit(id) {
       pending = { blob, name: file.name }; setPreview(await dataUrl(blob)); clear.hidden = false; markDirty();
     } catch { showError('photo', 'That photo could not be read. Try another.'); }
   });
-  editorBox.append(card('Photo', el('div', { className: 'photo-row' }, preview, change, clear), fileInput, alt.wrap, errors.photo));
+  panels.basic.append(card('Photo', el('div', { className: 'photo-row' }, preview, change, clear), fileInput, alt.wrap, errors.photo));
 
   // ----- Options (groups as chips) -----
   const chipRow = el('div', { className: 'chip-set', role: 'group', 'aria-label': 'Option groups' });
   const groupBox = el('div');
   const previewBox = el('div', { className: 'option-preview' });
   errors.options = errorLine();
-  editorBox.append(card('Options', el('p', {}, 'Choosing anything other than the standard option makes the order customised and needs the longer notice.'), chipRow, groupBox, errors.options, previewBox));
+  panels.advanced.append(card('Options', el('p', {}, 'Choosing anything other than the standard option makes the order customised and needs the longer notice.'), chipRow, groupBox, errors.options, previewBox));
   const drawPreview = () => {
     previewBox.replaceChildren(el('h3', {}, 'How customers see it'));
     const live = groups.filter((g) => g.active && g.options.some((o) => o.active));
@@ -231,7 +263,7 @@ async function edit(id) {
 
   // ----- the safeguard: changing allergens or ingredients clears "I have checked" and asks again -----
   let checkBox = null; let checkNote = null;
-  const infoChanged = () => { draft.infoChanged = true; markDirty(); if (draft.checked) { draft.checked = false; if (checkBox) checkBox.checked = false; if (checkNote) checkNote.textContent = 'You changed the allergen or ingredient information, so please tick the check again.'; } };
+  const infoChanged = () => { draft.infoChanged = true; markDirty(); dirtyTabs.add('allergens'); paintTabs(); if (draft.checked) { draft.checked = false; if (checkBox) checkBox.checked = false; if (checkNote) checkNote.textContent = 'You changed the allergen or ingredient information, so please tick the check again.'; } };
 
   // ----- Ingredients: tags, one at a time, in her order -----
   errors.ingredients = errorLine();
@@ -252,7 +284,7 @@ async function edit(id) {
     showError('ingredients', ''); draft.ingredients.push(tag); tagInput.value = ''; infoChanged(); drawTags(); tagInput.focus();
   };
   tagInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } });
-  editorBox.append(card('Ingredients', el('div', { className: 'tag-add' }, tagInput, el('button', { type: 'button', className: 'btn btn-small', onclick: addTag }, 'Add')), suggestions, errors.ingredients, tagList));
+  panels.advanced.append(card('Ingredients', el('div', { className: 'tag-add' }, tagInput, el('button', { type: 'button', className: 'btn btn-small', onclick: addTag }, 'Add')), suggestions, errors.ingredients, tagList));
   drawTags();
 
   // ----- Allergens: the list is data in the database -----
@@ -271,7 +303,7 @@ async function edit(id) {
   const manage = el('details', { className: 'manage-allergens' }, el('summary', {}, 'Manage allergens'), el('p', { className: 'muted' }, 'Add, rename, reorder or delete the allergens in this list. It is the same list for every product.'), manager);
   let managerLoaded = false;
   manage.addEventListener('toggle', async () => { if (manage.open && !managerLoaded) { managerLoaded = true; await mountAllergenManager(manager, { onChange: drawGrid }); } });
-  editorBox.append(card('Allergens', el('p', { className: 'reminder' }, LEGAL_REMINDER), grid, manage, note.wrap, errors.allergens));
+  panels.allergens.append(card('Allergens', el('p', { className: 'reminder' }, LEGAL_REMINDER), grid, manage, note.wrap, errors.allergens));
 
   // ----- Stock -----
   const tracked = makeSwitch('Count stock for this product', draft.tracked, (on) => { draft.tracked = on; stockBox.hidden = !on; markDirty(); });
@@ -280,20 +312,20 @@ async function edit(id) {
   qty.control.addEventListener('input', () => { draft.stock = qty.control.value; markDirty(); });
   const stepStock = (d) => () => { const cur = Number(qty.control.value || 0); qty.control.value = String(Math.max(0, cur + d)); draft.stock = qty.control.value; markDirty(); };
   const stockBox = el('div', { hidden: !draft.tracked }, qty.wrap, el('div', { className: 'btn-row' }, el('button', { type: 'button', className: 'btn btn-secondary', 'aria-label': 'One less in stock', onclick: stepStock(-1) }, '−'), el('button', { type: 'button', className: 'btn btn-secondary', 'aria-label': 'One more in stock', onclick: stepStock(1) }, '+')), errors.stock);
-  editorBox.append(card('Stock', el('p', {}, 'Stock counts packs already frozen and ready. Customised orders are made to order and do not use stock. Stock changes are live at once and do not need Publish.'), tracked.row, stockBox));
+  panels.availability.append(card('Stock', el('p', {}, 'Stock counts packs already frozen and ready. Customised orders are made to order and do not use stock. Stock changes are live at once and do not need Publish.'), tracked.row, stockBox));
 
   // ----- Availability, with the safeguard -----
-  errors.checked = errorLine();
+  errors.checked = errorLine(); errors.active = errorLine();
   checkBox = el('input', { type: 'checkbox', checked: draft.checked, onchange: () => { draft.checked = checkBox.checked; if (draft.checked) { draft.checkedAt = null; if (checkNote) checkNote.textContent = ''; } markDirty(); } });
   checkNote = el('p', { className: 'muted' });
   const active = makeSwitch('Shown in the shop', draft.active, (on) => {
-    if (on && !draft.checked) { active.set(false); showError('checked', 'Tick "I have checked the allergen and ingredient information" first. A product cannot be shown without it.'); return; }
-    showError('checked', ''); draft.active = on; markDirty();
+    if (on && !draft.checked) { active.set(false); showError('active', 'Open the Allergens tab and tick "I have checked the allergen and ingredient information" first. A product cannot be shown without it.'); return; }
+    showError('active', ''); draft.active = on; markDirty();
   });
   const available = makeSwitch('Available to order', draft.available, (on) => { draft.available = on; markDirty(); });
-  editorBox.append(card('Availability',
-    el('label', { className: 'check check-required' }, checkBox, ' I have checked the allergen and ingredient information'), checkNote, errors.checked,
-    active.row, available.row, el('p', { className: 'muted' }, `Customised orders need ${settings.custom_min_lead_hours ?? 48} hours' notice. You can change that in `, el('a', { href: 'settings' }, 'Settings'), '.')));
+  panels.allergens.append(card('Allergen check', el('label', { className: 'check check-required' }, checkBox, ' I have checked the allergen and ingredient information'), checkNote, errors.checked));
+  panels.availability.append(card('Availability',
+    errors.active, active.row, available.row, el('p', { className: 'muted' }, `Customised orders need ${settings.custom_min_lead_hours ?? 48} hours' notice. You can change that in `, el('a', { href: 'settings' }, 'Settings'), '.')));
 
   // ----- sticky Save and Cancel -----
   const saveBtn = el('button', { type: 'button', className: 'btn' }, 'Save');
@@ -302,23 +334,31 @@ async function edit(id) {
   const topOfEditor = () => document.querySelector('.admin-main').scrollTo({ top: 0, behavior: 'smooth' });
 
   saveBtn.addEventListener('click', async () => {
-    Object.values(errors).forEach((e) => { e.textContent = ''; });
+    Object.values(errors).forEach((e) => { e.textContent = ''; }); errorTabs.clear();
     const priceText = draft.price.trim();
     const pence = priceText === '' ? null : poundsToPence(priceText);
     const fields = { id: product?.id, name: draft.name, kind: draft.kind, unit_label: draft.unit_label, price_pence: pence, active: draft.active, available: draft.available,
       photo_path: pending ? 'pending.webp' : draft.photo_path, photo_alt: draft.photo_alt, ingredients: draft.ingredients, allergen_ids: draft.allergen_ids, allergen_note: draft.allergen_note,
       allergens_checked_at: draft.checked ? (draft.infoChanged || !draft.checkedAt ? new Date().toISOString() : draft.checkedAt) : null };
     let first = null;
-    const fail = (key, text) => { showError(key, text); first ||= errors[key]; };
+    const TAB_OF = { name: 'basic', price: 'basic', photo: 'basic', options: 'advanced', ingredients: 'advanced', allergens: 'allergens', checked: 'allergens', stock: 'availability', active: 'availability' };
+    const fail = (key, text) => { showError(key, text); errorTabs.add(TAB_OF[key]); first ||= { key, node: errors[key] }; };
     if (priceText !== '' && pence === null) fail('price', 'Enter a price of £0 or more, for example 10 or 10.50.');
     else { const e = validateProduct(fields); if (e) fail(/price/i.test(e) ? 'price' : 'name', e); }
     const pe = validatePhoto({ photo_path: fields.photo_path, photo_alt: draft.photo_alt }); if (pe) fail('photo', pe);
     const ie = validateIngredients({ ingredients: draft.ingredients, allergen_ids: draft.allergen_ids, allergen_note: draft.allergen_note }); if (ie) fail('allergens', ie);
-    const ce = validateChecked({ active: draft.active, checked: draft.checked }); if (ce) fail('checked', ce);
+    const ce = validateChecked({ active: draft.active, checked: draft.checked }); if (ce) fail('active', ce);
     for (const g of groups) { const ge = validateGroup(g, g.options); if (ge) { fail('options', `${g.label || 'New group'}: ${ge}`); break; } }
     let stockValue = null;
     if (draft.tracked) { const n = Number(String(draft.stock).trim()); if (String(draft.stock).trim() === '' || !Number.isInteger(n) || n < 0) fail('stock', 'Enter a whole number, 0 or more.'); else stockValue = n; }
-    if (first) { first.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    if (first) {
+      // jump to the first tab (in tab order) that has a problem and focus its field
+      const tab = TABS.map(([k]) => k).find((k) => errorTabs.has(k)); const target = Object.entries(errors).find(([k, n]) => TAB_OF[k] === tab && n.textContent)?.[1];
+      activate(tab);
+      const control = target?.closest('.edit-card')?.querySelector('input:not([type=hidden]):not([hidden]),textarea,select');
+      (control || target)?.scrollIntoView({ block: 'center', behavior: 'smooth' }); control?.focus({ preventScroll: true });
+      return;
+    }
 
     saveBtn.disabled = true; cancelBtn.disabled = true; saveBtn.setAttribute('aria-busy', 'true'); saveBtn.textContent = 'Saving…';
     try {
@@ -336,6 +376,7 @@ async function edit(id) {
       saveBtn.disabled = false; cancelBtn.disabled = false; saveBtn.removeAttribute('aria-busy'); saveBtn.textContent = 'Save';
     }
   });
+  activate(activeTab);
   document.querySelector('.admin-main').scrollTop = 0;
 }
 
