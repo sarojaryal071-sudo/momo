@@ -1,5 +1,7 @@
 # Step 4m — Order "More" menu and the Active toggle (two bugs seen on the live admin)
 
+> **Folded into `step-4n-admin-fixes-round.md` (D-066). Do NOT run this file on its own.** 4n uses Bug 1 below as written; Bug 2 is replaced by 4n section D.
+
 Prerequisite: current `main`. Merge `origin/main` first. Read `CLAUDE.md`, D-045, D-062, D-065 (only for what is already built) and `admin/js/orders.js`, the product list and `set_order_status`. Owner rules for the session: write the code, run the build once and only the tests for files you changed (and the database tests only if you change SQL); own 390 px screenshots of both fixes; no demo wording. Do not wait for Steps 4k or 4l; these fixes are independent and small.
 
 ## Bug 1: the order card "More" menu offers irrelevant actions

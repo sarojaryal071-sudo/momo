@@ -1,6 +1,6 @@
 # Step 4l — Catalogue: categories, reusable options, allergens by product (decision D-065)
 
-Prerequisite: Step 4k is merged. Merge `origin/main` first. Read `CLAUDE.md`, D-028, D-031, D-046, D-052, D-062, D-065, `backend/README.md`, the migrations (`0001` option tables, `0002` order functions, `0007` allergens), `place_order` and `set_order_status`, `scripts/build.mjs` and the shop code that renders options. Owner rules for the session: write the code, run the build once and only the tests for files you changed plus the database tests (they run on a local PostgreSQL; run them once because this step changes the order function); you cannot reach Supabase, so say what is and is not checked.
+Prerequisite: Step 4n is merged (not 4k alone). Merge `origin/main` first. Read `CLAUDE.md`, D-028, D-031, D-046, D-052, D-062, D-065, `backend/README.md`, the migrations (`0001` option tables, `0002` order functions, `0007` allergens), `place_order` and `set_order_status`, `scripts/build.mjs` and the shop code that renders options. Owner rules for the session: write the code, run the build once and only the tests for files you changed plus the database tests (they run on a local PostgreSQL; run them once because this step changes the order function); you cannot reach Supabase, so say what is and is not checked.
 
 ## Goal
 
@@ -14,16 +14,16 @@ A Flatpay-style catalogue she manages centrally: **Categories**, a library of **
 - **`place_order` and any order function** must validate selected options against the **effective** groups, with every existing rule unchanged (prices recomputed server-side, defaults, single and multiple, customised lead time, stock, limits). Order items must keep a **snapshot** of the chosen option labels and prices so later edits to the library never change old orders; verify this already holds, or add it.
 - Allergens: keep `allergens` and `product_allergens`; add an admin function or plain upserts to set the products of an allergen in one go; keep the per-product ticks and the `allergens_checked_at` safeguard (changing a product's allergens through the bulk screen clears that product's check, with a clear message).
 
-## 2. Admin UI
+## 2. Admin UI (D-066: Manage screens, product editor stays one page)
 
-On the Products area add four top tabs under the title: **Items, Categories, Options, Allergens** (strip never overflows at 320 px; selected state in the URL). Use the 4f kit.
+Prerequisite change: Step 4n is merged first (the product editor is a single scrolling page again; do **not** put tabs in it).
 
-- **Items:** the list as today, with a category filter and category shown on each row.
-- **Categories:** list with add, rename, reorder, delete (delete asks how many products use it and moves them to no category). Each category shows which option groups it applies to.
-- **Options:** the library. List of option groups; open one to edit name, single or multiple choice, its options (label, price change in £, default, order, active); and an **Applies to** section with two pickers: categories and individual products (checkbox lists with search), showing the count. Deleting a group in use shows how many products and categories use it and asks to confirm.
-- **Allergens:** the allergen list (add, rename, reorder, delete, with the permanent UK-law reminder) and, for each allergen, a **Contains in** picker to choose products in bulk (checkbox list with search and "select all in category"). Show a matrix summary per product so she can see what each product contains.
-- **Product editor** (from 4k): Basic gets a category selector; Advanced shows the **effective options** (inherited from the category, marked "from category", and linked directly) with an **Add option group** picker from the library and a **Create new group** shortcut; Allergens tab ticks still work and stay in sync with the bulk screen.
-- One docked Save per page, unsaved dots, real empty states, no demo wording.
+- **Products page:** keep the list as it is (with a category filter and the category on each row) and add a quiet **Manage** button next to Add product that opens a glass menu: **Categories, Options, Allergens**. Each is its own screen with a back arrow to Products (clean URLs, deep-linkable). No top tabs.
+- **Categories screen:** list with add, rename, reorder, delete (delete says how many products use it and moves them to no category). Each category shows which option groups it applies to.
+- **Options screen:** the library. List of option groups; open one to edit name, single or multiple choice, its options (label, price change in £, default, order, active); and an **Applies to** section with two pickers: categories and individual products (checkbox lists with search), showing the count. Deleting a group in use shows how many products and categories use it and asks to confirm.
+- **Allergens screen:** the allergen list (add, rename, reorder, delete, with the permanent UK-law reminder) and, for each allergen, a **Contains in** picker to choose products in bulk (checkbox list with search and "select all in category"), plus a per-product summary so she can see what each product contains.
+- **Product editor (single page):** Basic fields gain a **Category** selector; the Options card shows the **effective options** (inherited from the category, marked "from category", and linked directly) with **Add option group** from the library and **Create new group**; the Allergens card ticks stay and stay in sync with the bulk screen.
+- One docked Save per page, real empty states, no demo wording, the 4f look.
 
 ## 3. Build and shop
 
