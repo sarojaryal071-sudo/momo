@@ -194,3 +194,14 @@ test('sales: a month becomes weekly bars, a week stays daily, totals match', () 
   assert.equal(month.bars.reduce((s, b) => s + b.total, 0), 3000);
   assert.equal(month.bars[0].to, '2026-11-01'); // Sunday 1 Nov closes the first week
 });
+
+// Step 4n: reopening a cancelled order must fit the daily limit of its pickup day
+test('re-opening onto a full pickup day is refused', () => {
+  const day = '2026-12-01';
+  const mk = (id, status) => ({ id, status, pickup_date: day, items: [], total_pence: 0, order_date: '2026-11-01', stock_taken: false });
+  const state = { settings: { max_orders_per_day: 1 }, orders: [mk('a', 'cancelled'), mk('b', 'new')], products: [] };
+  assert.throws(() => setOrderStatus(state, 'a', 'new'), /full/);
+  assert.equal(state.orders[0].status, 'cancelled');
+  state.settings.max_orders_per_day = null;
+  assert.equal(setOrderStatus(state, 'a', 'new').status, 'new');
+});

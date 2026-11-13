@@ -230,6 +230,7 @@ export function setOrderStatus(state, id, status, now = new Date()) {
   if (status === 'cancelled') {
     if (order.stock_taken) returnStock(state, order);
   } else if (order.status === 'cancelled') {
+    if (order.pickup_date && state.settings.max_orders_per_day != null && ordersOnDay(state, order.pickup_date) >= state.settings.max_orders_per_day) throw new RuleError('day_full', 'That pickup day is full, so this order cannot be reopened.');
     for (const [slug, qty] of standardQty(order)) {
       const p = productOf(state, slug);
       if (p && p.stock_quantity != null && qty > p.stock_quantity) {

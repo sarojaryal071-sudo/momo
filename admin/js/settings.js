@@ -11,9 +11,16 @@ import { mountAllergenManager, LEGAL_REMINDER } from './allergens.js';
 import { askNotificationPermission, notificationState, playSoftSound, setSound, soundOn } from './alerts.js';
 
 const root = document.querySelector('[data-root]');
-const svg = (d) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true'); for (const part of d.split('|')) { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', part); s.append(p); } return s; };
+const svg = (d) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', '24'); s.setAttribute('height', '24'); s.setAttribute('aria-hidden', 'true'); for (const part of d.split('|')) { const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', part); s.append(p); } return s; };
 const card = (title, ...kids) => el('section', { className: 'panel' }, title ? el('h2', {}, title) : null, ...kids);
 const errorLine = () => el('p', { className: 'field-error', role: 'alert' });
+
+// Where she came from (for example the product editor): the back arrow returns there. Only known admin pages are accepted.
+const FROM = { products: 'Products', orders: 'Orders', pickup: 'Pickup', sales: 'Sales', prep: 'Prep list', 'new-order': 'New order', home: 'Home' };
+const fromKey = new URLSearchParams(location.search).get('from');
+const origin = Object.hasOwn(FROM, fromKey) ? { label: FROM[fromKey], href: fromKey === 'home' ? './' : fromKey } : null;
+const backLink = (toHub) => el('a', { className: 'back-link back-text', href: origin ? origin.href : (toHub ? '#' : '#') },
+  svg('M15 5l-7 7 7 7'), el('span', {}, origin ? `Back to ${origin.label}` : 'Settings'));
 
 let settings = {}; let notice = { active: false, message: '' };
 let page = null; // { dirty(), cleanup() } for the section that is open
@@ -120,7 +127,7 @@ async function load() {
 }
 
 function drawHub() {
-  root.replaceChildren(el('div', { className: 'title-row' }, el('h1', {}, 'Settings')),
+  root.replaceChildren(...[origin ? el('div', { className: 'back-row' }, backLink(true)) : null].filter(Boolean), el('div', { className: 'title-row' }, el('h1', {}, 'Settings')),
     el('div', { className: 'settings-list' }, ...SECTIONS.map((s) => el('a', { className: 'settings-row', href: `#${s.key}` },
       el('span', { className: 'settings-icon' }, svg(s.icon)),
       el('span', { className: 'settings-text' }, el('strong', {}, s.title), el('span', { className: 'muted' }, s.summary())),
@@ -133,8 +140,7 @@ async function drawPage(section) {
   const dirty = () => (built.values ? JSON.stringify(built.values()) !== initial : false);
   page = { dirty, cleanup: built.cleanup };
   window.onbeforeunload = () => (dirty() ? '' : undefined);
-  const view = el('div', { className: 'settings-page' }, el('div', { className: 'title-row' },
-    el('a', { className: 'icon-btn back-link', href: '#' }, svg('M15 5l-7 7 7 7'), el('span', { className: 'visually-hidden' }, 'Back to Settings')), el('h1', {}, section.title)), ...built.nodes);
+  const view = el('div', { className: 'settings-page' }, el('div', { className: 'back-row' }, backLink(false)), el('div', { className: 'title-row' }, el('h1', {}, section.title)), ...built.nodes);
   if (built.save) {
     const save = el('button', { type: 'button', className: 'btn' }, 'Save');
     const cancel = el('button', { type: 'button', className: 'btn btn-secondary' }, 'Cancel');

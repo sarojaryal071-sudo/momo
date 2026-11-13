@@ -226,6 +226,12 @@ update product_stock set quantity = 1 where product_id = (select id from product
 select t.chk(public._set_order_status((select id from sel), 'confirmed') ->> 'code' = 'stock', 're-opening with too little stock is refused');
 select t.chk((select status from orders where id = (select id from sel)) = 'cancelled' and t.stock('chicken-momo') = 1, 'a refused re-open changes nothing');
 update product_stock set quantity = 6 where product_id = (select id from products where slug = 'chicken-momo');
+update settings set value = '1' where key = 'max_orders_per_day';
+select t.place(t.order_json('chicken-momo', 1, '[]', '{"pickupDate":"2026-11-15","pickupTime":"12:00"}'));
+select t.chk(public._set_order_status((select id from sel), 'confirmed') ->> 'code' = 'day_full', 're-opening onto a full pickup day is refused');
+select t.chk((select status from orders where id = (select id from sel)) = 'cancelled', 'a refused re-open (day full) changes nothing');
+update settings set value = 'null' where key = 'max_orders_per_day';
+update product_stock set quantity = 6 where product_id = (select id from products where slug = 'chicken-momo');
 select t.chk(t.seq($$select public._set_order_status((select id from sel), 'confirmed')$$, $$select t.stock('chicken-momo') = 4 and (select status from orders where id = (select id from sel)) = 'confirmed'$$), 're-opening takes the stock again');
 select t.chk(t.seq($$select public._set_order_status((select id from sel), 'ready')$$, $$select t.stock('chicken-momo') = 4 and (select status from orders where id = (select id from sel)) = 'ready'$$), 'moving between open statuses leaves stock alone');
 select t.chk(t.try('authenticated', :'b', format('select public.set_order_status(%L, ''ready'')', (select id from sel))) = 'denied', 'a non-admin cannot call set_order_status');

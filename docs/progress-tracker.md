@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4k, coding agent)
+- Last updated: 2026-11-13 (Step 4n, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 4h (weekly pickup hours redesign, D-063), then Step 4i (admin sales summary, D-064), then Step 4j (Realtime connection fix), then Step 4n (admin fixes round: product editor back to one page, Settings hub look and back path, notice-period modal, red allergen navigation, order More menu, Publish wording; 4m is folded into it), Step 4l (catalogue: categories, reusable options, allergens by product, D-065), then Step 5 (SEO, hardening, launch).
 
@@ -239,6 +239,16 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
 
+## Step 4n — Admin fixes round (D-066, includes 4m)
+
+- [x] A: product editor back to one scrolling form (tabs removed); failed Save focuses the first invalid field with a red icon and words
+- [x] B: Settings hub restyled (sized icons, title above summary, raised rows); back arrow with `?from=` return ("Back to Products"); unsized-SVG safety net in CSS
+- [x] C: customised-order notice period editable from the product in a glass modal (same setting as Settings, Ordering)
+- [x] D: blocked Active toggle leads to the red-marked allergen check or price field; list chips "Needs allergen check" / "Set a price first"; product goes Active by itself once fixed
+- [x] E: order More menu per status; Reopen takes stock and now also checks the daily limit (migration 0010 + test); menu opens inside the card
+- [x] F: Publish setup message stays in the banner (503), Live shows last publish time
+- Also fixed: the sticky day header on Orders and the sticky tab offset (sticky offset is measured inside the padding).
+
 ## Step 4k — Admin sections (D-065)
 
 - [x] Settings hub (6 rows with live summaries) and sub-pages `settings#ordering|pickup|messages|notices|backup|app`, one docked Save/Cancel per page, unsaved-changes guard
@@ -415,3 +425,5 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - 2026-11-13, step 4j: build passes; admin-session test (backoff) passes; syntax checks on changed files; Settings Live feed line checked on the demo backend. Not checked: the real Realtime connection.
 
 - 2026-11-13, step 4k (demo backend only): build passes; Playwright at 390 px: hub, each section opens by hash, save and summary update, validation, unsaved dialog (Back and browser Back), deep links, Save bar on tab bar; product tabs, keyboard (arrows, Home, End), unsaved dot, error dot, jump and focus, safeguard on Availability. Not checked: real Supabase, desktop width by eye.
+
+- 2026-11-13, step 4n (demo backend only): build passes; mock-backend test (19) passes; local PostgreSQL tests pass incl. reopen on a full day; Playwright at 390 px: flagged check and price, auto Active on tick and save, notice modal (Escape, validation, unsaved edit kept), failed save focus, hub and back path, More menu per status; no overflow or oversized SVG at 320, 390 and 1440 px on Settings and the editor. Not checked: real Supabase.

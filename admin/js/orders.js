@@ -75,7 +75,7 @@ function messageBox(order, card) {
     card.append(box);
     return;
   }
-  if (!settings.pickup_address_text) box.append(el('p', { className: 'error', role: 'alert' }, 'Add your pickup address in Settings. ', el('a', { href: 'settings' }, 'Open Settings')));
+  if (!settings.pickup_address_text) box.append(el('p', { className: 'error', role: 'alert' }, 'Add your pickup address in Settings. ', el('a', { href: 'settings?from=orders#pickup' }, 'Open Settings')));
   const area = el('textarea', { rows: 8, value: messageText(order, order.status), 'aria-label': 'Message to send' });
   area.id = `msg-${order.id}`;
   const send = el('a', { className: 'btn btn-small', target: '_blank', rel: 'noopener noreferrer' }, 'Open WhatsApp');
@@ -86,9 +86,13 @@ function messageBox(order, card) {
   area.focus();
 }
 
+document.addEventListener('click', (e) => { document.querySelectorAll('.more[open]').forEach((m) => { if (!m.contains(e.target)) m.open = false; }); });
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.querySelectorAll('.more[open]').forEach((m) => { m.open = false; m.querySelector('summary')?.focus(); }); });
+
 function confirmCancel(order, card, showError) {
   busy = true;
-  const box = el('div', { className: 'confirm-box', role: 'alertdialog', 'aria-label': 'Cancel this order' }, el('p', {}, `Cancel ${order.order_number}? Its stock goes back on the shelf.`));
+  const box = el('div', { className: 'confirm-box', role: 'alertdialog', 'aria-label': 'Cancel this order' }, el('p', {}, `Cancel ${order.order_number}? The stock for this order goes back on the shelf.`));
   const yes = el('button', { type: 'button', className: 'btn btn-danger btn-small', onclick: () => changeStatus(order, 'cancelled', showError, { message: true }) }, 'Yes, cancel this order');
   const no = el('button', { type: 'button', className: 'btn btn-secondary btn-small', onclick: () => { box.remove(); busy = false; } }, 'Keep it');
   box.append(el('div', { className: 'btn-row' }, yes, no));
@@ -117,7 +121,7 @@ async function changeStatus(order, status, showError, { message = false } = {}) 
   if (message && phone) {
     const link = buildLink(phone, messageText(updated, status));
     if (win) win.location.href = link;
-    if (!settings.pickup_address_text && /\{address\}/.test(settings[`wa_template_${TEMPLATE_BY_STATUS[status]}`] || '')) toast('Add your pickup address in Settings so your messages include it.', { href: 'settings' });
+    if (!settings.pickup_address_text && /\{address\}/.test(settings[`wa_template_${TEMPLATE_BY_STATUS[status]}`] || '')) toast('Add your pickup address in Settings so your messages include it.', { href: 'settings?from=orders#pickup' });
   } else if (message && !phone) {
     toast(`${order.order_number} is ${STATUS_LABELS[status].toLowerCase()}. The phone number is not valid, so WhatsApp was not opened.`);
   }
@@ -154,12 +158,15 @@ function card(order) {
 
   const more = el('details', { className: 'more' }, el('summary', { 'aria-label': `More actions for ${order.order_number}` }, 'More'));
   const list = el('div', { className: 'more-list' });
-  if (phone) list.append(el('button', { type: 'button', className: 'menu-item', onclick: () => { more.open = false; open(); messageBox(order, article); } }, 'Message customer'));
-  for (const status of ['new', 'confirmed', 'ready', 'collected']) {
-    if (status === order.status || status === next?.status) continue;
-    list.append(el('button', { type: 'button', className: 'menu-item', onclick: () => { more.open = false; err.textContent = ''; changeStatus(order, status, showError); } }, `Set to ${STATUS_LABELS[status]}`));
-  }
-  if (order.status !== 'cancelled') list.append(el('button', { type: 'button', className: 'menu-item danger', onclick: () => { more.open = false; err.textContent = ''; confirmCancel(order, article, showError); } }, 'Cancel order'));
+  const item = (label, run, cls = '') => list.append(el('button', { type: 'button', className: `menu-item ${cls}`.trim(), onclick: () => { more.open = false; err.textContent = ''; run(); } }, label));
+  if (phone) item('Message customer', () => { open(); messageBox(order, article); });
+  // only the sensible next steps for the current status
+  if (order.status === 'confirmed') item('Back to New', () => changeStatus(order, 'new', showError));
+  if (order.status === 'ready') item('Back to Confirmed', () => changeStatus(order, 'confirmed', showError));
+  if (order.status === 'collected') item('Undo collected', () => changeStatus(order, 'ready', showError));
+  if (order.status === 'cancelled') item('Reopen order', () => changeStatus(order, 'new', showError));
+  if (order.status !== 'cancelled' && order.status !== 'collected') item('Cancel order', () => confirmCancel(order, article, showError), 'danger');
+  more.addEventListener('toggle', () => { if (more.open) list.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); });
   more.append(list);
   actions.append(more);
 

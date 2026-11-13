@@ -373,7 +373,7 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
   padding-inline: max(var(--gutter), calc((100% - var(--content-admin)) / 2)); }
 .admin-body:not(.login-body) > .tabbar { grid-row: 3; grid-column: 1; position: relative; inset: auto; z-index: 3; }
 .top-stack .admin-bar { position: relative; inset: auto; }
-.order-day { inset-block-start: var(--top-h, 0px); background: color-mix(in srgb, var(--white) 70%, transparent); border-radius: var(--r-input); padding-inline: var(--space-xs); }
+.order-day { inset-block-start: 0; background: color-mix(in srgb, var(--white) 70%, transparent); border-radius: var(--r-input); padding-inline: var(--space-xs); }
 @media (min-width: 48em) {
   .admin-body:not(.login-body) { display: block; block-size: auto; min-block-size: 100dvh; overflow: visible; padding-inline-start: var(--sidebar); }
   .admin-body:not(.login-body) > .top-stack { position: sticky; inset-block-start: 0; }
@@ -495,3 +495,41 @@ body[data-auth] main, body[data-auth] .admin-bar, body[data-auth] .tabbar { visi
 .settings-text .muted { font-size: var(--text-small); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .settings-page .title-row .back-link svg { inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 @media (min-width: 48em) { .tab-strip { inset-block-start: var(--top-h, 0px); } }
+
+/* Step 4n: the order More menu opens inside the card, below its button, so it never covers the order text */
+.more[open] { flex: 1 1 100%; }
+.more-list, .admin-body .more-list { position: static; margin-block-start: var(--space-3xs); min-inline-size: 0; box-shadow: none; }
+.order-actions-row { flex-wrap: wrap; }
+
+/* Step 4n */
+/* an inline SVG without its own size never fills the screen: this is the safety net (specificity 0) */
+svg:where(:not([width])) { inline-size: var(--icon); block-size: var(--icon); }
+/* Settings hub rows: solid white, hairline, raised; icon in a soft round tint; title above the one-line summary */
+.settings-row { box-shadow: var(--card-shadow); }
+.settings-icon { border-radius: 50%; }
+.settings-icon svg { inline-size: var(--icon); block-size: var(--icon); }
+.back-row { margin-block-end: var(--space-2xs); }
+.back-text { display: inline-flex; align-items: center; gap: var(--space-3xs); min-block-size: var(--tap); padding-inline-end: var(--space-xs); font-weight: 600; color: var(--emerald); text-decoration: none; }
+.back-text svg { inline-size: var(--icon); block-size: var(--icon); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.back-text:hover { text-decoration: underline; }
+.back-text:focus-visible { outline: var(--ring-width) solid var(--emerald); outline-offset: var(--ring-width); border-radius: var(--r-input); }
+/* errors: an icon and words, never colour alone */
+.field-error:not(:empty)::before { content: "!"; display: inline-grid; place-items: center; inline-size: 1.1em; block-size: 1.1em; margin-inline-end: 0.4em; border-radius: 50%; background: var(--chutney); color: var(--white); font-size: 0.8em; font-weight: 700; vertical-align: 0.05em; }
+.edit-card:has(.field-error:not(:empty)) :is(input, textarea, select) { border-color: var(--chutney); }
+.edit-card { scroll-margin-block-start: calc(var(--top-h, 0px) + var(--space-s)); }
+/* the red mark that leads her to what blocks the Active switch */
+.is-flagged { outline: var(--ring-width) solid var(--chutney); outline-offset: var(--space-3xs); border-radius: var(--r-input); }
+.is-flagged input[type="checkbox"] { accent-color: var(--chutney); outline: var(--ring-width) solid var(--chutney); outline-offset: 2px; }
+.is-flagged input[type="text"] { border-color: var(--chutney); }
+.flag-note { display: flex; align-items: center; gap: var(--space-2xs); margin-block: var(--space-2xs); font-size: var(--text-small); font-weight: 700; color: var(--chutney); }
+.flag-note[hidden] { display: none; }
+.flag-note::before { content: "!"; display: inline-grid; place-items: center; flex: none; inline-size: 1.25rem; block-size: 1.25rem; border-radius: 50%; background: var(--chutney); color: var(--white); font-size: 0.8125rem; }
+.needs-chip { align-self: start; justify-self: start; min-block-size: var(--tap); padding-inline: var(--space-s); font: inherit; font-size: var(--text-small); font-weight: 600; color: var(--chutney); background: var(--white); border: var(--hairline) solid var(--chutney); border-radius: var(--radius-pill); cursor: pointer; }
+.needs-chip::before { content: "!"; display: inline-grid; place-items: center; inline-size: 1.1rem; block-size: 1.1rem; margin-inline-end: var(--space-2xs); border-radius: 50%; background: var(--chutney); color: var(--white); font-size: 0.75rem; }
+.lead-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); margin-block-start: var(--space-xs); }
+.lead-row p { flex: 1 1 14rem; margin: 0; }
+.dialog-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xs); margin-block-end: var(--space-xs); }
+.dialog-head h2 { margin: 0; font-size: var(--text-read); }
+.dialog-close { flex: none; min-inline-size: var(--tap); min-block-size: var(--tap); }
+.notice-dialog .btn-row { margin-block-start: var(--space-s); }
+@media (min-width: 48em) { .order-day { inset-block-start: var(--top-h, 0px); } }

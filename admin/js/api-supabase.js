@@ -9,6 +9,7 @@ import { backoffSeconds, LIVE_FLAG_AFTER_SECONDS, recordLive } from './live-feed
 
 const SCRIPT = 'js/vendor/supabase.js'; // vendored, version pinned (see js/vendor/README.md); relative to the admin page
 const SETTING_LIMITS = { ordering_closed_message: 300, wa_template_confirmed: 1000, wa_template_ready: 1000, wa_template_cancelled: 1000, wa_template_collected: 1000, pickup_address_text: 500 };
+const SETUP_MESSAGE = 'Publishing needs a one-time setup. Ask the developer to finish it (see backend README, section 4).';
 const BUCKET = 'product-images';
 const WRONG = 'Email or password is wrong.'; // the same message for every login failure: nothing reveals whether an email exists
 
@@ -320,6 +321,7 @@ export const supabaseApi = {
       method: 'POST', headers: { apikey: siteConfig.supabaseAnonKey, Authorization: `Bearer ${data?.session?.access_token ?? ''}`, 'Content-Type': 'application/json' }, body: '{}',
     });
     const body = await res.json().catch(() => ({}));
+    if (res.status === 503) { const e = new Error(SETUP_MESSAGE); e.code = 'setup'; throw e; }
     if (!res.ok) throw new Error(body.message || 'Could not start publishing.');
     return body;
   },

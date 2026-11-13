@@ -15,6 +15,7 @@ const shopBox = document.querySelector('[data-shop]');
 const greeting = document.querySelector('[data-greeting]');
 const liveStatus = document.querySelector('[data-live]');
 let known = null;
+let publishProblem = ''; // stays in the card until the next try
 let busyShop = false;
 
 const hourNow = () => Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', hourCycle: 'h23' }).format(new Date()));
@@ -41,9 +42,9 @@ async function drawShop(settings) {
     const busy = status.state === 'publishing', failed = status.state === 'failed';
     const label = busy ? 'Publishing' : failed ? 'Failed' : status.unpublished ? 'Not published yet' : 'Live';
     const button = el('button', { type: 'button', className: 'btn btn-small', disabled: busy || (!status.unpublished && !failed) }, 'Publish changes');
-    button.addEventListener('click', async () => { button.disabled = true; try { await api.publish(); } catch { /* shown on Products */ } await refresh(); });
+    button.addEventListener('click', async () => { button.disabled = true; try { await api.publish(); publishProblem = ''; } catch (e) { publishProblem = e.message; } await refresh(); });
     shopBox.append(el('div', { className: 'publish-head' }, el('span', { className: 'status-badge', 'data-status': busy ? 'new' : failed ? 'cancelled' : status.unpublished ? 'ready' : 'confirmed' }, label),
-      el('span', { className: 'muted' }, busy ? 'Publishing now. The site updates in a minute or two.' : failed ? 'The last publish did not work. Press Publish to try again.' : status.unpublished ? 'You have product changes that are not on the site yet.' : 'The site shows your latest product changes.')), button ? el('div', { className: 'btn-row' }, button) : null);
+      el('span', { className: 'muted' }, busy ? 'Publishing now. The site updates in a minute or two.' : failed ? 'The last publish did not work. Press Publish to try again.' : status.unpublished ? 'You have product changes that are not on the site yet.' : 'The site shows your latest product changes.')), publishProblem ? el('p', { className: 'field-error', role: 'alert' }, publishProblem) : null, button ? el('div', { className: 'btn-row' }, button) : null);
   }
 }
 
