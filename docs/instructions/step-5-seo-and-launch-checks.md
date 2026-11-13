@@ -2,6 +2,8 @@
 
 Prerequisite: Steps 0 to 4 done. Read `CLAUDE.md`, the SEO rulebook and the technical rulebook first. Do only this step. Going live (setting `SITE_INDEXABLE` to `true`) is the owner's decision, not yours.
 
+> **Updates since this step was written (these win over the text below):** no email service exists (D-056: ignore every "owner's email" check except confirming no email address is in the repo); the order flow is real on Supabase with Realtime (D-055, D-057) and the admin is built (Steps 4 to 4n); no visible placeholder wording anywhere (D-052): unconfirmed values are marked with the invisible `data-pending` attribute and the indexable build and the launch checklist fail while one remains; **legal pages** (`privacy`, `terms`) may not contain invented wording: build them from clearly generic, accurate statements about what the site really does (what data is collected: name, phone, order details, pickup time; where it is stored: Supabase; no analytics, no cookies beyond what the admin needs; cash on pickup), keep them `noindex` and unlinked from the footer until the owner approves them, and list in the report what the owner must confirm with a solicitor or the council; addresses are clean (no `.html`, D-060); fonts are Bebas Neue and Space Grotesk (D-051); the admin stays `noindex` and out of the sitemap; `SITE_INDEXABLE` stays `false` until the owner turns it on. Owner rules for the session: write the code and the documents, run the build once and only the tests and checks this step names; report what you could not check (Supabase and live pages are not reachable from your sandbox).
+
 ## Goal
 
 Everything that must be true before the owner turns indexing on and shares the site publicly.
