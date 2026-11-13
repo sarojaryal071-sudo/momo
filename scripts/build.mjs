@@ -26,7 +26,7 @@ const useSeed = !live;
 const INSTAGRAM_GLYPH = '<svg class="phone-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17 7 h.01"/></svg>';
 const INSTAGRAM_RE = /<!-- build:instagram -->[\s\S]*?<!-- \/build:instagram -->/g;
 const NOINDEX = '<meta name="robots" content="noindex">';
-const OG_IMAGE = 'assets/img/placeholder-og.webp';
+const OG_IMAGE = 'assets/img/og-share.webp';
 const ORG = { name: 'Steam & Spice', telephone: '+44 7413 069241' };
 const TITLE_RANGE = [30, 65];
 const DESCRIPTION_RANGE = [120, 165];
@@ -77,6 +77,18 @@ if (useSeed) {
   products = merge(rows, content);
 }
 
+// Chutney picture (D-069): the turmeric-yellow chutney has no picture yet. The moment the owner adds frontend/assets/img/photo-chutney.webp it is
+// used for the chutney pot (card and dialog) and in the home Sauces tile; until then nothing red or invented stands in for it.
+const chutneyFile = join(root, 'frontend/assets/img/photo-chutney.webp');
+const hasChutney = existsSync(chutneyFile);
+if (hasChutney) {
+  const { default: sharp } = await import('sharp');
+  await mkdir(join(dist, 'assets/img'), { recursive: true });
+  await sharp(chutneyFile).resize({ width: 400, withoutEnlargement: true }).webp({ quality: 82 }).toFile(join(dist, 'assets/img/photo-chutney-400.webp'));
+  for (const p of products) if (p.slug === 'chutney-pot' && !p.photo) { p.photo = 'photo-chutney'; p.photo_alt ??= 'A bowl of homemade turmeric yellow chutney'; }
+}
+const CHUTNEY_FIGURE = '<figure class="sauce-figure"><img class="photo-frame sauce-photo" src="assets/img/photo-chutney.webp" width="400" height="400" alt="A bowl of homemade turmeric yellow chutney" loading="lazy"><figcaption>Chutney</figcaption></figure>';
+
 // The public config values go into the built site-config.js (the publishable key is public by design).
 {
   const cfg = join(dist, 'js/site-config.js');
@@ -112,6 +124,7 @@ for (const file of htmlFiles) {
     // Instagram line: a real link once the constant is set, otherwise the line stays empty and hidden (D-052).
     const ig = siteConfig.socialLinks.instagram;
     if (ig) html = html.replace(INSTAGRAM_RE, `<!-- build:instagram --><a class="contact-item" href="${escAttr(ig)}" rel="noopener">${INSTAGRAM_GLYPH}Instagram</a><!-- /build:instagram -->`);
+    if (rel === 'index.html') html = html.replace(/<!-- build:chutney-photo -->[\s\S]*?<!-- \/build:chutney-photo -->/, `<!-- build:chutney-photo -->${hasChutney ? CHUTNEY_FIGURE : ''}<!-- /build:chutney-photo -->`);
     if (products.length) html = fillRegion(html, renderRegion(page === 'index' ? 'index' : 'shop', products, siteUrl));
     // SEO region: canonical, og:url, og:image, and Organization data on the home page.
     const seo = [
@@ -121,7 +134,7 @@ for (const file of htmlFiles) {
       `<meta name="twitter:image" content="${siteUrl}/${OG_IMAGE}">`,
     ];
     if (rel === 'index.html') {
-      seo.push(`<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: ORG.name, url: `${siteUrl}/`, telephone: ORG.telephone })}</script>`);
+      seo.push(`<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: ORG.name, url: `${siteUrl}/`, logo: `${siteUrl}/assets/img/logo-full-960.webp`, telephone: ORG.telephone })}</script>`);
     }
     html = html.replace(/<!-- build:seo -->[\s\S]*?<!-- \/build:seo -->/, `<!-- build:seo -->\n  ${seo.join('\n  ')}\n  <!-- /build:seo -->`);
   }

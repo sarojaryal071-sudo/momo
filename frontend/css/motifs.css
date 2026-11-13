@@ -84,7 +84,10 @@ h2 { letter-spacing: var(--tracking-display); }
 .tile-peach { background: var(--peach); color: var(--charcoal); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-m); align-items: center; }
 .tile-peach h2 { color: var(--emerald); }
 .tile-peach img { display: block; inline-size: min(100%, var(--photo-small)); block-size: auto; justify-self: center; }
-.sauce-photo { aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-lg); }
+.sauce-photo { aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-lg); inline-size: 100%; block-size: auto; }
+.sauce-photos { display: flex; gap: var(--space-s); align-items: start; justify-content: center; min-inline-size: 0; }
+.sauce-figure { flex: 1 1 0; min-inline-size: 0; max-inline-size: var(--sauce-photo-max, 16rem); margin: 0; }
+.sauce-figure figcaption { margin-block-start: var(--space-2xs); font-size: var(--text-small); font-weight: 600; text-align: center; }
 .tile .btn-secondary { margin-block-start: var(--space-2xs); }
 @container (min-width: 44rem) {
   .tiles { grid-template-columns: minmax(0, 1fr) minmax(0, var(--tile-wide)); }

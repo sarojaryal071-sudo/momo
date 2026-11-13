@@ -2,7 +2,7 @@
 
 The coding agent updates this file at the end of every phase (see `docs/usage-rules.md` section 7). Trust it instead of re-exploring the repository. Edit only the lines that changed.
 
-- Last updated: 2026-11-13 (Step 4o, coding agent)
+- Last updated: 2026-11-13 (Step 4p, coding agent)
 - Current step: **Step 4d built and merged. Waiting for the owner: backend setup (`backend/README.md` section 3) and the live checks**
 - Next action: owner finishes `backend/README.md` and tests the admin on the live site; then Step 4f (admin visual style from the approved reference and Products redesign, D-061), then Step 4g (editable allergens and ingredients, Save bar fix, D-062), then Step 4h (weekly pickup hours redesign, D-063), then Step 4i (admin sales summary, D-064), then Step 4j (Realtime connection fix), then Step 4n (admin fixes round: product editor back to one page, Settings hub look and back path, notice-period modal, red allergen navigation, order More menu, Publish wording; 4m is folded into it), Step 4o (blurred colour patches on the public site, D-067), Step 4p (new logo everywhere, D-068), Step 4l (catalogue: categories, reusable options, allergens by product, D-065), then Step 5 (SEO, hardening, launch).
 
@@ -238,6 +238,12 @@ Legend: `[ ]` not done, `[x]` done. For every ticked item add: commit hash, one-
 - [x] Products: card list (thumbnail, name, price, Active toggle, stock chip, Edit, quiet reorder), Unpublished changes / Publish banner, full-screen Edit with glass bar, section cards, groups as chips, 14 allergens in a grid, stock tracking switch, availability, one sticky Save and Cancel, unsaved-changes dialog, toast on save
 - [x] Orders cards per the reference (Confirm and More on one row; Message customer moved into More); Home, Prep, Pickup, Settings use the kit through shared CSS
 - [ ] Owner checks: press feel, toggles, glass bars over cards, patches on all pages, a real product save, the publish banner
+
+## Step 4p — New logo (D-068) and sauce pictures (D-069)
+
+- [x] `npm run logo` (`scripts/make-logo.mjs`) makes `logo-full-{240,480,960}.webp`, `logo-mark-{64,128,256}.webp`, `favicon-32.png`, `favicon-180.png`, `icon-512.png`, the admin icons and `og-share.webp` (1200x630) from `docs/design/logo/logo-source-transparent.png`; outputs are committed. Old `favicon.svg` and `placeholder-og.webp` removed.
+- [x] Header: mark (name beside it from 48em); footer, phone menu and admin login: full lockup on a white plate (the wordmark is emerald, so it cannot sit on the emerald bands); receipt: small mark; admin bar and side panel: mark; Organization data has `logo`.
+- [x] Sauces: red photo = hot sauce only (caption, honest alt, seed `hot-sauce-pot`); admin add-on fallback removed (drawn bowl); `photo-chutney.webp` is used automatically by the build when it exists.
 
 ## Step 4o — Public background patches (D-067)
 

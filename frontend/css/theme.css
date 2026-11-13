@@ -195,6 +195,10 @@
   --icon: 1.6rem;
   --icon-trust: 2.25rem;
   --brand-mark: 2rem;
+  --logo-header: 2.5rem;       /* the dumpling mark in the header: inside the fixed header height */
+  --logo-full: 10rem;          /* the full lockup in the footer and the menu */
+  --logo-receipt: 2.25rem;     /* the mark on the receipt */
+  --logo-login: 11rem;         /* the full lockup above the admin login form */
   --brand-size: 1.5rem;
   --fold-art: clamp(6rem, 4rem + 10vw, 10rem);
   --reveal-distance: 1.5rem;

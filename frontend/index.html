@@ -16,7 +16,8 @@
   <meta property="og:site_name" content="Steam &amp; Spice">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icons/favicon-180.png">
   <link rel="preload" href="assets/fonts/bebas-neue-latin-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/space-grotesk-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/theme.css">
@@ -29,20 +30,21 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="wrap header-row">
-      <a class="brand" href="./" aria-current="page"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
+      <a class="brand" href="./" aria-current="page"><img class="brand-logo" src="assets/img/logo-mark-128.webp" srcset="assets/img/logo-mark-64.webp 64w, assets/img/logo-mark-128.webp 128w, assets/img/logo-mark-256.webp 256w" sizes="4rem" width="128" height="107" alt=""><span class="brand-name">Steam &amp; Spice</span></a>
       <div class="header-tools">
         <a class="cart-link" href="cart" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
         <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-menu" data-menu-toggle><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path class="icon-open" d="M4 7 H20 M4 12 H20 M4 17 H20"/><path class="icon-close" d="M5 5 L19 19 M19 5 L5 19"/></svg><span class="visually-hidden">Menu</span></button>
       </div>
       <nav id="site-menu" class="site-menu" aria-label="Main" tabindex="-1" data-menu>
         <div class="menu-bar">
-          <a class="brand" href="./" aria-current="page"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</a>
+          <a class="brand" href="./" aria-current="page"><img class="brand-logo" src="assets/img/logo-mark-128.webp" srcset="assets/img/logo-mark-64.webp 64w, assets/img/logo-mark-128.webp 128w, assets/img/logo-mark-256.webp 256w" sizes="4rem" width="128" height="107" alt=""><span class="brand-name">Steam &amp; Spice</span></a>
           <div class="menu-bar-tools">
             <a class="cart-link" href="cart" data-cart-link aria-label="Cart, 0 items"><svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 3.5h3l2.2 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1l1.6-6.6H6.6"/><circle cx="9.5" cy="20" r="1.2"/><circle cx="17" cy="20" r="1.2"/></svg><span class="cart-badge" data-cart-count>0</span></a>
             <button type="button" class="menu-close" aria-label="Close menu" data-menu-close><svg class="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
           </div>
         </div>
         <div class="menu-body">
+          <a class="menu-logo" href="./" aria-label="Steam &amp; Spice, home"><span class="logo-plate"><img class="brand-full" src="assets/img/logo-full-240.webp" srcset="assets/img/logo-full-240.webp 240w, assets/img/logo-full-480.webp 480w, assets/img/logo-full-960.webp 960w" sizes="12rem" width="240" height="223" alt=""></span></a>
         <ul class="nav-list">
           <li><a href="./" aria-current="page">Home</a></li>
           <li><a href="shop">Shop</a></li>
@@ -261,7 +263,7 @@
 </dialog>
 </li>
 <li class="product-card" id="product-hot-sauce-pot" data-slug="hot-sauce-pot" data-price-pence="222" data-kind="addon" data-name="hot sauce pot" data-has-options="true" data-stock="12" data-stock-pending>
-  <div class="card-media card-art card-art-bowl" aria-hidden="true"></div>
+  <div class="card-media"><img src="assets/img/photo-sauce.webp" srcset="assets/img/photo-sauce-400.webp 400w, assets/img/photo-sauce.webp 800w" sizes="(min-width: 40em) 22rem, 90vw" width="800" height="800" alt="A bowl of homemade red hot sauce" loading="lazy"></div>
   <div class="card-body">
     <h3><a class="card-link" href="shop#product-hot-sauce-pot" data-card-open>Hot sauce pot</a></h3>
     <p class="card-meta">1 pot</p>
@@ -275,7 +277,7 @@
   <div class="dialog-panel" tabindex="-1" autofocus>
     <span class="dialog-handle" aria-hidden="true" data-dialog-handle></span>
     <div class="dialog-head" data-dialog-head>
-      <div class="card-media dialog-media card-art card-art-bowl" aria-hidden="true"></div>
+      <div class="card-media dialog-media"><img src="assets/img/photo-sauce.webp" srcset="assets/img/photo-sauce-400.webp 400w, assets/img/photo-sauce.webp 800w" sizes="6rem" width="800" height="800" alt="A bowl of homemade red hot sauce" loading="lazy"></div>
       <div class="dialog-title">
         <h2 id="dlg-hot-sauce-pot-title">Hot sauce pot</h2>
         <p class="card-meta">1 pot</p>
@@ -332,7 +334,10 @@
               <p>Add our chutney or hot sauce to your order.</p>
               <p><a class="btn" href="shop">See the momo</a></p>
             </div>
-            <img class="photo-frame sauce-photo" src="assets/img/photo-sauce.webp" width="335" height="335" alt="A bowl of homemade red-orange sauce" loading="lazy">
+            <div class="sauce-photos">
+              <figure class="sauce-figure"><img class="photo-frame sauce-photo" src="assets/img/photo-sauce.webp" width="335" height="335" alt="A bowl of homemade red hot sauce" loading="lazy"><figcaption>Hot sauce</figcaption></figure>
+              <!-- build:chutney-photo --><!-- /build:chutney-photo -->
+            </div>
           </div>
         </div>
       </div>
@@ -394,8 +399,7 @@
     <div class="wrap">
       <div class="footer-grid">
         <div>
-          <p class="footer-brand"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 21 C4 13 11 7 16 7 C21 7 28 13 28 21 C24 25 8 25 4 21 Z M16 9 L16 24 M10 12 C11 16 12 20 13 23 M22 12 C21 16 20 20 19 23"/></svg>Steam &amp; Spice</p>
-          <p>Taste like Nepal.</p>
+          <p class="footer-brand"><span class="logo-plate"><img class="brand-full" src="assets/img/logo-full-240.webp" srcset="assets/img/logo-full-240.webp 240w, assets/img/logo-full-480.webp 480w, assets/img/logo-full-960.webp 960w" sizes="12rem" width="240" height="223" alt="Steam &amp; Spice"></span></p>
         </div>
         <div>
           <p class="footer-title">Quick links</p>

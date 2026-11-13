@@ -13,7 +13,6 @@ const publishBox = document.querySelector('[data-publish]');
 const addButton = document.querySelector('[data-add]');
 const titleRow = document.querySelector('.title-row');
 const topStack = document.querySelector('.top-stack');
-const SAUCE_PICTURE = '../assets/img/photo-sauce.webp'; // the existing sauce picture, used for add-ons that have no photo yet
 
 let products = [];
 let categoryFilter = ''; // '' all, '_none' no category, or a category id
@@ -53,14 +52,14 @@ async function drawPublish() {
     await drawPublish();
   });
   publishBox.append(el('div', { className: 'publish-head' }, el('span', { className: 'status-badge', 'data-status': busy ? 'new' : failed ? 'cancelled' : status.unpublished ? 'ready' : 'confirmed' }, label), el('span', { className: 'muted' }, text)),
-    publishProblem ? el('p', { className: 'field-error', role: 'alert' }, publishProblem) : null, el('div', { className: 'btn-row' }, button));
+    ...(publishProblem ? [el('p', { className: 'field-error', role: 'alert' }, publishProblem)] : []), el('div', { className: 'btn-row' }, button));
   clearTimeout(pollTimer);
   if (busy) pollTimer = setTimeout(drawPublish, PUBLISH_POLL_SECONDS * 1000);
 }
 
 // ---------- list ----------
 async function load() { products = await api.listProducts(); }
-const pictureOf = (p) => (api.photoUrl && api.photoUrl(p.photo_path)) || (p.kind === 'addon' ? SAUCE_PICTURE : null);
+const pictureOf = (p) => (api.photoUrl && api.photoUrl(p.photo_path)) || null; // no photo: the drawn placeholder (never another product's picture)
 
 function stockChip(p) {
   if (p.stock_quantity === 0) return el('span', { className: 'stock-chip', 'data-state': 'out' }, 'Sold out');
@@ -90,7 +89,7 @@ function drawList() {
       await api.reorderProducts(ids); await load(); drawList(); drawPublish();
     };
     const card = el('article', { className: 'product-card' },
-      el('div', { className: 'pc-thumb' }, pic ? el('img', { src: pic, alt: '', loading: 'lazy' }) : el('span', { className: 'pc-initial', 'aria-hidden': 'true' }, p.name.charAt(0))),
+      el('div', { className: 'pc-thumb' }, pic ? el('img', { src: pic, alt: '', loading: 'lazy' }) : p.kind === 'addon' ? el('span', { className: 'pc-art', 'aria-hidden': 'true' }) : el('span', { className: 'pc-initial', 'aria-hidden': 'true' }, p.name.charAt(0))),
       el('div', { className: 'pc-main' },
         el('h3', { className: 'pc-name' }, p.name),
         el('p', { className: 'pc-price' }, unpriced ? el('a', { href: '#', onclick: (e) => { e.preventDefault(); edit(p.id); } }, 'Set price') : `${formatMoney(p.price_pence)}${p.unit_label ? ` · ${p.unit_label}` : ''}${p.category ? ` · ${p.category}` : ''}`),

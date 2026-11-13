@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/build.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "logo": "node scripts/make-logo.mjs"
   },
   "devDependencies": {
     "sharp": "^0.33.5"

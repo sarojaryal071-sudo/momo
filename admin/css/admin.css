@@ -554,3 +554,13 @@ svg:where(:not([width])) { inline-size: var(--icon); block-size: var(--icon); }
 .add-group-row select { min-block-size: var(--tap); flex: 1 1 10rem; min-inline-size: 0; padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); }
 .new-group-dialog { inline-size: min(100% - 2 * var(--gutter), 32rem); max-block-size: 90dvh; overflow-y: auto; }
 .checklist input[type="search"], .filter-row select { min-block-size: var(--tap); padding-inline: var(--space-xs); font: inherit; font-size: var(--text-input); background: var(--white); border: var(--hairline) solid var(--line-strong); border-radius: var(--r-input); inline-size: 100%; }
+
+/* Step 4p: the new logo. The admin bar shows the mark; the wide-screen side panel shows the mark beside the name; the login shows the lockup. */
+.admin-brand .brand-logo { display: block; block-size: var(--logo-header); inline-size: auto; }
+.login-logo { display: block; inline-size: var(--logo-login); block-size: auto; margin-inline: auto; margin-block-end: var(--space-s); }
+.login-brand-text .logo-plate { display: inline-block; }
+@media (min-width: 48em) {
+  /* the side panel shows the mark alone, level with the top bar */
+  .admin-body:not(.login-body) .tabbar::before { content: ""; background: url("../../assets/img/logo-mark-128.webp") no-repeat calc(var(--space-m) + var(--space-3xs)) center / auto var(--logo-header); }
+}
+.pc-art { display: block; inline-size: 100%; block-size: 100%; background: var(--sage); -webkit-mask: url("../../assets/svg/art-bowl.svg") center / 60% no-repeat; mask: url("../../assets/svg/art-bowl.svg") center / 60% no-repeat; }

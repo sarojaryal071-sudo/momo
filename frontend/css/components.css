@@ -31,7 +31,16 @@
 .site-header { position: sticky; inset-block-start: 0; z-index: var(--z-menu); background: var(--white); border-block-end: var(--hairline) solid var(--line); }
 .header-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-m); min-block-size: calc(var(--tap) + var(--space-xs)); }
 .brand { display: inline-flex; align-items: center; gap: var(--space-2xs); font-family: var(--font-head); font-size: var(--brand-size); line-height: 1; letter-spacing: var(--tracking-display); color: var(--emerald); text-decoration: none; }
-.brand-mark { inline-size: var(--brand-mark); block-size: var(--brand-mark); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* the full lockup in the phone menu only (from the tablet width the menu is the header line) */
+.site-menu .menu-logo { display: none; }
+.brand-logo { block-size: var(--logo-header); inline-size: auto; flex: none; }
+/* phones: the mark alone (the name stays for screen readers); from the tablet width the wordmark sits beside it */
+.site-header .brand-name { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (min-width: 48em) { .site-header .brand-name { position: static; inline-size: auto; block-size: auto; overflow: visible; clip-path: none; } }
+/* the logo's wordmark is emerald, so on the emerald footer and menu the lockup sits on a white plate */
+.logo-plate { display: inline-block; padding: var(--space-s); background: var(--white); border-radius: var(--r-card, var(--radius)); line-height: 0; }
+.brand-full, .login-full { inline-size: var(--logo-full); block-size: auto; }
+.receipt-logo { block-size: var(--logo-receipt); inline-size: auto; }
 .header-tools { display: flex; align-items: center; gap: var(--space-2xs); }
 .cart-link, .menu-toggle { position: relative; display: inline-flex; align-items: center; justify-content: center; min-inline-size: var(--tap); min-block-size: var(--tap); color: var(--emerald); background: none; border: 0; cursor: pointer; }
 .menu-toggle { display: none; }
@@ -71,9 +80,11 @@
   .js .site-menu::after { content: ""; position: fixed; inset-inline: 0; inset-block-end: 0; pointer-events: none; block-size: var(--ridge-height); background: var(--sage); opacity: 0.7; -webkit-mask: url("../assets/svg/ridge.svg") center bottom / 100% 100% no-repeat; mask: url("../assets/svg/ridge.svg") center bottom / 100% 100% no-repeat; }
   .js .menu-bar { flex: none; display: flex; align-items: center; justify-content: space-between; min-block-size: calc(var(--close-size) + var(--space-m)); padding-block: var(--space-xs); }
   .js .menu-bar .brand, .js .menu-bar .cart-link { color: var(--white); }
+  .js .menu-bar .brand-logo { padding: var(--space-3xs) var(--space-2xs); background: var(--white); border-radius: var(--radius); box-sizing: content-box; }
   .js .menu-bar-tools { display: flex; align-items: center; gap: var(--space-xs); }
   .js .menu-bar .cart-badge { background: var(--white); color: var(--emerald); }
   .js .menu-close { display: grid; place-items: center; inline-size: var(--close-size); block-size: var(--close-size); padding: 0; color: var(--white); background: var(--pill-solid-dark); border: var(--hairline) solid var(--pill-border-dark); border-radius: 50%; box-shadow: var(--pill-highlight), var(--pill-shadow-dark); cursor: pointer; }
+  .js .site-menu .menu-logo { display: inline-block; line-height: 0; }
   .js .menu-body { display: grid; justify-items: center; align-content: center; gap: var(--space-xl); margin-block: auto; padding-block: var(--space-m); }
   .js .menu-contact-group { display: grid; justify-items: center; gap: var(--space-xs); inline-size: 100%; }
   .js .menu-label { display: block; margin: 0; font-size: var(--text-small); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--white); }
@@ -116,7 +127,7 @@
 .site-footer a { color: var(--white); }
 .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--space-l); }
 .footer-title { margin: 0 0 var(--space-xs); font-size: var(--text-small); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--peach); }
-.footer-brand { display: inline-flex; align-items: center; gap: var(--space-2xs); margin: 0 0 var(--space-2xs); font-family: var(--font-head); font-size: var(--brand-size); line-height: 1; white-space: nowrap; }
+.footer-brand { display: inline-flex; align-items: center; gap: var(--space-2xs); margin: 0 0 var(--space-xs); line-height: 1; }
 .footer-list { margin: 0; padding: 0; list-style: none; }
 .footer-list a, .phone-link { display: inline-flex; align-items: center; gap: var(--space-2xs); min-block-size: var(--tap); }
 .site-footer p { margin: 0 0 var(--space-2xs); }
