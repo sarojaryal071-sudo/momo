@@ -564,3 +564,19 @@ svg:where(:not([width])) { inline-size: var(--icon); block-size: var(--icon); }
   .admin-body:not(.login-body) .tabbar::before { content: ""; background: url("../../assets/img/logo-mark-128.webp") no-repeat calc(var(--space-m) + var(--space-3xs)) center / auto var(--logo-header); }
 }
 .pc-art { display: block; inline-size: 100%; block-size: 100%; background: var(--sage); -webkit-mask: url("../../assets/svg/art-bowl.svg") center / 60% no-repeat; mask: url("../../assets/svg/art-bowl.svg") center / 60% no-repeat; }
+
+/* The log out confirm: a raised 3D card in the centre of the screen. Solid white, a darker bottom edge and stacked shadows give it depth;
+   it tilts in only when motion is allowed. */
+.card-3d { overflow: visible; margin: auto; inline-size: min(100% - 2 * var(--gutter), 20rem); padding: var(--space-m) var(--space-m) var(--space-s); text-align: center; background: var(--white) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  border: var(--hairline) solid var(--line-strong); border-block-end: var(--space-3xs) solid color-mix(in srgb, var(--emerald) 35%, var(--line-strong)); border-radius: calc(var(--r-card) * 1.25);
+  box-shadow: 0 0.15rem 0 color-mix(in srgb, var(--charcoal) 10%, transparent), 0 0.9rem 1.2rem -0.4rem color-mix(in srgb, var(--charcoal) 28%, transparent), 0 2.2rem 3rem -0.6rem color-mix(in srgb, var(--emerald) 30%, transparent); }
+.card-3d::backdrop { background: color-mix(in srgb, var(--charcoal) 45%, transparent); }
+.card-3d-mark { display: block; block-size: calc(var(--logo-header) * 1.6); inline-size: auto; margin: calc(var(--space-m) * -1.8) auto var(--space-2xs); filter: drop-shadow(0 0.5rem 0.4rem color-mix(in srgb, var(--charcoal) 22%, transparent)); }
+.card-3d h2 { text-align: center; }
+.card-3d p { color: var(--muted); }
+.card-3d .btn-row { flex-direction: column; }
+.card-3d .btn-row .btn { flex: none; inline-size: 100%; }
+@media (prefers-reduced-motion: no-preference) {
+  .card-3d[open] { animation: card-3d-in 0.32s var(--ease-out, ease-out) both; transform-origin: 50% 100%; }
+  @keyframes card-3d-in { from { opacity: 0; transform: perspective(40rem) translateY(1.5rem) rotateX(18deg) scale(0.94); } to { opacity: 1; transform: perspective(40rem) translateY(0) rotateX(0) scale(1); } }
+}

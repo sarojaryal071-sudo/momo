@@ -44,7 +44,7 @@ async function drawShop(settings) {
     const button = el('button', { type: 'button', className: 'btn btn-small', disabled: busy || (!status.unpublished && !failed) }, 'Publish changes');
     button.addEventListener('click', async () => { button.disabled = true; try { await api.publish(); publishProblem = ''; } catch (e) { publishProblem = e.message; } await refresh(); });
     shopBox.append(el('div', { className: 'publish-head' }, el('span', { className: 'status-badge', 'data-status': busy ? 'new' : failed ? 'cancelled' : status.unpublished ? 'ready' : 'confirmed' }, label),
-      el('span', { className: 'muted' }, busy ? 'Publishing now. The site updates in a minute or two.' : failed ? 'The last publish did not work. Press Publish to try again.' : status.unpublished ? 'You have product changes that are not on the site yet.' : 'The site shows your latest product changes.')), publishProblem ? el('p', { className: 'field-error', role: 'alert' }, publishProblem) : null, button ? el('div', { className: 'btn-row' }, button) : null);
+      el('span', { className: 'muted' }, busy ? 'Publishing now. The site updates in a minute or two.' : failed ? 'The last publish did not work. Press Publish to try again.' : status.unpublished ? 'You have product changes that are not on the site yet.' : 'The site shows your latest product changes.')), ...(publishProblem ? [el('p', { className: 'field-error', role: 'alert' }, publishProblem)] : []), ...(button ? [el('div', { className: 'btn-row' }, button)] : []));
   }
 }
 

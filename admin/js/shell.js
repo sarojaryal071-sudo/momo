@@ -2,6 +2,7 @@
 // With the real backend the database checks the session too; this check is only for friendliness.
 import { api } from './api.js';
 import { clearLogin, isExpired } from './session.js';
+import { confirmDialog } from './dom.js';
 
 export const user = await api.currentUser();
 if (user && isExpired()) { // the 30 days are over: sign out and ask again
@@ -22,14 +23,12 @@ if (user && isExpired()) { // the 30 days are over: sign out and ask again
   document.querySelectorAll('[data-tab]').forEach((a) => { if (a.dataset.tab === current) a.setAttribute('aria-current', 'page'); });
   document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await api.logout(); clearLogin(); location.replace('login'); }));
 
-  // Log out: an icon button that opens a small in-page confirm. Escape or a click elsewhere closes it.
+  // Log out: the icon button opens a confirm as a raised 3D card in the centre of the screen. Escape, Cancel or a tap outside closes it.
   const outBtn = document.querySelector('[data-logout-btn]');
-  const confirmBox = document.getElementById('logout-confirm');
-  const setConfirm = (open) => { confirmBox.hidden = !open; outBtn.setAttribute('aria-expanded', String(open)); };
-  outBtn.addEventListener('click', () => { setConfirm(confirmBox.hidden); if (!confirmBox.hidden) confirmBox.querySelector('[data-logout-cancel]').focus(); });
-  confirmBox.querySelector('[data-logout-cancel]').addEventListener('click', () => { setConfirm(false); outBtn.focus(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !confirmBox.hidden) { setConfirm(false); outBtn.focus(); } });
-  document.addEventListener('click', (e) => { if (!confirmBox.hidden && !e.target.closest('.admin-actions')) setConfirm(false); });
+  outBtn.addEventListener('click', async () => {
+    const yes = await confirmDialog({ title: 'Log out?', message: 'You will need your email and password to come back in.', confirmLabel: 'Log out', cancelLabel: 'Stay logged in', card3d: true });
+    if (yes) { await api.logout(); clearLogin(); location.replace('login'); } else outBtn.focus();
+  });
 
   // Paused strip: at the top of every page while ordering is paused. Settings fires "settings-changed" after a save.
   const strip = document.querySelector('[data-paused]');
